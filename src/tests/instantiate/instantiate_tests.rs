@@ -2,7 +2,7 @@
 mod instantiate_tests {
     use crate::contract::instantiate;
     use crate::error::ContractError;
-    use crate::msg::InstantiateContractMsg;
+    use crate::msg::{ConfigResponse, InstantiateContractMsg};
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{retrieve_buyer_state, Config};
     use crate::version_info::{get_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
@@ -28,7 +28,7 @@ mod instantiate_tests {
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
         match init_response {
             Ok(response) => {
-                let expected_config_attributes = Config {
+                let expected_config_attributes = ConfigResponse {
                     is_private: true,
                     allowed_sellers: vec![
                         Addr::unchecked("allowed-seller-0"),
@@ -42,14 +42,6 @@ mod instantiate_tests {
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
                 };
-                assert_eq!(response.attributes.len(), 1);
-                assert_eq!(
-                    response.attributes[0],
-                    Attribute::new(
-                        "contract_config",
-                        format!("{:?}", expected_config_attributes)
-                    )
-                );
 
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().config,

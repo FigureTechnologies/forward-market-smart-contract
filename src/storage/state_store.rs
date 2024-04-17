@@ -1,6 +1,6 @@
 use crate::error::ContractError;
 use crate::error::ContractError::StorageError;
-use cosmwasm_std::{Addr, Storage, Uint128};
+use cosmwasm_std::{Addr, Coin, Storage, Uint128};
 use cw_storage_plus::Item;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -88,7 +88,7 @@ pub struct Config {
 pub struct Seller {
     pub seller_address: Addr,
     pub accepted_value_cents: Uint128,
-    pub pool_denoms: Vec<String>,
+    pub pool_coins: Vec<Coin>,
     pub offer_hash: String,
 }
 

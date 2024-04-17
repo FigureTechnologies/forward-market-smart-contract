@@ -12,7 +12,7 @@ mod execute_disable_contract_tests {
         Config, Seller,
     };
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Uint128};
+    use cosmwasm_std::{Addr, Coin, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -142,7 +142,10 @@ mod execute_disable_contract_tests {
             &Seller {
                 seller_address: Addr::unchecked(allowed_seller_address),
                 accepted_value_cents: Uint128::new(450000000),
-                pool_denoms: vec!["test.denom.pool.0".to_string()],
+                pool_coins: vec![Coin {
+                    denom: "test.denom.pool.0".to_string(),
+                    amount: Uint128::new(1),
+                }],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -203,9 +206,7 @@ mod execute_disable_contract_tests {
                 agreement_terms_hash: "mock-terms-hash".to_string(),
             },
             RemoveAsSeller {},
-            FinalizePools {
-                pool_denoms: vec![],
-            },
+            FinalizePools {},
             DealerConfirm {},
             UpdateAgreementTermsHash {
                 agreement_terms_hash: "".to_string(),

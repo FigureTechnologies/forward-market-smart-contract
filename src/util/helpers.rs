@@ -5,15 +5,13 @@ use crate::error::ContractError::{
 };
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
-use crate::storage::state_store::{
-    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
-    save_contract_config, Config,
-};
+use crate::storage::state_store::{retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state, save_contract_config, Config, retrieve_seller_state, Seller};
 use bech32::ToBase32;
 use cosmwasm_std::{
     Addr, CosmosMsg, DepsMut, Empty, MessageInfo, QuerierWrapper, Response, StdError, StdResult,
     Uint128,
 };
+use provwasm_std::types::cosmos::bank::v1beta1::MsgSend;
 use provwasm_std::types::cosmos::base::query::v1beta1::PageRequest;
 use provwasm_std::types::cosmos::base::v1beta1::Coin;
 use provwasm_std::types::provenance::marker::v1::{
@@ -234,7 +232,7 @@ pub fn is_dealer(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractErr
 pub fn seller_has_finalized(deps: &DepsMut) -> Result<bool, ContractError> {
     match retrieve_optional_seller_state(deps.storage)? {
         None => Ok(false),
-        Some(seller) => Ok(!seller.pool_denoms.is_empty()),
+        Some(seller) => Ok(!seller.pool_coins.is_empty()),
     }
 }
 
@@ -271,24 +269,26 @@ pub fn create_send_coin_back_to_seller_messages(
     deps: &DepsMut,
     contract_address: String,
     seller_address: String,
-    pool_denoms: Vec<String>,
-) -> Result<Vec<MsgTransferRequest>, ContractError> {
+) -> Result<Vec<MsgSend>, ContractError> {
     let mut messages = vec![];
 
-    // Iterate over the list of denoms so that we can update the value owner of the scope to be the
-    // seller instead of the contract
-    for denom in pool_denoms {
-        let held_coin = get_balance(&deps, denom.clone())?;
-
-        // Transfer the coins back to the seller
-        messages.push(MsgTransferRequest {
-            amount: Some(held_coin.coin),
-            administrator: contract_address.to_string(),
-            from_address: contract_address.to_string(),
-            to_address: seller_address.to_string(),
-        });
+    let seller_state = retrieve_optional_seller_state(deps.storage)?;
+    match seller_state {
+        None => { return Ok(messages) }
+        Some(state) => {
+            messages.push(MsgSend {
+                from_address: contract_address.to_string(),
+                to_address: seller_address.to_string(),
+                amount: state.pool_coins.into_iter().map(|std_coin| -> Coin {
+                    Coin {
+                        denom: std_coin.denom,
+                        amount: std_coin.amount.to_string(),
+                    }
+                }).collect(),
+            });
+            return Ok(messages);
+        }
     }
-    return Ok(messages);
 }
 
 pub struct HeldCoin {

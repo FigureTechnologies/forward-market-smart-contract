@@ -24,7 +24,6 @@ pub fn execute_dealer_reset(
         &deps,
         env.contract.address.to_string(),
         updated_seller.seller_address.to_string(),
-        updated_seller.pool_denoms,
     )?;
 
     let mut response = Response::new();
@@ -33,7 +32,7 @@ pub fn execute_dealer_reset(
     }
 
     // The contract no longer owns the denoms, so clear the list
-    updated_seller.pool_denoms = vec![];
+    updated_seller.pool_coins = vec![];
     save_seller_state(deps.storage, &updated_seller)?;
 
     let mut updated_buyer = retrieve_buyer_state(deps.storage)?;
