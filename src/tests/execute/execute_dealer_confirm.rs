@@ -1,12 +1,11 @@
 #[cfg(test)]
-mod execute_seller_confirm_tests {
+mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::storage::state_store::{
         retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config,
         save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData,
     };
-    use crate::util::helpers::scope;
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
@@ -14,13 +13,11 @@ mod execute_seller_confirm_tests {
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::shim::Any;
     use provwasm_std::types::cosmos::auth::v1beta1::BaseAccount;
+    use provwasm_std::types::cosmos::base::v1beta1::Coin;
 
     use provwasm_std::types::provenance::marker::v1::{
-        AccessGrant, MarkerAccount, MarkerStatus, MarkerType, QueryMarkerRequest,
-        QueryMarkerResponse,
-    };
-    use provwasm_std::types::provenance::metadata::v1::{
-        MsgUpdateValueOwnersRequest, ValueOwnershipRequest, ValueOwnershipResponse,
+        AccessGrant, Balance, MarkerAccount, MarkerStatus, MarkerType, MsgTransferRequest,
+        QueryHoldingRequest, QueryHoldingResponse, QueryMarkerRequest, QueryMarkerResponse,
     };
 
     use crate::msg::ExecuteMsg::{
@@ -28,7 +25,6 @@ mod execute_seller_confirm_tests {
         FinalizePools, RemoveAsSeller, RescindFinalizedPools, UpdateAgreementTermsHash,
         UpdateAllowedSellers, UpdateFaceValueCents,
     };
-    use uuid::Uuid;
 
     #[test]
     fn execute_dealer_confirm() {
@@ -38,7 +34,6 @@ mod execute_seller_confirm_tests {
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
         let token_denom = "test.forward.market.token";
-        let scope_id = "8e6caea3-c91f-4d59-9741-fe6b665b2f14";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -114,27 +109,35 @@ mod execute_seller_confirm_tests {
             SystemResult::Ok(ContractResult::Ok(binary))
         });
 
-        let cb_value_owner = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
-            let message = ValueOwnershipRequest::try_from(bin.clone()).unwrap();
+        let cb_holding = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
+            let message = QueryHoldingRequest::try_from(bin.clone()).unwrap();
 
-            let response = ValueOwnershipResponse {
-                scope_uuids: vec![scope_id.to_string()],
-                request: Some(message),
-                pagination: None,
+            let response = if message.id == "test.token.asset.pool.0" {
+                QueryHoldingResponse {
+                    balances: vec![Balance {
+                        address: seller_address.to_string(),
+                        coins: vec![Coin {
+                            denom: "test.token.asset.pool.0".to_string(),
+                            amount: "1".to_string(),
+                        }],
+                    }],
+                    pagination: None,
+                }
+            } else {
+                panic!("unexpected query for denom")
             };
 
             let binary = to_json_binary(&response).unwrap();
             SystemResult::Ok(ContractResult::Ok(binary))
         });
+        deps.querier.registered_custom_queries.insert(
+            "/provenance.marker.v1.Query/Holding".to_string(),
+            cb_holding,
+        );
 
         deps.querier
             .registered_custom_queries
             .insert("/provenance.marker.v1.Query/Marker".to_string(), cb);
-
-        deps.querier.registered_custom_queries.insert(
-            "/provenance.metadata.v1.Query/ValueOwnership".to_string(),
-            cb_value_owner,
-        );
 
         match execute(
             deps.as_mut(),
@@ -145,10 +148,14 @@ mod execute_seller_confirm_tests {
             Ok(response) => {
                 assert_eq!(
                     response.messages[0].msg,
-                    CosmosMsg::from(MsgUpdateValueOwnersRequest {
-                        scope_ids: vec![scope(Uuid::parse_str(scope_id).unwrap()).unwrap().bytes],
-                        value_owner_address: "base_addr".to_string(),
-                        signers: vec![env.clone().contract.address.to_string()]
+                    CosmosMsg::from(MsgTransferRequest {
+                        amount: Some(Coin {
+                            denom: pool_denom.to_string(),
+                            amount: "1".to_string(),
+                        }),
+                        administrator: env.contract.address.to_string(),
+                        from_address: env.contract.address.to_string(),
+                        to_address: "base_addr".to_string(),
                     })
                 );
 

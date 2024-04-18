@@ -73,13 +73,14 @@ mod execute_add_seller_tests {
                             manager: contract_address.clone(),
                             from_address: contract_address.clone(),
                             status: MarkerStatus::Proposed as i32,
-                            marker_type: MarkerType::Restricted as i32,
+                            marker_type: MarkerType::Coin as i32,
                             access_list: vec![
                                 AccessGrant {
                                     address: dealer_address.to_string(),
                                     permissions: vec![
                                         Access::Withdraw as i32,
                                         Access::Transfer as i32,
+                                        Access::Deposit as i32,
                                     ],
                                 },
                                 AccessGrant {
@@ -91,13 +92,13 @@ mod execute_add_seller_tests {
                                         Access::Deposit as i32,
                                         Access::Withdraw as i32,
                                         Access::Delete as i32,
-                                        Access::Transfer as i32,
+                                        Access::Transfer as i32
                                     ],
                                 }
                             ],
                             supply_fixed: false,
-                            allow_governance_control: false,
-                            allow_forced_transfer: false,
+                            allow_governance_control: true,
+                            allow_forced_transfer: true,
                             required_attributes: vec![],
                         })
                     );
@@ -295,11 +296,15 @@ mod execute_add_seller_tests {
                         manager: contract_address.clone(),
                         from_address: contract_address.clone(),
                         status: MarkerStatus::Proposed as i32,
-                        marker_type: MarkerType::Restricted as i32,
+                        marker_type: MarkerType::Coin as i32,
                         access_list: vec![
                             AccessGrant {
                                 address: dealer_address.to_string(),
-                                permissions: vec![Access::Withdraw as i32, Access::Transfer as i32,],
+                                permissions: vec![
+                                    Access::Withdraw as i32,
+                                    Access::Transfer as i32,
+                                    Access::Deposit as i32,
+                                ],
                             },
                             AccessGrant {
                                 address: contract_address.to_string(),
@@ -310,13 +315,13 @@ mod execute_add_seller_tests {
                                     Access::Deposit as i32,
                                     Access::Withdraw as i32,
                                     Access::Delete as i32,
-                                    Access::Transfer as i32,
+                                    Access::Transfer as i32
                                 ],
                             }
                         ],
                         supply_fixed: false,
-                        allow_governance_control: false,
-                        allow_forced_transfer: false,
+                        allow_governance_control: true,
+                        allow_forced_transfer: true,
                         required_attributes: vec![],
                     })
                 );

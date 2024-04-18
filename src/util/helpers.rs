@@ -44,8 +44,8 @@ pub fn create_and_transfer_marker(
             address: access_address.to_string(),
             permissions: vec![
                 Access::Withdraw as i32,
+                Access::Transfer as i32,
                 Access::Deposit as i32,
-                Access::Admin as i32,
             ],
         })
     }
@@ -61,6 +61,7 @@ pub fn create_and_transfer_marker(
             Access::Deposit as i32,
             Access::Withdraw as i32,
             Access::Delete as i32,
+            Access::Transfer as i32,
         ],
     });
 
@@ -73,7 +74,7 @@ pub fn create_and_transfer_marker(
         access_list: access_grants,
         supply_fixed: false,
         allow_governance_control: true,
-        allow_forced_transfer: false,
+        allow_forced_transfer: true,
         required_attributes: vec![],
     }));
 

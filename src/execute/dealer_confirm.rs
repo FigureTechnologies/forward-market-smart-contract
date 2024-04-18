@@ -60,7 +60,7 @@ pub fn execute_dealer_confirm(
         Some(base_account) => base_account.address,
     };
 
-    // Iterate over the list of denoms so that we can update the value owner of the scope to be the
+    // Iterate over the list of denoms so that we can update the value owner of the pool markers to be the
     // forward market marker
     for denom in seller_state.pool_denoms {
         let held_coin = get_balance(&deps, denom.clone())?;
