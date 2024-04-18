@@ -6,15 +6,11 @@ use crate::error::ContractError::{
 use crate::storage::state_store::{
     retrieve_contract_config, retrieve_seller_state, save_settlement_data_state, SettlementData,
 };
-use crate::util::helpers::{
-    buyer_has_accepted, get_balance, get_marker, is_dealer, seller_has_finalized,
-};
+use crate::util::helpers::{buyer_has_accepted, get_marker, is_dealer, seller_has_finalized};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use provwasm_std::types::cosmos::bank::v1beta1::MsgSend;
 use provwasm_std::types::cosmos::base::v1beta1::Coin;
-use provwasm_std::types::provenance::marker::v1::{
-    MarkerQuerier, MsgDeleteAccessRequest,
-};
+use provwasm_std::types::provenance::marker::v1::{MarkerQuerier, MsgDeleteAccessRequest};
 
 pub fn execute_dealer_confirm(
     deps: DepsMut,
@@ -65,12 +61,16 @@ pub fn execute_dealer_confirm(
     response = response.add_message(MsgSend {
         from_address: env.contract.address.to_string(),
         to_address: forward_market_base_address.clone(),
-        amount: seller_state.pool_coins.into_iter().map(|std_coin| -> Coin {
-            Coin {
-                denom: std_coin.denom,
-                amount: std_coin.amount.to_string(),
-            }
-        }).collect(),
+        amount: seller_state
+            .pool_coins
+            .into_iter()
+            .map(|std_coin| -> Coin {
+                Coin {
+                    denom: std_coin.denom,
+                    amount: std_coin.amount.to_string(),
+                }
+            })
+            .collect(),
     });
 
     save_settlement_data_state(

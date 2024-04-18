@@ -1,11 +1,14 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    FaceValueMustBePositive, IllegalConfigUpdate, InvalidDenom, InvalidDenomOwnership,
-    InvalidMaxFaceValue, InvalidTickSizeValueMatch, UnauthorizedConfigUpdate,
+    FaceValueMustBePositive, IllegalConfigUpdate, InvalidMaxFaceValue, InvalidTickSizeValueMatch,
+    UnauthorizedConfigUpdate,
 };
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
-use crate::storage::state_store::{retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state, save_contract_config, Config, retrieve_seller_state, Seller};
+use crate::storage::state_store::{
+    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
+    save_contract_config, Config,
+};
 use bech32::ToBase32;
 use cosmwasm_std::{
     Addr, CosmosMsg, DepsMut, Empty, MessageInfo, QuerierWrapper, Response, StdError, StdResult,
@@ -16,8 +19,7 @@ use provwasm_std::types::cosmos::base::query::v1beta1::PageRequest;
 use provwasm_std::types::cosmos::base::v1beta1::Coin;
 use provwasm_std::types::provenance::marker::v1::{
     Access, AccessGrant, MarkerAccount, MarkerQuerier, MarkerStatus, MarkerType,
-    MsgActivateRequest, MsgAddMarkerRequest, MsgFinalizeRequest, MsgTransferRequest,
-    MsgWithdrawRequest, QueryHoldingRequest, QueryHoldingResponse,
+    MsgActivateRequest, MsgAddMarkerRequest, MsgFinalizeRequest, MsgWithdrawRequest,
 };
 use provwasm_std::types::provenance::metadata::v1::{MetadataQuerier, ValueOwnershipResponse};
 use uuid::Uuid;
@@ -152,43 +154,6 @@ pub fn scope(scope_uuid: Uuid) -> Result<MetadataAddress, ContractError> {
     })
 }
 
-pub fn get_balance(deps: &DepsMut, denom: String) -> Result<HeldCoin, ContractError> {
-    // Partial ownership of assets being contributed is not supported, so we check to make sure that the
-    // coins are only held by one address
-    let holding_response: QueryHoldingResponse = deps.querier.query(
-        &QueryHoldingRequest {
-            id: denom.clone(),
-            pagination: None,
-        }
-        .into(),
-    )?;
-    if holding_response.balances.len() > 1 {
-        return Err(InvalidDenomOwnership {
-            denom: denom.clone(),
-        });
-    }
-
-    // Querying by denom should return a single balance and a single coin, if this is not the
-    // case we are in an error state
-    if holding_response.balances.len() != 1 {
-        return Err(InvalidDenom {
-            denom: denom.clone(),
-        });
-    }
-    let balance = holding_response.balances.first().ok_or(InvalidDenom {
-        denom: denom.clone(),
-    })?;
-    if balance.coins.len() != 1 {
-        return Err(InvalidDenom {
-            denom: denom.clone(),
-        });
-    }
-    Ok(HeldCoin {
-        coin: balance.coins.first().unwrap().clone(),
-        address: balance.clone().address,
-    })
-}
-
 pub fn validate_face_values(
     min_face_value_cents: Uint128,
     max_face_value_cents: Uint128,
@@ -274,24 +239,23 @@ pub fn create_send_coin_back_to_seller_messages(
 
     let seller_state = retrieve_optional_seller_state(deps.storage)?;
     match seller_state {
-        None => { return Ok(messages) }
+        None => Ok(messages),
         Some(state) => {
             messages.push(MsgSend {
                 from_address: contract_address.to_string(),
                 to_address: seller_address.to_string(),
-                amount: state.pool_coins.into_iter().map(|std_coin| -> Coin {
-                    Coin {
-                        denom: std_coin.denom,
-                        amount: std_coin.amount.to_string(),
-                    }
-                }).collect(),
+                amount: state
+                    .pool_coins
+                    .into_iter()
+                    .map(|std_coin| -> Coin {
+                        Coin {
+                            denom: std_coin.denom,
+                            amount: std_coin.amount.to_string(),
+                        }
+                    })
+                    .collect(),
             });
-            return Ok(messages);
+            Ok(messages)
         }
     }
-}
-
-pub struct HeldCoin {
-    pub coin: Coin,
-    pub address: String,
 }

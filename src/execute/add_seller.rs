@@ -70,7 +70,7 @@ pub fn execute_add_seller(
     };
     save_seller_state(deps.storage, &seller_state)?;
 
-    let number_of_coins = accepted_value_cents.clone().div(config.tick_size.clone());
+    let number_of_coins = accepted_value_cents.div(config.tick_size);
 
     let buyer_state = retrieve_buyer_state(deps.storage)?;
 

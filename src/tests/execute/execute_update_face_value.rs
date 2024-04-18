@@ -2,14 +2,14 @@
 mod execute_update_face_value {
     use crate::contract::execute;
     use crate::error::ContractError;
+    use crate::msg::ConfigResponse;
     use crate::msg::ExecuteMsg::UpdateFaceValueCents;
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, Uint128};
+    use cosmwasm_std::{Addr, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
-    use crate::msg::ConfigResponse;
 
     #[test]
     fn update_face_value_cents() {

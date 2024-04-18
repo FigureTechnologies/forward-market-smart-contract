@@ -92,16 +92,6 @@ pub enum ContractError {
     #[error("The seller must finalize the pool list and the buyer must accept it before confirmation is allowed")]
     InvalidConfirmationRequest,
 
-    /// Occurs if a denom in the list of pools is not valid
-    #[error("Invalid denom specified {denom:?}")]
-    InvalidDenom { denom: String },
-
-    /// Occurs if the seller attempts to finalize with a denom for which they do not own all coins
-    #[error(
-        "Invalid denom ownership detected. Contract only supports one owner per denom: {denom:?}"
-    )]
-    InvalidDenomOwnership { denom: String },
-
     /// Occurs if the seller provides a denom that cannot be found on chain
     #[error("Marker base account address not found: {denom:?}")]
     MissingMarkerBaseAccount { denom: String },

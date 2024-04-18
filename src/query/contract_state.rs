@@ -1,6 +1,12 @@
 use crate::error::ContractError;
-use crate::msg::{BuyerResponse, ConfigResponse, GetContractStateResponse, SellerResponse, SettlementDataResponse, VersionInfoResponse};
-use crate::storage::state_store::{retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state, retrieve_optional_settlement_data_state, Seller, SettlementData};
+use crate::msg::{
+    BuyerResponse, ConfigResponse, GetContractStateResponse, SellerResponse,
+    SettlementDataResponse, VersionInfoResponse,
+};
+use crate::storage::state_store::{
+    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
+    retrieve_optional_settlement_data_state,
+};
 use crate::version_info::get_version_info;
 use cosmwasm_std::Deps;
 
@@ -8,28 +14,26 @@ pub fn query_contract_state(deps: Deps) -> Result<GetContractStateResponse, Cont
     let buyer = retrieve_buyer_state(deps.storage)?;
     let seller = retrieve_optional_seller_state(deps.storage)?;
     let seller_response: Option<SellerResponse> = match seller {
-        None => {None}
-        Some(seller_state) => {
-            Some(SellerResponse {
-                seller_address: seller_state.seller_address,
-                accepted_value_cents: seller_state.accepted_value_cents,
-                pool_denoms: seller_state.pool_coins.into_iter().map(|coin| -> String {
-                    coin.denom
-                }).collect(),
-                offer_hash: seller_state.offer_hash,
-            })
-        }
+        None => None,
+        Some(seller_state) => Some(SellerResponse {
+            seller_address: seller_state.seller_address,
+            accepted_value_cents: seller_state.accepted_value_cents,
+            pool_denoms: seller_state
+                .pool_coins
+                .into_iter()
+                .map(|coin| -> String { coin.denom })
+                .collect(),
+            offer_hash: seller_state.offer_hash,
+        }),
     };
 
     let settlement_data = retrieve_optional_settlement_data_state(deps.storage)?;
     let settlement_data_response: Option<SettlementDataResponse> = match settlement_data {
-        None => {None}
-        Some(state) => {
-            Some(SettlementDataResponse {
-                block_height: state.block_height,
-                settling_dealer: state.settling_dealer,
-            })
-        }
+        None => None,
+        Some(state) => Some(SettlementDataResponse {
+            block_height: state.block_height,
+            settling_dealer: state.settling_dealer,
+        }),
     };
     let config = retrieve_contract_config(deps.storage)?;
 
@@ -54,7 +58,7 @@ pub fn query_contract_state(deps: Deps) -> Result<GetContractStateResponse, Cont
         settlement_data: settlement_data_response,
         version_info: VersionInfoResponse {
             version: version_info.version,
-            definition: version_info.definition
+            definition: version_info.definition,
         },
     };
     Ok(response)

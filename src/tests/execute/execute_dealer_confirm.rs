@@ -16,21 +16,17 @@ mod execute_dealer_confirm_tests {
     use provwasm_std::types::cosmos::bank::v1beta1::MsgSend;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
 
+    use cosmwasm_std::Coin as CosmwasmCoin;
     use provwasm_std::types::provenance::marker::v1::{
         AccessGrant, MarkerAccount, MarkerStatus, MarkerType, QueryMarkerRequest,
         QueryMarkerResponse,
     };
-    use provwasm_std::types::provenance::metadata::v1::{
-        MsgUpdateValueOwnersRequest, ValueOwnershipRequest, ValueOwnershipResponse,
-    };
-    use cosmwasm_std::Coin as CosmwasmCoin;
 
     use crate::msg::ExecuteMsg::{
         AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, DealerReset,
         FinalizePools, RemoveAsSeller, RescindFinalizedPools, UpdateAgreementTermsHash,
         UpdateAllowedSellers, UpdateFaceValueCents,
     };
-    use uuid::Uuid;
 
     #[test]
     fn execute_dealer_confirm() {
@@ -39,7 +35,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let token_denom = "test.forward.market.token";
-        let scope_id = "8e6caea3-c91f-4d59-9741-fe6b665b2f14";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -72,12 +67,10 @@ mod execute_dealer_confirm_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_coins: vec![
-                    CosmwasmCoin {
-                        denom: "test.token.asset.pool.0".to_string(),
-                        amount: Uint128::new(1),
-                    }
-                ],
+                pool_coins: vec![CosmwasmCoin {
+                    denom: "test.token.asset.pool.0".to_string(),
+                    amount: Uint128::new(1),
+                }],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -133,7 +126,6 @@ mod execute_dealer_confirm_tests {
                 assert_eq!(
                     response.messages[0].msg,
                     CosmosMsg::from(MsgSend {
-
                         // scope_ids: vec![scope(Uuid::parse_str(scope_id).unwrap()).unwrap().bytes],
                         // value_owner_address: "base_addr".to_string(),
                         // signers: vec![env.clone().contract.address.to_string()]
@@ -205,12 +197,10 @@ mod execute_dealer_confirm_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_coins: vec![
-                    CosmwasmCoin{
-                        denom: "test.token.asset.pool.0".to_string(),
-                        amount: Uint128::new(1),
-                    }
-                ],
+                pool_coins: vec![CosmwasmCoin {
+                    denom: "test.token.asset.pool.0".to_string(),
+                    amount: Uint128::new(1),
+                }],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -279,12 +269,10 @@ mod execute_dealer_confirm_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_coins: vec![
-                    CosmwasmCoin {
-                        denom: "test.token.asset.pool.0".to_string(),
-                        amount: Uint128::new(1),
-                    }
-                ],
+                pool_coins: vec![CosmwasmCoin {
+                    denom: "test.token.asset.pool.0".to_string(),
+                    amount: Uint128::new(1),
+                }],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )

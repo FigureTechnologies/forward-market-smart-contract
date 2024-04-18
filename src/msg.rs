@@ -1,5 +1,3 @@
-use crate::storage::state_store::{Buyer, Config, Seller, SettlementData};
-use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::{Addr, Uint128};
 use schemars::JsonSchema;
@@ -153,5 +151,3 @@ pub struct VersionInfoResponse {
     pub definition: String,
     pub version: String,
 }
-
-

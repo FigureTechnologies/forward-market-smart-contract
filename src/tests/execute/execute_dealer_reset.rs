@@ -7,6 +7,7 @@ mod execute_dealer_reset_tests {
         save_buyer_state, save_contract_config, save_seller_state, Buyer, Config, Seller,
     };
     use cosmwasm_std::testing::{mock_env, mock_info};
+    use cosmwasm_std::Coin as CosmwasmCoin;
     use cosmwasm_std::{
         to_json_binary, Addr, Attribute, Binary, ContractResult, SystemResult, Uint128,
     };
@@ -15,7 +16,6 @@ mod execute_dealer_reset_tests {
     use provwasm_std::types::provenance::marker::v1::{
         Balance, QueryHoldingRequest, QueryHoldingResponse,
     };
-    use cosmwasm_std::Coin as CosmwasmCoin;
 
     #[test]
     fn perform_dealer_reset() {
@@ -56,12 +56,10 @@ mod execute_dealer_reset_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_coins: vec![
-                    CosmwasmCoin {
-                        denom: "test.token.asset.pool.0".to_string(),
-                        amount: Uint128::new(1),
-                    }
-                ],
+                pool_coins: vec![CosmwasmCoin {
+                    denom: "test.token.asset.pool.0".to_string(),
+                    amount: Uint128::new(1),
+                }],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -217,12 +215,10 @@ mod execute_dealer_reset_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_coins: vec![
-                    CosmwasmCoin {
-                        denom: "test.token.asset.pool.0".to_string(),
-                        amount: Uint128::new(1),
-                    }
-                ],
+                pool_coins: vec![CosmwasmCoin {
+                    denom: "test.token.asset.pool.0".to_string(),
+                    amount: Uint128::new(1),
+                }],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
