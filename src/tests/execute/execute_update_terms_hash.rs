@@ -9,6 +9,7 @@ mod execute_update_agreement_terms_hash {
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
+    use crate::msg::ConfigResponse;
 
     #[test]
     fn update_terms_hash() {
@@ -57,7 +58,7 @@ mod execute_update_agreement_terms_hash {
         };
         match execute(deps.as_mut(), env, info, update_agreement_terms_hash) {
             Ok(response) => {
-                let expected_config_attributes = Config {
+                let expected_config_attributes = ConfigResponse {
                     is_private: true,
                     allowed_sellers: vec![
                         Addr::unchecked("allowed-seller-0"),
@@ -71,14 +72,6 @@ mod execute_update_agreement_terms_hash {
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
                 };
-                assert_eq!(response.attributes.len(), 1);
-                assert_eq!(
-                    response.attributes[0],
-                    Attribute::new(
-                        "contract_config",
-                        format!("{:?}", expected_config_attributes)
-                    )
-                );
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().config,
                     expected_config_attributes

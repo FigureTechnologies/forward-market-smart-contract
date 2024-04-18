@@ -213,7 +213,7 @@ mod execute_remove_as_seller_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(1000000),
-                pool_denoms: vec![],
+                pool_coins: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )

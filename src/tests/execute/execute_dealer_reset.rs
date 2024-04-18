@@ -15,6 +15,7 @@ mod execute_dealer_reset_tests {
     use provwasm_std::types::provenance::marker::v1::{
         Balance, QueryHoldingRequest, QueryHoldingResponse,
     };
+    use cosmwasm_std::Coin as CosmwasmCoin;
 
     #[test]
     fn perform_dealer_reset() {
@@ -22,7 +23,6 @@ mod execute_dealer_reset_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let dealer_address = "dealer_address";
-        let pool_denom = "test.token.asset.pool.0";
         let token_denom = "test.forward.market.token";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
@@ -42,7 +42,6 @@ mod execute_dealer_reset_tests {
         )
         .unwrap();
 
-        let pool_denoms = vec![pool_denom.into()];
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
@@ -57,7 +56,12 @@ mod execute_dealer_reset_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_denoms,
+                pool_coins: vec![
+                    CosmwasmCoin {
+                        denom: "test.token.asset.pool.0".to_string(),
+                        amount: Uint128::new(1),
+                    }
+                ],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -93,7 +97,7 @@ mod execute_dealer_reset_tests {
                 let expected_seller_state = Seller {
                     seller_address: Addr::unchecked(seller_address),
                     accepted_value_cents: Uint128::new(550000000),
-                    pool_denoms: vec![],
+                    pool_coins: vec![],
                     offer_hash: "mock-offer-hash".to_string(),
                 };
                 let seller_state_attr = response
@@ -180,7 +184,6 @@ mod execute_dealer_reset_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let dealer_address = "dealer_address";
-        let pool_denom = "test.token.asset.pool.0";
         let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
@@ -200,7 +203,6 @@ mod execute_dealer_reset_tests {
         )
         .unwrap();
 
-        let pool_denoms = vec![pool_denom.into()];
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
@@ -215,7 +217,12 @@ mod execute_dealer_reset_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(550000000),
-                pool_denoms,
+                pool_coins: vec![
+                    CosmwasmCoin {
+                        denom: "test.token.asset.pool.0".to_string(),
+                        amount: Uint128::new(1),
+                    }
+                ],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )

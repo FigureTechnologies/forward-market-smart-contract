@@ -1,7 +1,7 @@
 use crate::storage::state_store::{Buyer, Config, Seller, SettlementData};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
-use cosmwasm_std::Uint128;
+use cosmwasm_std::{Addr, Uint128};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +41,7 @@ pub enum ExecuteMsg {
     /// A route that allows the sender to remove themselves from the list of allowed sellers
     RemoveAsSeller {},
     /// A route that allows the seller to finalize a list of pools
-    FinalizePools { pool_denoms: Vec<String> },
+    FinalizePools {},
     /// A route executed by the dealer that causes the settlement of the transaction
     DealerConfirm {},
     /// A route that can be used by the buyer to update terms of the contract before a seller has been added
@@ -78,11 +78,11 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
-    pub buyer: Buyer,
-    pub seller: Option<Seller>,
-    pub config: Config,
-    pub settlement_data: Option<SettlementData>,
-    pub version_info: VersionInfoV1,
+    pub buyer: BuyerResponse,
+    pub seller: Option<SellerResponse>,
+    pub config: ConfigResponse,
+    pub settlement_data: Option<SettlementDataResponse>,
+    pub version_info: VersionInfoResponse,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -114,3 +114,44 @@ impl KeyType {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct ConfigResponse {
+    pub is_private: bool,
+    pub allowed_sellers: Vec<Addr>,
+    pub agreement_terms_hash: String,
+    pub token_denom: String,
+    pub max_face_value_cents: Uint128,
+    pub min_face_value_cents: Uint128,
+    pub tick_size: Uint128,
+    pub dealers: Vec<Addr>,
+    pub is_disabled: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct SellerResponse {
+    pub seller_address: Addr,
+    pub accepted_value_cents: Uint128,
+    pub pool_denoms: Vec<String>,
+    pub offer_hash: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct BuyerResponse {
+    pub buyer_address: Addr,
+    pub has_accepted_pools: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct SettlementDataResponse {
+    pub block_height: u64,
+    pub settling_dealer: Addr,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct VersionInfoResponse {
+    pub definition: String,
+    pub version: String,
+}
+
+

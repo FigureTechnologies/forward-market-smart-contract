@@ -3,7 +3,7 @@ mod execute_finalize_pools_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::FinalizePools;
-    use crate::storage::state_store::{save_contract_config, save_seller_state, Config, Seller};
+    use crate::storage::state_store::{save_contract_config, save_seller_state, Config, Seller, save_buyer_state, Buyer};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{
         to_json_binary, Addr, Attribute, Binary, ContractResult, SystemResult, Uint128,
@@ -13,6 +13,10 @@ mod execute_finalize_pools_tests {
     use provwasm_std::types::provenance::marker::v1::{
         Balance, QueryHoldingRequest, QueryHoldingResponse,
     };
+    use cosmwasm_std::Coin as CoswasmCoin;
+    use crate::msg::SellerResponse;
+    use crate::query::contract_state::query_contract_state;
+    use crate::version_info::{set_version_info, VersionInfoV1};
 
     #[test]
     fn execute_finalize_pool() {
@@ -20,7 +24,7 @@ mod execute_finalize_pools_tests {
         let seller_address = "allowed-seller-0";
         let pool_denom = "test.token.asset.pool.0";
         let token_denom = "test.forward.market.token";
-        let info = mock_info(seller_address, &[]);
+        let info = mock_info(seller_address, &[CoswasmCoin { denom: pool_denom.to_string(), amount: Uint128::new(1)}]);
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -38,13 +42,22 @@ mod execute_finalize_pools_tests {
         )
         .unwrap();
 
-        let pool_denoms = vec![pool_denom.into()];
+        set_version_info(&mut deps.storage, &VersionInfoV1 {
+            definition: "".to_string(),
+            version: "".to_string(),
+        }).unwrap();
+
+        save_buyer_state(&mut deps.storage, &Buyer {
+            buyer_address: Addr::unchecked("buyer-address"),
+            has_accepted_pools: false,
+        }).unwrap();
+
         save_seller_state(
             &mut deps.storage,
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(650000000),
-                pool_denoms: vec![],
+                pool_coins: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -79,19 +92,18 @@ mod execute_finalize_pools_tests {
             deps.as_mut(),
             env.clone(),
             info,
-            FinalizePools { pool_denoms },
+            FinalizePools { },
         ) {
             Ok(response) => {
-                let expected_seller_state = Seller {
+                let expected_seller_state = SellerResponse {
                     seller_address: Addr::unchecked(seller_address),
                     accepted_value_cents: Uint128::new(650000000),
                     pool_denoms: vec![pool_denom.into()],
                     offer_hash: "mock-offer-hash".to_string(),
                 };
-                assert_eq!(response.attributes.len(), 1);
                 assert_eq!(
-                    response.attributes[0],
-                    Attribute::new("seller_state", format!("{:?}", expected_seller_state))
+                    query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
+                    expected_seller_state
                 );
             }
             Err(error) => {
@@ -129,7 +141,7 @@ mod execute_finalize_pools_tests {
             &Seller {
                 seller_address: Addr::unchecked(seller_address),
                 accepted_value_cents: Uint128::new(650000000),
-                pool_denoms: vec![],
+                pool_coins: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -139,9 +151,7 @@ mod execute_finalize_pools_tests {
             deps.as_mut(),
             env.clone(),
             info,
-            FinalizePools {
-                pool_denoms: vec![],
-            },
+            FinalizePools {},
         ) {
             Ok(_) => {
                 panic!("failed to detect error when finalizing an empty list of pool denoms")
@@ -164,7 +174,7 @@ mod execute_finalize_pools_tests {
         let unauthorized_seller_address = "unauthorized-seller";
         let allowed_seller_address = "allowed-seller";
         let token_denom = "test.forward.market.token";
-        let info = mock_info(unauthorized_seller_address, &[]);
+        let info = mock_info(unauthorized_seller_address, &[CoswasmCoin { denom: "test.denom.0".to_string(), amount: Uint128::new(1)}]);
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -187,7 +197,7 @@ mod execute_finalize_pools_tests {
             &Seller {
                 seller_address: Addr::unchecked(allowed_seller_address),
                 accepted_value_cents: Uint128::new(650000000),
-                pool_denoms: vec![],
+                pool_coins: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
@@ -197,9 +207,7 @@ mod execute_finalize_pools_tests {
             deps.as_mut(),
             env.clone(),
             info,
-            FinalizePools {
-                pool_denoms: vec!["test.denom.0".into()],
-            },
+            FinalizePools {},
         ) {
             Ok(_) => {
                 panic!("failed to detect error when finalizing with an invalid seller")

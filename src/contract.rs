@@ -90,8 +90,8 @@ pub fn execute(
             agreement_terms_hash,
         ),
         ExecuteMsg::RemoveAsSeller {} => execute_remove_as_seller(deps, info),
-        ExecuteMsg::FinalizePools { pool_denoms } => {
-            execute_finalize_pools(deps, env, info, &pool_denoms)
+        ExecuteMsg::FinalizePools { } => {
+            execute_finalize_pools(deps, env, info)
         }
         ExecuteMsg::DealerConfirm {} => execute_dealer_confirm(deps, env, info),
         ExecuteMsg::UpdateAgreementTermsHash {

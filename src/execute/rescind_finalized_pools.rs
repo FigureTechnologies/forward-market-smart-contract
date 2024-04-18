@@ -24,7 +24,7 @@ pub fn execute_rescind_finalized_pools(
     }
 
     let mut updated_seller_state = retrieve_seller_state(deps.storage)?;
-    if updated_seller_state.pool_denoms.is_empty() {
+    if updated_seller_state.pool_coins.is_empty() {
         return Err(InvalidRescindRequest);
     }
 
@@ -32,13 +32,12 @@ pub fn execute_rescind_finalized_pools(
         &deps,
         env.contract.address.to_string(),
         updated_seller_state.seller_address.to_string(),
-        updated_seller_state.pool_denoms,
     )?;
 
     let response = Response::new().add_messages(transfer_messages);
 
     // The contract no longer owns the denoms, so clear the list
-    updated_seller_state.pool_denoms = vec![];
+    updated_seller_state.pool_coins = vec![];
     save_seller_state(deps.storage, &updated_seller_state)?;
 
     Ok(response.add_attribute("seller_state", format!("{:?}", updated_seller_state)))

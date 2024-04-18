@@ -65,7 +65,7 @@ pub fn execute_add_seller(
     let seller_state = Seller {
         seller_address: info.sender.clone(),
         accepted_value_cents,
-        pool_denoms: vec![],
+        pool_coins: vec![],
         offer_hash,
     };
     save_seller_state(deps.storage, &seller_state)?;
