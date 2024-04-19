@@ -79,7 +79,6 @@ mod execute_add_seller_tests {
                                     address: dealer_address.to_string(),
                                     permissions: vec![
                                         Access::Withdraw as i32,
-                                        Access::Transfer as i32,
                                         Access::Deposit as i32,
                                     ],
                                 },
@@ -92,13 +91,12 @@ mod execute_add_seller_tests {
                                         Access::Deposit as i32,
                                         Access::Withdraw as i32,
                                         Access::Delete as i32,
-                                        Access::Transfer as i32
                                     ],
                                 }
                             ],
                             supply_fixed: false,
                             allow_governance_control: true,
-                            allow_forced_transfer: true,
+                            allow_forced_transfer: false,
                             required_attributes: vec![],
                         })
                     );
@@ -302,7 +300,6 @@ mod execute_add_seller_tests {
                                 address: dealer_address.to_string(),
                                 permissions: vec![
                                     Access::Withdraw as i32,
-                                    Access::Transfer as i32,
                                     Access::Deposit as i32,
                                 ],
                             },
@@ -315,13 +312,12 @@ mod execute_add_seller_tests {
                                     Access::Deposit as i32,
                                     Access::Withdraw as i32,
                                     Access::Delete as i32,
-                                    Access::Transfer as i32
                                 ],
                             }
                         ],
                         supply_fixed: false,
                         allow_governance_control: true,
-                        allow_forced_transfer: true,
+                        allow_forced_transfer: false,
                         required_attributes: vec![],
                     })
                 );
