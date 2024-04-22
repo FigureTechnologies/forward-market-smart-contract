@@ -11,13 +11,13 @@ is a party that will trigger the settlement of the contract once both parties ha
 contract.
 
 ## Status
-// TODO: Add licensing info
+[![Latest Release][release-badge]][release-latest]
+[![Apache 2.0 License][license-badge]][license-url]
 
-## Documentation
-
-// TODO: Publish rust docs to link below
-
-For more information on the internal composition of the contract, view the [published documentation](https://figuretechnologies.github.io/forward-market-smart-contract/).
+[license-badge]: https://img.shields.io/github/license/FigureTechnologies/forward-market-smart-contract.svg
+[license-url]: https://github.com/FigureTechnologies/forward-market-smart-contract/blob/main/LICENSE
+[release-badge]: https://img.shields.io/github/tag/FigureTechnologies/forward-market-smart-contract.svg
+[release-latest]: https://github.com/FigureTechnologies/forward-market-smart-contract/releases/latest
 
 ## Contract Instantiation
 
@@ -31,7 +31,7 @@ To instantiate a new instance of the contract, the following parameters are requ
 * `min_face_value_cents`: The minimum value that may be accepted by a seller
 * `tick_size`: The number of coins per accepted cents by the seller (if the seller accepts 1000 cents and tick size is 10, 100 coins will be minted for the token_denom)
 * `dealers`: The list of addresses allowed to confirm and reset the contract
-  
+
 Example instantiation payload:
 ```json
 {
