@@ -47,10 +47,12 @@ Example instantiation payload:
 ```
 
 ## Contract Execution
-
+### AddSeller
 #### Adds the sender as the seller on the contract. Along with the sender being added, an accepted value of the contract is also submitted
 
 * `accepted_value_cents`: The amount of the face value the seller is willing to provide. This must be between the min and max face values defied by the contract
+* `offer_hash`: A hash generated from the offer terms that are stored in block vault
+* `agreement_terms_hash`: The hash generated from the agreement terms that the seller is agreeing to
 
 Example execution payload:
 
@@ -58,11 +60,14 @@ Example execution payload:
 {
   "AddSeller": {
     "accepted_value_cents": 70_000_000,
+    "offer_hash": "b1c2d3e4",
+    "agreement_terms_hash": "a1b2c3d4"
   }
 }
 
 ```
 
+### RemoveAsSeller
 #### Allows the sender to remove themselves from the list of allowed sellers. No arguments are required
 
 Example execution payload:
@@ -73,6 +78,7 @@ Example execution payload:
 }
 ```
 
+### FinalizePools
 #### Allows the seller to finalize a list of specified pools. This means that the buyer can now review and potentially accept the pools
 
 * `pool_denoms`: The list of denoms for the markers that hold the pooled assets
@@ -87,6 +93,7 @@ Example execution payload:
 }
 ```
 
+### DealerConfirm
 #### Allows the dealer to initiate the settlement of the transaction
 
 Example execution payload:
@@ -97,6 +104,7 @@ Example execution payload:
 }
 ```
 
+### UpdateAgreementTermsHash
 #### Allows the buyer to update terms of the contract before a seller has been added
 
 * `agreement_terms_hash`: A hash generated from the agreement terms that are stored in block vault
@@ -111,8 +119,8 @@ Example execution payload:
 }
 ```
 
+### UpdateFaceValueCents
 #### Allows the buyer to update the face values before a seller has been added
-
 
 * `max_face_value_cents`: The maximum value that may be accepted by a seller
 * `min_face_value_cents`: The minimum value that may be accepted by a seller
@@ -130,6 +138,7 @@ Example execution payload:
 }
 ```
 
+### UpdateAllowedSellers
 #### Allows the buyer to update the allowed seller's list before a seller has been added
 
 * `allowed_sellers`: A list addresses allowed to be a seller in the contract. This is only valid if the is_private field is set to true and must be empty when is_private is false
@@ -144,6 +153,7 @@ Example execution payload:
 }
 ```
 
+### AcceptFinalizedPool
 #### Allows the buyer to accept a seller's finalized list of pools
 
 Example execution payload:
@@ -154,6 +164,7 @@ Example execution payload:
 }
 ```
 
+### RescindFinalizedPools
 #### Allows the seller to rescind a finalized list of pools before the buyer has accepted
 
 Example execution payload:
@@ -164,6 +175,7 @@ Example execution payload:
 }
 ```
 
+### DealerReset
 #### Allows the dealer to reset a contract, which will clear buyer acceptance, seller finalization, and return the coins in escrow by the contract back to the seller
 
 Example execution payload:
@@ -171,6 +183,15 @@ Example execution payload:
 ```json
 {
   "DealerReset": {}
+}
+```
+
+### ContractDisable
+#### Allows the dealer to disable a contract provided that the contract does not hold any coins
+
+```json
+{
+  "ContractDisable": {}
 }
 ```
 
