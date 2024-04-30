@@ -12,12 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Generate Latest Schema Files
-        uses: actions-rs/cargo@v1
-        with:
-          command: run
-          args: --example schema
-
       - name: Optimize Contract
         run: make optimize
 
@@ -27,6 +21,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            artifacts/forward_market_smart_contract.wasm
+            artifacts/forward_market_contract.wasm
             artifacts/checksums.txt
-            schema/*.json
