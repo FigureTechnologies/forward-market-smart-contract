@@ -201,7 +201,7 @@ pub fn validate_face_values(
     }
 
     // Max value must be greater or equal to the min value
-    if min_face_value_cents >= max_face_value_cents {
+    if min_face_value_cents > max_face_value_cents {
         return Err(InvalidMaxFaceValue);
     }
 
