@@ -15,8 +15,8 @@ pub fn execute_disable_contract(
         return Err(IllegalDisableRequest);
     }
 
-    // In order to disable the contract you must be either the buyer or a dealer
-    if !is_buyer(&deps, &info)? && !is_dealer(&deps, &info)? {
+    // In order to disable the contract you must be either the contract admin or a dealer
+    if !is_contract_admin(&deps, &info)? && !is_dealer(&deps, &info)? {
         return Err(UnauthorizedDisableRequest);
     }
 

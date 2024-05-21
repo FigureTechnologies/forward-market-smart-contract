@@ -1,7 +1,7 @@
 use crate::storage::state_store::{Buyer, Config, Seller, SettlementData};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
-use cosmwasm_std::Uint128;
+use cosmwasm_std::{Int64, Uint128};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -10,12 +10,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateContractMsg {
     /// A flag indicating whether to limit the allowed seller addresses to the list defined in the allowed sellers list
-    pub is_private: bool,
-    /// A list addresses allowed to be a seller in the contract. This is only valid if the is_private field is set to
-    /// true and must be empty when is_private is false
+    pub use_private_sellers: bool,
+    /// A flag indicating whether to limit the allowed buyer addresses to the list defined in the allowed buyers list
+    pub use_private_buyers: bool,
+    /// A list of addresses allowed to be a seller in the contract. This is only valid if the use_private_sellers field is set to
+    /// true and must be empty when use_private_sellers is false
     pub allowed_sellers: Vec<String>,
-    /// A hash generated from the agreement terms that are stored in block vault
-    pub agreement_terms_hash: String,
+    /// A list of addresses allowed to be a buyer in the contract. This is only valid if the use_private_buyers field is set to
+    /// true and must be empty when use_private_buyers is false
+    pub allowed_buyers: Vec<String>,
+    /// The max number of potential buyers allowed to submit bids to the contract
+    pub max_buyer_count: Uint128,
     /// The denom of the marker that all seller assets with be transferred to upon successful confirmation by the dealer
     pub token_denom: String,
     /// The maximum value that may be accepted by a seller

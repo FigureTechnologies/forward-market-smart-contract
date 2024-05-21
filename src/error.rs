@@ -28,11 +28,15 @@ pub enum ContractError {
     #[error("Seller address is not in allowed list of private sellers")]
     UnauthorizedPrivateSeller,
 
-    /// Occurs if anyone other than the buyer attempts to modify contract configuration options
+    /// Occurs when a buyer that is not specified in the allowed buyers list tries to submit a bid
+    #[error("Buyer address is not in allowed list of private buyers")]
+    UnauthorizedPrivateBuyer,
+
+    /// Occurs if anyone other than the contract admin attempts to modify contract configuration options
     #[error("Only the buyer can update the contract configuration")]
     UnauthorizedConfigUpdate,
 
-    /// Occurs if the buyer attempts to modify configuration after the seller has already been added
+    /// Occurs if the contract admin attempts to modify configuration after the seller has already been added
     #[error("Configuration cannot be updated once a seller has been established")]
     IllegalConfigUpdate,
 
@@ -174,4 +178,8 @@ pub enum ContractError {
     /// Occurs if the seller is agreeing to a terms hash that does not match the latest
     #[error("The agreement terms hash provided by the seller does not match the current agreement terms hash")]
     InvalidAgreementTermsHash,
+
+    /// Occurs when a buyer attempts to submit a bid but the limit of allowed buyers has already been reached
+    #[error("The limit of allowed buyers has already been reached")]
+    MaxPrivateBuyersReached,
 }

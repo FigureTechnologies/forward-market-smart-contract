@@ -29,8 +29,8 @@ pub fn execute_add_seller(
 
     let config = retrieve_contract_config(deps.storage)?;
 
-    // If the contract is private, make sure this seller is allowed to engage with it
-    if config.is_private && !config.allowed_sellers.contains(&info.sender) {
+    // If using private sellers, make sure this seller is allowed to engage with the contract
+    if config.use_private_sellers && !config.allowed_sellers.contains(&info.sender) {
         return Err(UnauthorizedPrivateSeller);
     }
 
@@ -52,13 +52,6 @@ pub fn execute_add_seller(
     // The accepted value must be compatible with the tick size
     if !is_valid_tick_size(config.tick_size, accepted_value_cents) {
         return Err(InvalidTickSizeValueMatch);
-    }
-
-    // The seller passes the agreement terms hash for the terms they are agreeing to. We check
-    // the hash against what is stored in the contract to make sure the seller isn't agreeing to
-    // a previous state of the contract
-    if config.agreement_terms_hash != agreement_terms_hash {
-        return Err(InvalidAgreementTermsHash);
     }
 
     // Store the seller information

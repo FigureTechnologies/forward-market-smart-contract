@@ -1,7 +1,7 @@
 use crate::error::ContractError;
 use crate::error::ContractError::InvalidVisibilityConfig;
 use crate::storage::state_store::retrieve_contract_config;
-use crate::util::helpers::update_config_as_buyer;
+use crate::util::helpers::update_config_as_admin;
 use cosmwasm_std::{DepsMut, MessageInfo, Response};
 
 pub fn execute_update_allowed_sellers(
@@ -12,7 +12,7 @@ pub fn execute_update_allowed_sellers(
     let config = retrieve_contract_config(deps.storage)?;
 
     let mut updated_sellers = vec![];
-    if config.is_private {
+    if config.use_private_sellers {
         for seller_str in allowed_sellers {
             let seller_addr = deps.api.addr_validate(&seller_str)?;
             updated_sellers.push(seller_addr)
@@ -23,5 +23,5 @@ pub fn execute_update_allowed_sellers(
 
     let mut updated_config = config.clone();
     updated_config.allowed_sellers = updated_sellers;
-    update_config_as_buyer(deps, info, updated_config)
+    update_config_as_admin(deps, info, updated_config)
 }

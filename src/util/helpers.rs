@@ -5,10 +5,7 @@ use crate::error::ContractError::{
 };
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
-use crate::storage::state_store::{
-    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
-    save_contract_config, Config,
-};
+use crate::storage::state_store::{retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state, save_contract_config, Config, retrieve_optional_transaction_state, TransactionState};
 use bech32::ToBase32;
 use cosmwasm_std::{
     Addr, CosmosMsg, DepsMut, Empty, MessageInfo, QuerierWrapper, Response, StdError, StdResult,
@@ -238,27 +235,36 @@ pub fn seller_has_finalized(deps: &DepsMut) -> Result<bool, ContractError> {
 }
 
 pub fn is_buyer(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
-    let buyer_state = retrieve_buyer_state(deps.storage)?;
-    Ok(buyer_state.buyer_address == info.sender)
+    return match retrieve_optional_transaction_state(deps.storage)? {
+        None => { Ok(false) }
+        Some(state) => {
+            Ok(state.buyer_address == info.sender)
+        }
+    }
 }
 
 pub fn buyer_has_accepted(deps: &DepsMut) -> Result<bool, ContractError> {
-    let buyer_state = retrieve_buyer_state(deps.storage)?;
-    Ok(buyer_state.has_accepted_pools)
+    return match retrieve_optional_transaction_state(deps.storage)? {
+        None => { Ok(false) }
+        Some(state) => {
+            Ok(state.buyer_has_accepted_pools)
+        }
+    }
 }
 
-pub fn update_config_as_buyer(
+pub fn update_config_as_admin(
     deps: DepsMut,
     info: MessageInfo,
     updated_config: Config,
 ) -> Result<Response, ContractError> {
+    let config = retrieve_contract_config(deps.storage)?;
+    if (info.sender != config.contract_admin) {
+        return Err(UnauthorizedConfigUpdate);
+    }
+
     match retrieve_optional_seller_state(deps.storage)? {
         None => {}
         Some(_) => return Err(IllegalConfigUpdate),
-    }
-
-    if !is_buyer(&deps, &info)? {
-        return Err(UnauthorizedConfigUpdate);
     }
 
     save_contract_config(deps.storage, &updated_config)?;

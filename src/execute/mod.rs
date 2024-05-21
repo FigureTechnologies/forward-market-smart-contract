@@ -9,3 +9,4 @@ pub mod rescind_finalized_pools;
 pub mod update_allowed_sellers;
 pub mod update_face_value_cents;
 pub mod update_terms_hash;
+mod add_buyer;

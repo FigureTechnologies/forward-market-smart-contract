@@ -20,14 +20,14 @@ pub fn save_contract_config(
     })
 }
 
-pub fn retrieve_buyer_state(storage: &dyn Storage) -> Result<Buyer, ContractError> {
-    BUYER.load(storage).map_err(|e| StorageError {
+pub fn retrieve_buyer_state(storage: &dyn Storage) -> Result<BuyerList, ContractError> {
+    BUYERS.load(storage).map_err(|e| StorageError {
         message: format!("{e:?}"),
     })
 }
 
-pub fn save_buyer_state(storage: &mut dyn Storage, buyer: &Buyer) -> Result<(), ContractError> {
-    BUYER.save(storage, buyer).map_err(|e| StorageError {
+pub fn save_buyer_state(storage: &mut dyn Storage, buyer: &BuyerList) -> Result<(), ContractError> {
+    BUYERS.save(storage, buyer).map_err(|e| StorageError {
         message: format!("{e:?}"),
     })
 }
@@ -71,17 +71,28 @@ pub fn save_settlement_data_state(
         })
 }
 
+pub fn retrieve_optional_transaction_state(
+    storage: &mut dyn Storage,
+) -> Result<Option<TransactionState>, ContractError>{
+    TRANSACTION_STATE.may_load(storage).map_err(|e| StorageError {
+        message: format!("{e:?}"),
+    })
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct Config {
-    pub is_private: bool,
+    pub use_private_sellers: bool,
+    pub use_private_buyers: bool,
     pub allowed_sellers: Vec<Addr>,
-    pub agreement_terms_hash: String,
+    pub allowed_buyers: Vec<Addr>,
+    pub max_buyer_count: i32,
     pub token_denom: String,
     pub max_face_value_cents: Uint128,
     pub min_face_value_cents: Uint128,
     pub tick_size: Uint128,
     pub dealers: Vec<Addr>,
     pub is_disabled: bool,
+    pub contract_admin: Addr
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -93,9 +104,14 @@ pub struct Seller {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+pub struct BuyerList {
+    pub buyers: Vec<Buyer>
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct Buyer {
     pub buyer_address: Addr,
-    pub has_accepted_pools: bool,
+    pub agreement_terms_hash: String
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -104,7 +120,14 @@ pub struct SettlementData {
     pub settling_dealer: Addr,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+pub struct TransactionState {
+    pub buyer_address: Addr,
+    pub buyer_has_accepted_pools: bool,
+}
+
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const SELLER: Item<Seller> = Item::new("seller");
-pub const BUYER: Item<Buyer> = Item::new("buyer");
+pub const BUYERS: Item<BuyerList> = Item::new("buyer_list");
 pub const SETTLEMENT_DATA: Item<SettlementData> = Item::new("settlement_data");
+pub const TRANSACTION_STATE: Item<TransactionState> = Item::new("transaction_state");

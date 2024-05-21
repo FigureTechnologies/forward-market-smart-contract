@@ -12,7 +12,7 @@ pub fn execute_remove_as_seller(
 ) -> Result<Response, ContractError> {
     let config = retrieve_contract_config(deps.storage)?;
     // If the contract is not private the allowed seller's list is not used
-    if !config.is_private {
+    if !config.use_private_sellers {
         return Err(InvalidSellerRemovalRequest);
     }
 
