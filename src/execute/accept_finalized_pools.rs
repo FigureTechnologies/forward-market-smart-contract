@@ -2,7 +2,7 @@ use crate::error::ContractError;
 use crate::error::ContractError::{
     IllegalAcceptingParty, IllegalPoolAcceptanceRequest, PoolAlreadyAccepted,
 };
-use crate::storage::state_store::{retrieve_buyer_state, save_buyer_state};
+use crate::storage::state_store::{save_transaction_state, TransactionState};
 use crate::util::helpers::{buyer_has_accepted, is_buyer, seller_has_finalized};
 use cosmwasm_std::{DepsMut, MessageInfo, Response};
 
@@ -25,9 +25,13 @@ pub fn execute_accept_finalized_pools(
         return Err(PoolAlreadyAccepted);
     }
 
-    // Update state to reflect that the buyer has accepted
-    let mut updated_buyer = retrieve_buyer_state(deps.storage)?.clone();
-    updated_buyer.has_accepted_pools = true;
-    save_buyer_state(deps.storage, &updated_buyer)?;
-    Ok(Response::new().add_attribute("buyer_state", format!("{:?}", updated_buyer)))
+    let transaction_state = TransactionState {
+        buyer_address: info.sender,
+        buyer_has_accepted_pools: true,
+    };
+
+    // Update the transaction state to reflect that the buyer has accepted
+    save_transaction_state(deps.storage, &transaction_state)?;
+
+    Ok(Response::new().add_attribute("transaction_state", format!("{:?}", transaction_state)))
 }

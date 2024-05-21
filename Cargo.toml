@@ -45,6 +45,7 @@ hex = "0.4.3"
 bech32 = "0.9.1"
 rust_decimal = "1.29.0"
 uuid = { version = "1.7.0", features = ["v1"] }
+log = "0.4.21"
 
 [dev-dependencies]
 provwasm-mocks = { version = "=2.1.0" }

@@ -1,7 +1,7 @@
-use crate::storage::state_store::{Buyer, Config, Seller, SettlementData};
+use crate::storage::state_store::{BuyerList, Config, Seller, SettlementData, TransactionState};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
-use cosmwasm_std::{Int64, Uint128};
+use cosmwasm_std::Uint128;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -20,7 +20,7 @@ pub struct InstantiateContractMsg {
     /// true and must be empty when use_private_buyers is false
     pub allowed_buyers: Vec<String>,
     /// The max number of potential buyers allowed to submit bids to the contract
-    pub max_buyer_count: Uint128,
+    pub max_buyer_count: i32,
     /// The denom of the marker that all seller assets with be transferred to upon successful confirmation by the dealer
     pub token_denom: String,
     /// The maximum value that may be accepted by a seller
@@ -41,7 +41,6 @@ pub enum ExecuteMsg {
     AddSeller {
         accepted_value_cents: Uint128,
         offer_hash: String,
-        agreement_terms_hash: String,
     },
     /// A route that allows the sender to remove themselves from the list of allowed sellers
     RemoveAsSeller {},
@@ -49,8 +48,6 @@ pub enum ExecuteMsg {
     FinalizePools { pool_denoms: Vec<String> },
     /// A route executed by the dealer that causes the settlement of the transaction
     DealerConfirm {},
-    /// A route that can be used by the buyer to update terms of the contract before a seller has been added
-    UpdateAgreementTermsHash { agreement_terms_hash: String },
     /// A route that can be used by the buyer to update the face values before a seller has been added
     UpdateFaceValueCents {
         max_face_value_cents: Uint128,
@@ -71,6 +68,13 @@ pub enum ExecuteMsg {
     /// finalized list of pools, either the seller must rescind the offer or a dealer must reset the
     /// contract before the disable operation will be allowed).
     ContractDisable {},
+    /// A route used by the seller to accept a bid from a buyer in the list of buyer bids
+    AcceptBuyer {
+        buyer_address: String,
+        agreement_terms_hash: String,
+    },
+    /// A route used by a potential buyer to add their bid to the list of buyer bids
+    AddBuyer { agreement_terms_hash: String },
 }
 
 /// All defined payloads to be used when querying routes on this contract instance.
@@ -83,11 +87,12 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
-    pub buyer: Buyer,
+    pub buyers: BuyerList,
     pub seller: Option<Seller>,
     pub config: Config,
     pub settlement_data: Option<SettlementData>,
     pub version_info: VersionInfoV1,
+    pub transaction_state: Option<TransactionState>,
 }
 
 #[derive(Clone, Debug, PartialEq)]

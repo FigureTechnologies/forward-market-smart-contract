@@ -298,10 +298,7 @@ mod execute_add_seller_tests {
                         access_list: vec![
                             AccessGrant {
                                 address: dealer_address.to_string(),
-                                permissions: vec![
-                                    Access::Withdraw as i32,
-                                    Access::Deposit as i32,
-                                ],
+                                permissions: vec![Access::Withdraw as i32, Access::Deposit as i32,],
                             },
                             AccessGrant {
                                 address: contract_address.to_string(),

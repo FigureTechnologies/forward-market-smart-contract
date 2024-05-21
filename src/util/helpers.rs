@@ -5,7 +5,10 @@ use crate::error::ContractError::{
 };
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
-use crate::storage::state_store::{retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state, save_contract_config, Config, retrieve_optional_transaction_state, TransactionState};
+use crate::storage::state_store::{
+    retrieve_contract_config, retrieve_optional_seller_state, retrieve_optional_transaction_state,
+    save_contract_config, Config,
+};
 use bech32::ToBase32;
 use cosmwasm_std::{
     Addr, CosmosMsg, DepsMut, Empty, MessageInfo, QuerierWrapper, Response, StdError, StdResult,
@@ -39,10 +42,7 @@ pub fn create_and_transfer_marker(
         // Give the dealers access to withdraw and transfer only
         access_grants.push(AccessGrant {
             address: access_address.to_string(),
-            permissions: vec![
-                Access::Withdraw as i32,
-                Access::Deposit as i32,
-            ],
+            permissions: vec![Access::Withdraw as i32, Access::Deposit as i32],
         })
     }
 
@@ -236,20 +236,21 @@ pub fn seller_has_finalized(deps: &DepsMut) -> Result<bool, ContractError> {
 
 pub fn is_buyer(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
     return match retrieve_optional_transaction_state(deps.storage)? {
-        None => { Ok(false) }
-        Some(state) => {
-            Ok(state.buyer_address == info.sender)
-        }
-    }
+        None => Ok(false),
+        Some(state) => Ok(state.buyer_address == info.sender),
+    };
 }
 
 pub fn buyer_has_accepted(deps: &DepsMut) -> Result<bool, ContractError> {
     return match retrieve_optional_transaction_state(deps.storage)? {
-        None => { Ok(false) }
-        Some(state) => {
-            Ok(state.buyer_has_accepted_pools)
-        }
-    }
+        None => Ok(false),
+        Some(state) => Ok(state.buyer_has_accepted_pools),
+    };
+}
+
+pub fn is_contract_admin(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
+    let config = retrieve_contract_config(deps.storage)?;
+    return Ok(info.sender != config.contract_admin);
 }
 
 pub fn update_config_as_admin(
@@ -257,8 +258,7 @@ pub fn update_config_as_admin(
     info: MessageInfo,
     updated_config: Config,
 ) -> Result<Response, ContractError> {
-    let config = retrieve_contract_config(deps.storage)?;
-    if (info.sender != config.contract_admin) {
+    if !is_contract_admin(&deps, &info)? {
         return Err(UnauthorizedConfigUpdate);
     }
 

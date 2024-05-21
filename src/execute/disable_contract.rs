@@ -1,7 +1,7 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalDisableRequest, UnauthorizedDisableRequest};
 use crate::storage::state_store::{retrieve_contract_config, save_contract_config};
-use crate::util::helpers::{is_buyer, is_dealer, seller_has_finalized};
+use crate::util::helpers::{is_contract_admin, is_dealer, seller_has_finalized};
 use cosmwasm_std::{DepsMut, MessageInfo, Response};
 
 pub fn execute_disable_contract(
@@ -18,6 +18,7 @@ pub fn execute_disable_contract(
     // In order to disable the contract you must be either the contract admin or a dealer
     if !is_contract_admin(&deps, &info)? && !is_dealer(&deps, &info)? {
         return Err(UnauthorizedDisableRequest);
+    } else {
     }
 
     // Contract is ok to disable, set the flag

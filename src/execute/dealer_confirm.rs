@@ -34,7 +34,7 @@ pub fn execute_dealer_confirm(
 
     // A private contract should not allow a state where the accepted seller is not in the list of allowed
     // sellers, but before we transfer anything run a sanity check
-    if config.is_private
+    if config.use_private_sellers
         && !config
             .allowed_sellers
             .contains(&seller_state.seller_address)

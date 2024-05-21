@@ -1,7 +1,7 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{InvalidEmptyDealerConfig, InvalidVisibilityConfig};
 use crate::msg::InstantiateContractMsg;
-use crate::storage::state_store::{save_contract_config, Config, save_buyer_state, BuyerList};
+use crate::storage::state_store::{save_buyer_state, save_contract_config, BuyerList, Config};
 use crate::util::helpers::validate_face_values;
 use crate::version_info::{set_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
 use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, Response};
@@ -22,7 +22,7 @@ pub fn instantiate_contract(
     // Convert the list of allowed sellers to addresses if the contract uses private sellers
     let mut allowed_sellers = vec![];
     if msg.use_private_sellers {
-        allowed_sellers = validate_and_map_address(msg.allowed_sellers, &deps);
+        allowed_sellers = validate_and_map_address(msg.allowed_sellers, &deps)?;
     } else if !msg.allowed_sellers.is_empty() {
         return Err(InvalidVisibilityConfig);
     }
@@ -30,8 +30,8 @@ pub fn instantiate_contract(
     // Convert the list of allowed buyers to addresses if the contract uses private buyers
     let mut allowed_buyers = vec![];
     if msg.use_private_sellers {
-        allowed_buyers = validate_and_map_address(msg.allowed_buyers, &deps);
-    } else if !msg.allowed_sellers.is_empty() {
+        allowed_buyers = validate_and_map_address(msg.allowed_buyers, &deps)?;
+    } else if !msg.allowed_buyers.is_empty() {
         return Err(InvalidVisibilityConfig);
     }
 
@@ -41,7 +41,7 @@ pub fn instantiate_contract(
     }
 
     // Convert the list of dealers to addresses
-    let mut dealer_addresses = validate_and_map_address(msg.dealers, &deps);
+    let dealer_addresses = validate_and_map_address(msg.dealers, &deps)?;
 
     // Store the initial configuration
     let config = Config {
@@ -56,12 +56,10 @@ pub fn instantiate_contract(
         tick_size: msg.tick_size,
         dealers: dealer_addresses,
         is_disabled: false,
-        contract_admin: info.sender
+        contract_admin: info.sender,
     };
     save_contract_config(deps.storage, &config)?;
-    save_buyer_state(deps.storage, &BuyerList {
-        buyers: vec![]
-    })?;
+    save_buyer_state(deps.storage, &BuyerList { buyers: vec![] })?;
 
     set_version_info(
         deps.storage,
@@ -74,11 +72,14 @@ pub fn instantiate_contract(
     Ok(Response::new().add_attribute("contract_config", format!("{:?}", config)))
 }
 
-fn validate_and_map_address(address_strings: Vec<String>, deps: &DepsMut) -> Vec<Addr> {
+fn validate_and_map_address(
+    address_strings: Vec<String>,
+    deps: &DepsMut,
+) -> Result<Vec<Addr>, ContractError> {
     let mut addresses = vec![];
     for seller_str in address_strings {
         let seller_addr = deps.api.addr_validate(&seller_str)?;
         addresses.push(seller_addr)
     }
-    return addresses
+    return Ok(addresses);
 }

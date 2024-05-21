@@ -72,11 +72,28 @@ pub fn save_settlement_data_state(
 }
 
 pub fn retrieve_optional_transaction_state(
+    storage: &dyn Storage,
+) -> Result<Option<TransactionState>, ContractError> {
+    TRANSACTION_STATE
+        .may_load(storage)
+        .map_err(|e| StorageError {
+            message: format!("{e:?}"),
+        })
+}
+
+pub fn save_transaction_state(
     storage: &mut dyn Storage,
-) -> Result<Option<TransactionState>, ContractError>{
-    TRANSACTION_STATE.may_load(storage).map_err(|e| StorageError {
-        message: format!("{e:?}"),
-    })
+    transaction_state: &TransactionState,
+) -> Result<(), ContractError> {
+    TRANSACTION_STATE
+        .save(storage, transaction_state)
+        .map_err(|e| StorageError {
+            message: format!("{e:?}"),
+        })
+}
+
+pub fn clear_transaction_state(storage: &mut dyn Storage) -> () {
+    TRANSACTION_STATE.remove(storage)
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -92,7 +109,7 @@ pub struct Config {
     pub tick_size: Uint128,
     pub dealers: Vec<Addr>,
     pub is_disabled: bool,
-    pub contract_admin: Addr
+    pub contract_admin: Addr,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -105,13 +122,13 @@ pub struct Seller {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct BuyerList {
-    pub buyers: Vec<Buyer>
+    pub buyers: Vec<Buyer>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct Buyer {
     pub buyer_address: Addr,
-    pub agreement_terms_hash: String
+    pub agreement_terms_hash: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]

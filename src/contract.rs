@@ -4,7 +4,9 @@ use cosmwasm_std::{
 
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalContractExecution, InvalidContractExecution};
+use crate::execute::accept_buyer::execute_accept_buyer;
 use crate::execute::accept_finalized_pools::execute_accept_finalized_pools;
+use crate::execute::add_buyer::execute_add_buyer;
 use crate::execute::add_seller::execute_add_seller;
 use crate::execute::dealer_confirm::execute_dealer_confirm;
 use crate::execute::dealer_reset::execute_dealer_reset;
@@ -79,15 +81,7 @@ pub fn execute(
         ExecuteMsg::AddSeller {
             accepted_value_cents,
             offer_hash,
-            agreement_terms_hash,
-        } => execute_add_seller(
-            deps,
-            env,
-            info,
-            accepted_value_cents,
-            offer_hash,
-            agreement_terms_hash,
-        ),
+        } => execute_add_seller(deps, info, accepted_value_cents, offer_hash),
         ExecuteMsg::RemoveAsSeller {} => execute_remove_as_seller(deps, info),
         ExecuteMsg::FinalizePools { pool_denoms } => {
             execute_finalize_pools(deps, env, info, &pool_denoms)
@@ -111,6 +105,13 @@ pub fn execute(
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),
         ExecuteMsg::DealerReset {} => execute_dealer_reset(deps, env, info),
         ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, info),
+        ExecuteMsg::AcceptBuyer {
+            buyer_address,
+            agreement_terms_hash,
+        } => execute_accept_buyer(deps, env, info, buyer_address, agreement_terms_hash),
+        ExecuteMsg::AddBuyer {
+            agreement_terms_hash,
+        } => execute_add_buyer(deps, info, agreement_terms_hash),
     }
 }
 

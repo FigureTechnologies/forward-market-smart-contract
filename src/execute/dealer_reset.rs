@@ -1,7 +1,8 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalDealerResetRequest, InvalidDealerResetRequest};
 use crate::storage::state_store::{
-    retrieve_buyer_state, retrieve_optional_seller_state, save_buyer_state, save_seller_state,
+    clear_transaction_state, retrieve_optional_seller_state, retrieve_optional_transaction_state,
+    save_seller_state,
 };
 use crate::util::helpers::{create_send_coin_back_to_seller_messages, is_dealer};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
@@ -36,10 +37,12 @@ pub fn execute_dealer_reset(
     updated_seller.pool_denoms = vec![];
     save_seller_state(deps.storage, &updated_seller)?;
 
-    let mut updated_buyer = retrieve_buyer_state(deps.storage)?;
-    updated_buyer.has_accepted_pools = false;
-    save_buyer_state(deps.storage, &updated_buyer)?;
-    Ok(response
-        .add_attribute("seller_state", format!("{:?}", updated_seller))
-        .add_attribute("buyer_state", format!("{:?}", updated_buyer)))
+    clear_transaction_state(deps.storage);
+
+    match retrieve_optional_transaction_state(deps.storage)? {
+        None => {}
+        Some(_) => {}
+    }
+
+    Ok(response.add_attribute("seller_state", format!("{:?}", updated_seller)))
 }

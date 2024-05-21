@@ -175,11 +175,19 @@ pub enum ContractError {
     #[error("A contract may only be disabled by the buyer or a dealer")]
     UnauthorizedDisableRequest,
 
-    /// Occurs if the seller is agreeing to a terms hash that does not match the latest
+    /// Occurs if the seller is agreeing to a terms hash that does not match the latest for the buyer
     #[error("The agreement terms hash provided by the seller does not match the current agreement terms hash")]
     InvalidAgreementTermsHash,
 
     /// Occurs when a buyer attempts to submit a bid but the limit of allowed buyers has already been reached
     #[error("The limit of allowed buyers has already been reached")]
     MaxPrivateBuyersReached,
+
+    /// Occurs when a seller attempts to accept a bid for a buyer that doesn't exist
+    #[error("Bid does not exist for buyer with address {address:?}")]
+    BuyerDoesNotExist { address: String },
+
+    /// Occurs when a seller attempts to accept a bid when a previous bid has already been accepted
+    #[error("Cannot accept bid because a bid from address {address:?} was already accepted")]
+    BidAlreadyExists { address: String },
 }

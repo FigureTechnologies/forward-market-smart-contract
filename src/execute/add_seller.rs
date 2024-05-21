@@ -1,25 +1,21 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
     AcceptedValueExceedsMaxFaceValue, AcceptedValueLessThanMinFaceValue,
-    AcceptedValueMustBePositive, InvalidAgreementTermsHash, InvalidTickSizeValueMatch,
-    SellerAlreadyExists, UnauthorizedPrivateSeller,
+    AcceptedValueMustBePositive, InvalidTickSizeValueMatch, SellerAlreadyExists,
+    UnauthorizedPrivateSeller,
 };
 
 use crate::storage::state_store::{
-    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
-    save_seller_state, Seller,
+    retrieve_contract_config, retrieve_optional_seller_state, save_seller_state, Seller,
 };
-use crate::util::helpers::{create_and_transfer_marker, is_valid_tick_size};
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128};
-use std::ops::Div;
+use crate::util::helpers::is_valid_tick_size;
+use cosmwasm_std::{DepsMut, MessageInfo, Response, Uint128};
 
 pub fn execute_add_seller(
     deps: DepsMut,
-    env: Env,
     info: MessageInfo,
     accepted_value_cents: Uint128,
     offer_hash: String,
-    agreement_terms_hash: String,
 ) -> Result<Response, ContractError> {
     // Make sure we haven't already set the seller config. If we have, return an error
     match retrieve_optional_seller_state(deps.storage)? {
@@ -63,20 +59,5 @@ pub fn execute_add_seller(
     };
     save_seller_state(deps.storage, &seller_state)?;
 
-    let number_of_coins = accepted_value_cents.clone().div(config.tick_size.clone());
-
-    let buyer_state = retrieve_buyer_state(deps.storage)?;
-
-    // Now that we have a seller, we can create the forward market token and give it to the buyer
-    let create_token_messages = create_and_transfer_marker(
-        env.contract.address.to_string(),
-        config.token_denom,
-        number_of_coins,
-        buyer_state.buyer_address.to_string(),
-        config.dealers.clone(),
-    );
-
-    Ok(Response::new()
-        .add_messages(create_token_messages)
-        .add_attribute("seller_state", format!("{:?}", seller_state)))
+    Ok(Response::new().add_attribute("seller_state", format!("{:?}", seller_state)))
 }
