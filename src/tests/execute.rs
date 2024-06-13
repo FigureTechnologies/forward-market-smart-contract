@@ -6,4 +6,4 @@ mod execute_finalize_pools;
 mod execute_remove_as_seller;
 mod execute_update_allowed_sellers;
 mod execute_update_face_value;
-mod execute_update_terms_hash;
+

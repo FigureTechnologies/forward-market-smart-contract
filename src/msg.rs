@@ -1,4 +1,4 @@
-use crate::storage::state_store::{BuyerList, Config, Seller, SettlementData, TransactionState};
+use crate::storage::state_store::{Buyer, Config, Seller, SettlementData, TransactionState};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Uint128;
@@ -87,7 +87,7 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
-    pub buyers: BuyerList,
+    pub buyers: Vec<Buyer>,
     pub seller: Option<Seller>,
     pub config: Config,
     pub settlement_data: Option<SettlementData>,
