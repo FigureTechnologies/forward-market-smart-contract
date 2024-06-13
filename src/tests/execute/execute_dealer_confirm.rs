@@ -2,7 +2,7 @@
 mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config, save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData, BuyerList};
+    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config, save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData, BuyerList, save_transaction_state, TransactionState};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
@@ -70,6 +70,15 @@ mod execute_dealer_confirm_tests {
             },
         )
         .unwrap();
+
+        save_transaction_state(
+            &mut deps.storage,
+            &TransactionState {
+                buyer_address: Addr::unchecked(buyer_address),
+                buyer_has_accepted_pools: true,
+                agreement_terms_hash: "".to_string(),
+            }
+        ).unwrap();
 
         let cb = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
             let message = QueryMarkerRequest::try_from(bin.clone()).unwrap();
@@ -178,7 +187,7 @@ mod execute_dealer_confirm_tests {
     }
 
     #[test]
-    fn execute_seller_confirm_invalid_seller_state() {
+    fn execute_seller_confirm_invalid_seller() {
         let mut deps = mock_provenance_dependencies();
         let dealer_address = "dealer-address";
         let seller_address = "allowed-seller-0";
@@ -224,6 +233,15 @@ mod execute_dealer_confirm_tests {
             },
         )
         .unwrap();
+
+        save_transaction_state(
+            &mut deps.storage,
+            &TransactionState {
+                buyer_address: Addr::unchecked(buyer_address),
+                buyer_has_accepted_pools: true,
+                agreement_terms_hash: "".to_string(),
+            }
+        ).unwrap();
 
         match execute(
             deps.as_mut(),

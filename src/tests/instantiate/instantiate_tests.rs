@@ -13,7 +13,7 @@ mod instantiate_tests {
     #[test]
     fn instantiate_private_forward_market_contract() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_buyer", &[]);
+        let info = mock_info("contract-admin", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
             use_private_sellers: true,
@@ -82,7 +82,7 @@ mod instantiate_tests {
         let info = mock_info("contract_buyer", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
-            use_private_sellers: true,
+            use_private_sellers: false,
             use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
             allowed_buyers: vec![],

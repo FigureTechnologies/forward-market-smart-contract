@@ -4,7 +4,7 @@ mod execute_update_face_value {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::UpdateFaceValueCents;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config};
+    use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config, BuyerList};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Uint128};
@@ -28,11 +28,15 @@ mod execute_update_face_value {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 10,
+                max_buyer_count: 2,
                 contract_admin: info.sender.clone()
             },
         )
         .unwrap();
+
+        save_buyer_state(&mut deps.storage, &BuyerList {
+            buyers: vec![],
+        }).unwrap();
 
         set_version_info(
             &mut deps.storage,

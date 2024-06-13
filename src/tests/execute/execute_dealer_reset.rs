@@ -13,6 +13,8 @@ mod execute_dealer_reset_tests {
     use provwasm_std::types::provenance::marker::v1::{
         Balance, QueryHoldingRequest, QueryHoldingResponse,
     };
+    use crate::query::contract_state::query_contract_state;
+    use crate::version_info::{set_version_info, VersionInfoV1};
 
     #[test]
     fn perform_dealer_reset() {
@@ -42,6 +44,14 @@ mod execute_dealer_reset_tests {
             },
         )
         .unwrap();
+
+        set_version_info(
+            &mut deps.storage,
+            &VersionInfoV1 {
+                definition: "mock".to_string(),
+                version: "0.0.0".to_string(),
+            },
+        ).unwrap();
 
         let pool_denoms = vec![pool_denom.into()];
 
@@ -106,21 +116,13 @@ mod execute_dealer_reset_tests {
                     seller_state_attr,
                     Attribute::new("seller_state", format!("{:?}", expected_seller_state))
                 );
-                let expected_buyer_state = BuyerList {
-                    buyers: vec![Buyer {
+                let expected_buyers = vec![Buyer {
                         buyer_address: Addr::unchecked(buyer_address),
                         agreement_terms_hash: "".to_string(),
-                    }],
-                };
-                let buyer_state_attr = response
-                    .attributes
-                    .clone()
-                    .into_iter()
-                    .find(|attr| -> bool { attr.key == "buyer_state" })
-                    .unwrap();
+                    }];
                 assert_eq!(
-                    buyer_state_attr,
-                    Attribute::new("buyer_state", format!("{:?}", expected_buyer_state))
+                    query_contract_state(deps.as_ref()).unwrap().buyers,
+                    expected_buyers
                 );
             }
             Err(error) => {

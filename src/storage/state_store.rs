@@ -120,6 +120,7 @@ pub struct Seller {
     pub offer_hash: String,
 }
 
+// TODO: Rename this to bidders?
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct BuyerList {
     pub buyers: Vec<Buyer>,
