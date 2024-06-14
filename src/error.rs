@@ -33,7 +33,7 @@ pub enum ContractError {
     UnauthorizedPrivateBuyer,
 
     /// Occurs if anyone other than the contract admin attempts to modify contract configuration options
-    #[error("Only the buyer can update the contract configuration")]
+    #[error("Only the contract admin can update the contract configuration")]
     UnauthorizedConfigUpdate,
 
     /// Occurs if the contract admin attempts to modify configuration after the seller has already been added

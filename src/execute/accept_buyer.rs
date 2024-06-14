@@ -57,6 +57,7 @@ pub fn execute_accept_buyer(
     let transaction_state = TransactionState {
         buyer_address: buyer_address.clone(),
         buyer_has_accepted_pools: false,
+        agreement_terms_hash
     };
     save_transaction_state(deps.storage, &transaction_state)?;
 
@@ -68,7 +69,7 @@ pub fn execute_accept_buyer(
         .clone()
         .div(config.tick_size.clone());
 
-    // Now that we have a seller, we can create the forward market token and give it to the buyer
+    // Now that we have a buyer, we can create the forward market token and give it to the buyer
     let create_token_messages = create_and_transfer_marker(
         env.contract.address.to_string(),
         config.token_denom,

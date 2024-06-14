@@ -250,7 +250,7 @@ pub fn buyer_has_accepted(deps: &DepsMut) -> Result<bool, ContractError> {
 
 pub fn is_contract_admin(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
     let config = retrieve_contract_config(deps.storage)?;
-    return Ok(info.sender != config.contract_admin);
+    return Ok(info.sender == config.contract_admin);
 }
 
 pub fn update_config_as_admin(

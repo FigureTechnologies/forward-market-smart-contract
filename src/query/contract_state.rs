@@ -15,7 +15,7 @@ pub fn query_contract_state(deps: Deps) -> Result<GetContractStateResponse, Cont
     let version_info = get_version_info(deps.storage)?;
     let transaction_state = retrieve_optional_transaction_state(deps.storage)?;
     let response = GetContractStateResponse {
-        buyers,
+        buyers: buyers.buyers,
         seller,
         config,
         settlement_data,

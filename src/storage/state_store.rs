@@ -120,6 +120,7 @@ pub struct Seller {
     pub offer_hash: String,
 }
 
+// TODO: Rename this to bidders?
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct BuyerList {
     pub buyers: Vec<Buyer>,
@@ -141,6 +142,7 @@ pub struct SettlementData {
 pub struct TransactionState {
     pub buyer_address: Addr,
     pub buyer_has_accepted_pools: bool,
+    pub agreement_terms_hash: String
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");

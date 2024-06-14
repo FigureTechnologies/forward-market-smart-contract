@@ -13,34 +13,39 @@ mod instantiate_tests {
     #[test]
     fn instantiate_private_forward_market_contract() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_buyer", &[]);
+        let info = mock_info("contract-admin", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
-            is_private: true,
+            use_private_sellers: true,
+            use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
-            agreement_terms_hash: "mock-terms-hash".to_string(),
+            allowed_buyers: vec![],
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(1000000),
             max_face_value_cents: Uint128::new(5000000),
             tick_size: Uint128::new(1000),
             dealers: vec!["dealer-address".to_string()],
+            max_buyer_count: 1,
         };
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
         match init_response {
             Ok(response) => {
                 let expected_config_attributes = Config {
-                    is_private: true,
+                    use_private_sellers: true,
+                    use_private_buyers: false,
                     allowed_sellers: vec![
                         Addr::unchecked("allowed-seller-0"),
                         Addr::unchecked("allowed-seller-1"),
                     ],
-                    agreement_terms_hash: "mock-terms-hash".to_string(),
+                    allowed_buyers: vec![],
                     token_denom: "test.forward.market.token".to_string(),
                     min_face_value_cents: Uint128::new(1000000),
                     max_face_value_cents: Uint128::new(5000000),
                     tick_size: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
+                    max_buyer_count: 1,
+                    contract_admin: Addr::unchecked("contract-admin")
                 };
                 assert_eq!(response.attributes.len(), 1);
                 assert_eq!(
@@ -64,11 +69,6 @@ mod instantiate_tests {
                     get_version_info(&deps.storage).unwrap(),
                     expected_version_info
                 );
-
-                assert_eq!(
-                    get_buyer_address(&deps.storage),
-                    Addr::unchecked("contract_buyer")
-                )
             }
             Err(error) => {
                 panic!("failed to initialize: {:?}", error)
@@ -82,14 +82,16 @@ mod instantiate_tests {
         let info = mock_info("contract_buyer", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
-            is_private: false,
+            use_private_sellers: false,
+            use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
-            agreement_terms_hash: "mock-terms-hash".to_string(),
+            allowed_buyers: vec![],
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(1000000),
             max_face_value_cents: Uint128::new(5000000),
             tick_size: Uint128::new(1000),
             dealers: vec!["dealer-address".to_string()],
+            max_buyer_count: 1
         };
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
         match init_response {
@@ -112,14 +114,16 @@ mod instantiate_tests {
         let info = mock_info("contract_buyer", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
-            is_private: true,
+            use_private_sellers: true,
+            use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
-            agreement_terms_hash: "mock-terms-hash".to_string(),
+            allowed_buyers: vec![],
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(0),
             max_face_value_cents: Uint128::new(0),
             tick_size: Uint128::new(0),
             dealers: vec!["dealer-address".to_string()],
+            max_buyer_count: 4
         };
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
         match init_response {
@@ -141,14 +145,16 @@ mod instantiate_tests {
         let info = mock_info("contract_buyer", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
-            is_private: true,
+            use_private_sellers: true,
+            use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
-            agreement_terms_hash: "mock-terms-hash".to_string(),
+            allowed_buyers: vec![],
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(10),
             max_face_value_cents: Uint128::new(11),
             tick_size: Uint128::new(5),
             dealers: vec!["dealer-address".to_string()],
+            max_buyer_count: 5
         };
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
         match init_response {
@@ -172,14 +178,16 @@ mod instantiate_tests {
         let info = mock_info("contract_buyer", &[]);
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
-            is_private: true,
+            use_private_sellers: true,
+            use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
-            agreement_terms_hash: "mock-terms-hash".to_string(),
+            allowed_buyers: vec![],
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(10),
             max_face_value_cents: Uint128::new(11),
             tick_size: Uint128::new(0),
             dealers: vec!["dealer-address".to_string()],
+            max_buyer_count: 10
         };
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
         match init_response {
@@ -193,9 +201,5 @@ mod instantiate_tests {
                 }
             },
         }
-    }
-
-    fn get_buyer_address(store: &dyn Storage) -> Addr {
-        retrieve_buyer_state(store).unwrap().buyer_address
     }
 }

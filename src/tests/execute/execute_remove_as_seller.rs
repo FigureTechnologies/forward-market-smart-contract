@@ -21,24 +21,18 @@ mod execute_remove_as_seller_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
+                use_private_sellers: true,
+                use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
+                allowed_buyers: vec![],
                 token_denom: token_denom.into(),
                 max_face_value_cents: Uint128::new(650000000),
                 min_face_value_cents: Uint128::new(100000),
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-            },
-        )
-        .unwrap();
-
-        save_buyer_state(
-            &mut deps.storage,
-            &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
-                has_accepted_pools: false,
+                max_buyer_count: 5,
+                contract_admin: Addr::unchecked("contract-admin")
             },
         )
         .unwrap();
@@ -46,15 +40,18 @@ mod execute_remove_as_seller_tests {
         match execute(deps.as_mut(), env.clone(), info, RemoveAsSeller {}) {
             Ok(response) => {
                 let expected_config_attributes = Config {
-                    is_private: true,
+                    use_private_sellers: true,
+                    use_private_buyers: false,
                     allowed_sellers: vec![],
-                    agreement_terms_hash: "mock-terms-hash".to_string(),
+                    allowed_buyers: vec![],
                     token_denom: token_denom.to_string(),
                     min_face_value_cents: Uint128::new(100000),
                     max_face_value_cents: Uint128::new(650000000),
                     tick_size: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
+                    max_buyer_count: 5,
+                    contract_admin: Addr::unchecked("contract-admin")
                 };
                 assert_eq!(response.attributes.len(), 1);
                 assert_eq!(
@@ -85,24 +82,18 @@ mod execute_remove_as_seller_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: false,
+                use_private_sellers: false,
+                use_private_buyers: false,
                 allowed_sellers: vec![],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
+                allowed_buyers: vec![],
                 token_denom: token_denom.into(),
                 max_face_value_cents: Uint128::new(650000000),
                 min_face_value_cents: Uint128::new(100000),
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-            },
-        )
-        .unwrap();
-
-        save_buyer_state(
-            &mut deps.storage,
-            &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
-                has_accepted_pools: false,
+                max_buyer_count: 3,
+                contract_admin: Addr::unchecked("contract-admin")
             },
         )
         .unwrap();
@@ -134,24 +125,18 @@ mod execute_remove_as_seller_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
+                use_private_sellers: true,
+                use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked("allowed-seller-1")],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
+                allowed_buyers: vec![],
                 token_denom: token_denom.into(),
                 max_face_value_cents: Uint128::new(650000000),
                 min_face_value_cents: Uint128::new(100000),
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-            },
-        )
-        .unwrap();
-
-        save_buyer_state(
-            &mut deps.storage,
-            &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
-                has_accepted_pools: false,
+                max_buyer_count: 2,
+                contract_admin: Addr::unchecked("contract-admin")
             },
         )
         .unwrap();
@@ -179,31 +164,24 @@ mod execute_remove_as_seller_tests {
     fn execute_remove_as_seller_already_accepted() {
         let mut deps = mock_provenance_dependencies();
         let seller_address = "allowed-seller-0";
-        let buyer_address = "contract_buyer";
         let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
+                use_private_sellers: true,
+                use_private_buyers: true,
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
+                allowed_buyers: vec![],
                 token_denom: token_denom.into(),
                 max_face_value_cents: Uint128::new(650000000),
                 min_face_value_cents: Uint128::new(500000),
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-            },
-        )
-        .unwrap();
-
-        save_buyer_state(
-            &mut deps.storage,
-            &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
-                has_accepted_pools: false,
+                max_buyer_count: 10,
+                contract_admin: Addr::unchecked("contract-admin")
             },
         )
         .unwrap();
