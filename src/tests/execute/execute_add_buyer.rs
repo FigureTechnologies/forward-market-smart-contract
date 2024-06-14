@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod execute_add_buyer_tests {
+mod execute_add_bidder_tests {
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Response, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;

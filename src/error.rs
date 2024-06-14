@@ -189,5 +189,5 @@ pub enum ContractError {
 
     /// Occurs when a seller attempts to accept a bid when a previous bid has already been accepted
     #[error("Cannot accept bid because a bid from address {address:?} was already accepted")]
-    BidAlreadyExists { address: String },
+    BuyerAlreadyExists { address: String },
 }

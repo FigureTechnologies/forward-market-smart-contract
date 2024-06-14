@@ -1,6 +1,6 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    BidAlreadyExists, BuyerDoesNotExist, InvalidAgreementTermsHash, UnauthorizedAsSeller,
+    BuyerAlreadyExists, BuyerDoesNotExist, InvalidAgreementTermsHash, UnauthorizedAsSeller,
 };
 use crate::storage::state_store::{
     retrieve_buyer_state, retrieve_contract_config, retrieve_optional_transaction_state,
@@ -48,7 +48,7 @@ pub fn execute_accept_buyer(
     match retrieve_optional_transaction_state(deps.storage)? {
         None => {}
         Some(transaction_state) => {
-            return Err(BidAlreadyExists {
+            return Err(BuyerAlreadyExists {
                 address: transaction_state.buyer_address.to_string(),
             })
         }
