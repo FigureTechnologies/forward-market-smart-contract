@@ -1,4 +1,4 @@
-use crate::storage::state_store::{Buyer, Config, Seller, SettlementData, TransactionState};
+use crate::storage::state_store::{Bid, Config, Seller, SettlementData, TransactionState};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Uint128;
@@ -69,12 +69,12 @@ pub enum ExecuteMsg {
     /// contract before the disable operation will be allowed).
     ContractDisable {},
     /// A route used by the seller to accept a bid from a buyer in the list of buyer bids
-    AcceptBuyer {
-        buyer_address: String,
+    AcceptBid {
+        bidder_address: String,
         agreement_terms_hash: String,
     },
     /// A route used by a potential buyer to add their bid to the list of buyer bids
-    AddBuyer { agreement_terms_hash: String },
+    AddBid { agreement_terms_hash: String },
 }
 
 /// All defined payloads to be used when querying routes on this contract instance.
@@ -87,7 +87,7 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
-    pub buyers: Vec<Buyer>,
+    pub buyers: Vec<Bid>,
     pub seller: Option<Seller>,
     pub config: Config,
     pub settlement_data: Option<SettlementData>,

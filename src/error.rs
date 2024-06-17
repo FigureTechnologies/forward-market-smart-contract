@@ -183,11 +183,11 @@ pub enum ContractError {
     #[error("The limit of allowed buyers has already been reached")]
     MaxPrivateBuyersReached,
 
-    /// Occurs when a seller attempts to accept a bid for a buyer that doesn't exist
-    #[error("Bid does not exist for buyer with address {address:?}")]
-    BuyerDoesNotExist { address: String },
+    /// Occurs when a seller attempts to accept a bid for a bidder address that doesn't exist
+    #[error("Bid does not exist for address {address:?}")]
+    BidDoesNotExist { address: String },
 
     /// Occurs when a seller attempts to accept a bid when a previous bid has already been accepted
     #[error("Cannot accept bid because a bid from address {address:?} was already accepted")]
-    BidAlreadyExists { address: String },
+    BidPreviouslyAccepted { address: String },
 }

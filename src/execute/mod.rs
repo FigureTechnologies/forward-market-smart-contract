@@ -1,6 +1,6 @@
-pub mod accept_buyer;
+pub mod accept_bid;
 pub mod accept_finalized_pools;
-pub mod add_buyer;
+pub mod add_bidder;
 pub mod add_seller;
 pub mod dealer_confirm;
 pub mod dealer_reset;

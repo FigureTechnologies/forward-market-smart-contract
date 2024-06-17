@@ -3,7 +3,7 @@ mod execute_dealer_reset_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::DealerReset;
-    use crate::storage::state_store::{save_buyer_state, save_contract_config, save_seller_state, Buyer, Config, Seller, BuyerList};
+    use crate::storage::state_store::{save_bid_list_state, save_contract_config, save_seller_state, Bid, Config, Seller, BidList};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{
         to_json_binary, Addr, Attribute, Binary, ContractResult, SystemResult, Uint128,
@@ -39,7 +39,7 @@ mod execute_dealer_reset_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -55,8 +55,8 @@ mod execute_dealer_reset_tests {
 
         let pool_denoms = vec![pool_denom.into()];
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![Buyer {
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![Bid {
                 buyer_address: Addr::unchecked(buyer_address),
                 agreement_terms_hash: "".to_string(),
             }],
@@ -116,7 +116,7 @@ mod execute_dealer_reset_tests {
                     seller_state_attr,
                     Attribute::new("seller_state", format!("{:?}", expected_seller_state))
                 );
-                let expected_buyers = vec![Buyer {
+                let expected_buyers = vec![Bid {
                         buyer_address: Addr::unchecked(buyer_address),
                         agreement_terms_hash: "".to_string(),
                     }];
@@ -152,14 +152,14 @@ mod execute_dealer_reset_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
-                max_buyer_count: 1,
+                max_bid_count: 1,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
         .unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![Buyer {
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![Bid {
                 buyer_address: Addr::unchecked(buyer_address),
                 agreement_terms_hash: "".to_string(),
             }],
@@ -203,14 +203,14 @@ mod execute_dealer_reset_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
-                max_buyer_count: 6,
+                max_bid_count: 6,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
         .unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![Buyer {
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![Bid {
                 buyer_address: Addr::unchecked(buyer_address),
                 agreement_terms_hash: "".to_string(),
             }],

@@ -35,7 +35,7 @@ mod execute_finalize_pools_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 1,
+                max_bid_count: 1,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -124,7 +124,7 @@ mod execute_finalize_pools_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -185,7 +185,7 @@ mod execute_finalize_pools_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
