@@ -3,7 +3,7 @@ mod execute_add_seller_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::AddSeller;
-    use crate::storage::state_store::{save_buyer_state, save_contract_config, save_seller_state, Buyer, Config, Seller, BuyerList};
+    use crate::storage::state_store::{save_bid_list_state, save_contract_config, save_seller_state, Bid, Config, Seller, BidList};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
@@ -39,7 +39,7 @@ mod execute_add_seller_tests {
                 tick_size,
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
-                max_buyer_count: 3,
+                max_bid_count: 3,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -53,8 +53,8 @@ mod execute_add_seller_tests {
             },
         ).unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![Buyer {
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![Bid {
                 buyer_address: Addr::unchecked(buyer_address),
                 agreement_terms_hash: "".to_string(),
             }],
@@ -102,7 +102,7 @@ mod execute_add_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 10,
+                max_bid_count: 10,
                 contract_admin: Addr::unchecked(contract_admin)
             },
         )
@@ -140,7 +140,7 @@ mod execute_add_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked(contract_admin)
             },
         )
@@ -204,7 +204,7 @@ mod execute_add_seller_tests {
                 tick_size,
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked(contract_admin)
             },
         )
@@ -218,8 +218,8 @@ mod execute_add_seller_tests {
             },
         ).unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![Buyer {
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![Bid {
                 buyer_address: Addr::unchecked(buyer_address),
                 agreement_terms_hash: "".to_string(),
             }],
@@ -267,7 +267,7 @@ mod execute_add_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 5,
+                max_bid_count: 5,
                 contract_admin: Addr::unchecked(contract_admin)
             },
         )

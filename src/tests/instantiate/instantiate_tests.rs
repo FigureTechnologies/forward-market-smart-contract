@@ -4,7 +4,7 @@ mod instantiate_tests {
     use crate::error::ContractError;
     use crate::msg::InstantiateContractMsg;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{retrieve_buyer_state, Config};
+    use crate::storage::state_store::{retrieve_bid_list_state, Config};
     use crate::version_info::{get_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Storage, Uint128};
@@ -44,7 +44,7 @@ mod instantiate_tests {
                     tick_size: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
-                    max_buyer_count: 1,
+                    max_bid_count: 1,
                     contract_admin: Addr::unchecked("contract-admin")
                 };
                 assert_eq!(response.attributes.len(), 1);

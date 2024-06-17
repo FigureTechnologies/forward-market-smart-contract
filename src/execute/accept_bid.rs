@@ -1,20 +1,20 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    BuyerAlreadyExists, BuyerDoesNotExist, InvalidAgreementTermsHash, UnauthorizedAsSeller,
+    BidPreviouslyAccepted, BidDoesNotExist, InvalidAgreementTermsHash, UnauthorizedAsSeller,
 };
 use crate::storage::state_store::{
-    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_transaction_state,
-    retrieve_seller_state, save_transaction_state, Buyer, TransactionState,
+    retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_transaction_state,
+    retrieve_seller_state, save_transaction_state, Bid, TransactionState,
 };
 use crate::util::helpers::{create_and_transfer_marker, is_seller};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use std::ops::Div;
 
-pub fn execute_accept_buyer(
+pub fn execute_accept_bid(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    buyer_address_str: String,
+    bidder_address_str: String,
     agreement_terms_hash: String,
 ) -> Result<Response, ContractError> {
     // Only the seller can accept a buyer's bid
@@ -22,23 +22,23 @@ pub fn execute_accept_buyer(
         return Err(UnauthorizedAsSeller);
     }
 
-    let buyer_address = deps.api.addr_validate(&buyer_address_str)?;
+    let bidder_address = deps.api.addr_validate(&bidder_address_str)?;
 
-    // Make sure the buyer address exists in the list of buyer bids
-    let buyer_state = retrieve_buyer_state(deps.storage)?;
-    let buyer: Option<Buyer> = buyer_state
-        .buyers
+    // Make sure the bidder address exists in the list of bids
+    let bid_list = retrieve_bid_list_state(deps.storage)?;
+    let bid: Option<Bid> = bid_list
+        .bids
         .into_iter()
-        .find(|buyer| -> bool { buyer.buyer_address == buyer_address_str });
+        .find(|existing_bid| -> bool { existing_bid.buyer_address == bidder_address_str });
 
-    match buyer {
+    match bid {
         None => {
-            return Err(BuyerDoesNotExist {
-                address: buyer_address.to_string(),
+            return Err(BidDoesNotExist {
+                address: bidder_address.to_string(),
             });
         }
-        Some(buyer_state) => {
-            if buyer_state.agreement_terms_hash != agreement_terms_hash {
+        Some(bid_state) => {
+            if bid_state.agreement_terms_hash != agreement_terms_hash {
                 return Err(InvalidAgreementTermsHash);
             }
         }
@@ -48,14 +48,14 @@ pub fn execute_accept_buyer(
     match retrieve_optional_transaction_state(deps.storage)? {
         None => {}
         Some(transaction_state) => {
-            return Err(BuyerAlreadyExists {
+            return Err(BidPreviouslyAccepted {
                 address: transaction_state.buyer_address.to_string(),
             })
         }
     }
 
     let transaction_state = TransactionState {
-        buyer_address: buyer_address.clone(),
+        buyer_address: bidder_address.clone(),
         buyer_has_accepted_pools: false,
         agreement_terms_hash
     };
@@ -74,7 +74,7 @@ pub fn execute_accept_buyer(
         env.contract.address.to_string(),
         config.token_denom,
         number_of_coins,
-        buyer_address.to_string(),
+        bidder_address.to_string(),
         config.dealers.clone(),
     );
 

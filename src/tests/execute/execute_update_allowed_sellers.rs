@@ -4,7 +4,7 @@ mod execute_update_allowed_sellers {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::UpdateAllowedSellers;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config, BuyerList};
+    use crate::storage::state_store::{save_bid_list_state, save_contract_config, Bid, Config, BidList};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Uint128};
@@ -29,7 +29,7 @@ mod execute_update_allowed_sellers {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 8,
+                max_bid_count: 8,
                 contract_admin: info.sender.clone()
             },
         )
@@ -43,8 +43,8 @@ mod execute_update_allowed_sellers {
             },
         )
         .unwrap();
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![],
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![],
         }).unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
@@ -64,7 +64,7 @@ mod execute_update_allowed_sellers {
                     tick_size: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
-                    max_buyer_count: 8,
+                    max_bid_count: 8,
                     contract_admin: info.sender.clone()
                 };
                 assert_eq!(response.attributes.len(), 1);
@@ -106,7 +106,7 @@ mod execute_update_allowed_sellers {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 5,
+                max_bid_count: 5,
                 contract_admin: info.sender.clone()
             },
         )

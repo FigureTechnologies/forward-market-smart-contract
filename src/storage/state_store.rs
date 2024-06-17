@@ -20,14 +20,14 @@ pub fn save_contract_config(
     })
 }
 
-pub fn retrieve_buyer_state(storage: &dyn Storage) -> Result<BuyerList, ContractError> {
-    BUYERS.load(storage).map_err(|e| StorageError {
+pub fn retrieve_bid_list_state(storage: &dyn Storage) -> Result<BidList, ContractError> {
+    BID_LIST.load(storage).map_err(|e| StorageError {
         message: format!("{e:?}"),
     })
 }
 
-pub fn save_buyer_state(storage: &mut dyn Storage, buyer: &BuyerList) -> Result<(), ContractError> {
-    BUYERS.save(storage, buyer).map_err(|e| StorageError {
+pub fn save_bid_list_state(storage: &mut dyn Storage, buyer: &BidList) -> Result<(), ContractError> {
+    BID_LIST.save(storage, buyer).map_err(|e| StorageError {
         message: format!("{e:?}"),
     })
 }
@@ -102,7 +102,7 @@ pub struct Config {
     pub use_private_buyers: bool,
     pub allowed_sellers: Vec<Addr>,
     pub allowed_buyers: Vec<Addr>,
-    pub max_buyer_count: i32,
+    pub max_bid_count: i32,
     pub token_denom: String,
     pub max_face_value_cents: Uint128,
     pub min_face_value_cents: Uint128,
@@ -120,14 +120,13 @@ pub struct Seller {
     pub offer_hash: String,
 }
 
-// TODO: Rename this to bidders?
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
-pub struct BuyerList {
-    pub buyers: Vec<Buyer>,
+pub struct BidList {
+    pub bids: Vec<Bid>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
-pub struct Buyer {
+pub struct Bid {
     pub buyer_address: Addr,
     pub agreement_terms_hash: String,
 }
@@ -147,6 +146,6 @@ pub struct TransactionState {
 
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const SELLER: Item<Seller> = Item::new("seller");
-pub const BUYERS: Item<BuyerList> = Item::new("buyer_list");
+pub const BID_LIST: Item<BidList> = Item::new("buyer_list");
 pub const SETTLEMENT_DATA: Item<SettlementData> = Item::new("settlement_data");
 pub const TRANSACTION_STATE: Item<TransactionState> = Item::new("transaction_state");

@@ -8,7 +8,7 @@ mod execute_disable_contract_tests {
         UpdateAllowedSellers, UpdateFaceValueCents,
     };
     use crate::storage::state_store::{
-        retrieve_contract_config, save_buyer_state, save_contract_config, save_seller_state, Buyer,
+        retrieve_contract_config, save_bid_list_state, save_contract_config, save_seller_state, Bid,
         Config, Seller,
     };
     use cosmwasm_std::testing::{mock_env, mock_info};
@@ -34,7 +34,7 @@ mod execute_disable_contract_tests {
             tick_size: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
-            max_buyer_count: 1,
+            max_bid_count: 1,
             contract_admin: Addr::unchecked(contract_admin)
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
@@ -71,7 +71,7 @@ mod execute_disable_contract_tests {
             tick_size: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
-            max_buyer_count: 1,
+            max_bid_count: 1,
             contract_admin: Addr::unchecked("contract-admin")
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
@@ -114,7 +114,7 @@ mod execute_disable_contract_tests {
             tick_size: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
-            max_buyer_count: 5,
+            max_bid_count: 5,
             contract_admin: Addr::unchecked(contract_admin)
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
@@ -168,7 +168,7 @@ mod execute_disable_contract_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: true,
-                max_buyer_count: 3,
+                max_bid_count: 3,
                 contract_admin: Addr::unchecked(contract_admin)
             },
         )

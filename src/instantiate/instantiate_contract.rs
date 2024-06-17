@@ -1,7 +1,7 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{InvalidEmptyDealerConfig, InvalidVisibilityConfig};
 use crate::msg::InstantiateContractMsg;
-use crate::storage::state_store::{save_buyer_state, save_contract_config, BuyerList, Config};
+use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
 use crate::util::helpers::validate_face_values;
 use crate::version_info::{set_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
 use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, Response};
@@ -49,7 +49,7 @@ pub fn instantiate_contract(
         use_private_buyers: msg.use_private_buyers,
         allowed_sellers,
         allowed_buyers,
-        max_buyer_count: msg.max_buyer_count,
+        max_bid_count: msg.max_buyer_count,
         token_denom: msg.token_denom,
         max_face_value_cents: msg.max_face_value_cents,
         min_face_value_cents: msg.min_face_value_cents,
@@ -59,7 +59,7 @@ pub fn instantiate_contract(
         contract_admin: info.sender,
     };
     save_contract_config(deps.storage, &config)?;
-    save_buyer_state(deps.storage, &BuyerList { buyers: vec![] })?;
+    save_bid_list_state(deps.storage, &BidList { bids: vec![] })?;
 
     set_version_info(
         deps.storage,

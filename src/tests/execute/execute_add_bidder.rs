@@ -5,9 +5,9 @@ mod execute_add_bidder_tests {
     use provwasm_mocks::mock_provenance_dependencies;
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::msg::ExecuteMsg::AddBuyer;
+    use crate::msg::ExecuteMsg::AddBid;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{Buyer, BuyerList, Config, save_buyer_state, save_contract_config, Seller};
+    use crate::storage::state_store::{Bid, BidList, Config, save_bid_list_state, save_contract_config, Seller};
     use crate::version_info::{set_version_info, VersionInfoV1};
 
     #[test]
@@ -29,7 +29,7 @@ mod execute_add_bidder_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 3,
+                max_bid_count: 3,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         ).unwrap();
@@ -42,17 +42,17 @@ mod execute_add_bidder_tests {
             },
         ).unwrap();
 
-        let existing_bidder = Buyer {
+        let existing_bidder = Bid {
             buyer_address: Addr::unchecked("existing-buyer-address"),
             agreement_terms_hash: "mock-hash-existing-buyers".to_string(),
         };
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![
                 existing_bidder.clone()
             ],
         }).unwrap();
 
-        let add_bidder_message = AddBuyer {
+        let add_bidder_message = AddBid {
             agreement_terms_hash: "buyer-mock-hash".to_string(),
         };
         match execute(deps.as_mut(), env, info, add_bidder_message) {
@@ -61,7 +61,7 @@ mod execute_add_bidder_tests {
                     query_contract_state(deps.as_ref()).unwrap().buyers,
                     vec![
                         existing_bidder.clone(),
-                        Buyer {
+                        Bid {
                             buyer_address: Addr::unchecked("bidder_address"),
                             agreement_terms_hash: "buyer-mock-hash".to_string(),
                         }
@@ -93,7 +93,7 @@ mod execute_add_bidder_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 3,
+                max_bid_count: 3,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         ).unwrap();
@@ -106,11 +106,11 @@ mod execute_add_bidder_tests {
             },
         ).unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![],
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![],
         }).unwrap();
 
-        let add_bidder_message = AddBuyer {
+        let add_bidder_message = AddBid {
             agreement_terms_hash: "buyer-mock-hash".to_string(),
         };
         match execute(deps.as_mut(), env, info, add_bidder_message) {
@@ -118,7 +118,7 @@ mod execute_add_bidder_tests {
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().buyers,
                     vec![
-                        Buyer {
+                        Bid {
                             buyer_address: Addr::unchecked("bidder_address"),
                             agreement_terms_hash: "buyer-mock-hash".to_string(),
                         }
@@ -150,7 +150,7 @@ mod execute_add_bidder_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 3,
+                max_bid_count: 3,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         ).unwrap();
@@ -163,11 +163,11 @@ mod execute_add_bidder_tests {
             },
         ).unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![],
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![],
         }).unwrap();
 
-        let add_bidder_message = AddBuyer {
+        let add_bidder_message = AddBid {
             agreement_terms_hash: "buyer-mock-hash".to_string(),
         };
         match execute(deps.as_mut(), env, info, add_bidder_message) {
@@ -204,7 +204,7 @@ mod execute_add_bidder_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         ).unwrap();
@@ -217,20 +217,20 @@ mod execute_add_bidder_tests {
             },
         ).unwrap();
 
-        save_buyer_state(&mut deps.storage, &BuyerList {
-            buyers: vec![
-                Buyer {
+        save_bid_list_state(&mut deps.storage, &BidList {
+            bids: vec![
+                Bid {
                     buyer_address: Addr::unchecked("existing-buyer-address-0"),
                     agreement_terms_hash: "mock-hash-existing-buyers-0".to_string(),
                 },
-                Buyer {
+                Bid {
                     buyer_address: Addr::unchecked("existing-buyer-address-1"),
                     agreement_terms_hash: "mock-hash-existing-buyers-1".to_string(),
                 }
             ],
         }).unwrap();
 
-        let add_bidder_message = AddBuyer {
+        let add_bidder_message = AddBid {
             agreement_terms_hash: "buyer-mock-hash".to_string(),
         };
         match execute(deps.as_mut(), env, info, add_bidder_message) {

@@ -4,7 +4,7 @@ mod execute_remove_as_seller_tests {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::RemoveAsSeller;
     use crate::storage::state_store::{
-        save_buyer_state, save_contract_config, save_seller_state, Buyer, Config, Seller,
+        save_bid_list_state, save_contract_config, save_seller_state, Bid, Config, Seller,
     };
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Uint128};
@@ -31,7 +31,7 @@ mod execute_remove_as_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 5,
+                max_bid_count: 5,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -50,7 +50,7 @@ mod execute_remove_as_seller_tests {
                     tick_size: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
-                    max_buyer_count: 5,
+                    max_bid_count: 5,
                     contract_admin: Addr::unchecked("contract-admin")
                 };
                 assert_eq!(response.attributes.len(), 1);
@@ -92,7 +92,7 @@ mod execute_remove_as_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 3,
+                max_bid_count: 3,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -135,7 +135,7 @@ mod execute_remove_as_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 2,
+                max_bid_count: 2,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
@@ -180,7 +180,7 @@ mod execute_remove_as_seller_tests {
                 tick_size: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
-                max_buyer_count: 10,
+                max_bid_count: 10,
                 contract_admin: Addr::unchecked("contract-admin")
             },
         )
