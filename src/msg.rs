@@ -42,6 +42,9 @@ pub enum ExecuteMsg {
         accepted_value_cents: Uint128,
         offer_hash: String,
     },
+    UpdateSellerOfferHash {
+        offer_hash: String
+    },
     /// A route that allows the sender to remove themselves from the list of allowed sellers
     RemoveAsSeller {},
     /// A route that allows the seller to finalize a list of pools
