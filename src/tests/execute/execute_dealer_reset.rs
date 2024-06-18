@@ -3,7 +3,11 @@ mod execute_dealer_reset_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::DealerReset;
-    use crate::storage::state_store::{save_bid_list_state, save_contract_config, save_seller_state, Bid, Config, Seller, BidList};
+    use crate::query::contract_state::query_contract_state;
+    use crate::storage::state_store::{
+        save_bid_list_state, save_contract_config, save_seller_state, Bid, BidList, Config, Seller,
+    };
+    use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{
         to_json_binary, Addr, Attribute, Binary, ContractResult, SystemResult, Uint128,
@@ -13,8 +17,6 @@ mod execute_dealer_reset_tests {
     use provwasm_std::types::provenance::marker::v1::{
         Balance, QueryHoldingRequest, QueryHoldingResponse,
     };
-    use crate::query::contract_state::query_contract_state;
-    use crate::version_info::{set_version_info, VersionInfoV1};
 
     #[test]
     fn perform_dealer_reset() {
@@ -34,13 +36,11 @@ mod execute_dealer_reset_tests {
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(550000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
@@ -51,16 +51,21 @@ mod execute_dealer_reset_tests {
                 definition: "mock".to_string(),
                 version: "0.0.0".to_string(),
             },
-        ).unwrap();
+        )
+        .unwrap();
 
         let pool_denoms = vec![pool_denom.into()];
 
-        save_bid_list_state(&mut deps.storage, &BidList {
-            bids: vec![Bid {
-                buyer_address: Addr::unchecked(buyer_address),
-                agreement_terms_hash: "".to_string(),
-            }],
-        }).unwrap();
+        save_bid_list_state(
+            &mut deps.storage,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: Addr::unchecked(buyer_address),
+                    agreement_terms_hash: "".to_string(),
+                }],
+            },
+        )
+        .unwrap();
 
         save_seller_state(
             &mut deps.storage,
@@ -117,9 +122,9 @@ mod execute_dealer_reset_tests {
                     Attribute::new("seller_state", format!("{:?}", expected_seller_state))
                 );
                 let expected_buyers = vec![Bid {
-                        buyer_address: Addr::unchecked(buyer_address),
-                        agreement_terms_hash: "".to_string(),
-                    }];
+                    buyer_address: Addr::unchecked(buyer_address),
+                    agreement_terms_hash: "".to_string(),
+                }];
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().buyers,
                     expected_buyers
@@ -147,23 +152,25 @@ mod execute_dealer_reset_tests {
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(250000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 1,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
 
-        save_bid_list_state(&mut deps.storage, &BidList {
-            bids: vec![Bid {
-                buyer_address: Addr::unchecked(buyer_address),
-                agreement_terms_hash: "".to_string(),
-            }],
-        }).unwrap();
+        save_bid_list_state(
+            &mut deps.storage,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: Addr::unchecked(buyer_address),
+                    agreement_terms_hash: "".to_string(),
+                }],
+            },
+        )
+        .unwrap();
 
         match execute(deps.as_mut(), env.clone(), info, DealerReset {}) {
             Ok(_) => {
@@ -198,23 +205,25 @@ mod execute_dealer_reset_tests {
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(500000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 6,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
 
-        save_bid_list_state(&mut deps.storage, &BidList {
-            bids: vec![Bid {
-                buyer_address: Addr::unchecked(buyer_address),
-                agreement_terms_hash: "".to_string(),
-            }],
-        }).unwrap();
+        save_bid_list_state(
+            &mut deps.storage,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: Addr::unchecked(buyer_address),
+                    agreement_terms_hash: "".to_string(),
+                }],
+            },
+        )
+        .unwrap();
 
         let pool_denoms = vec![pool_denom.into()];
 

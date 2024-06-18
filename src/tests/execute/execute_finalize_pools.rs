@@ -30,13 +30,11 @@ mod execute_finalize_pools_tests {
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(350000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 1,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
@@ -119,13 +117,11 @@ mod execute_finalize_pools_tests {
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(450000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
@@ -180,13 +176,11 @@ mod execute_finalize_pools_tests {
                 allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(550000000),
-                min_face_value_cents: Uint128::new(550000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();

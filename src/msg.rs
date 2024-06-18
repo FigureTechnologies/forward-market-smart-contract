@@ -23,13 +23,8 @@ pub struct InstantiateContractMsg {
     pub max_buyer_count: i32,
     /// The denom of the marker that all seller assets with be transferred to upon successful confirmation by the dealer
     pub token_denom: String,
-    /// The maximum value that may be accepted by a seller
-    pub max_face_value_cents: Uint128,
-    /// The minimum value that may be accepted by a seller
-    pub min_face_value_cents: Uint128,
-    /// The number of coins per accepted_value_cents (if the seller accepts 1000 cents and tick size is 10, 100 coins
-    /// will be minted for the token_denom)
-    pub tick_size: Uint128,
+    /// The number of coins that will represent the forward market
+    pub token_count: Uint128,
     /// The list of addresses allowed to confirm and reset the contract
     pub dealers: Vec<String>,
 }
@@ -48,12 +43,6 @@ pub enum ExecuteMsg {
     FinalizePools { pool_denoms: Vec<String> },
     /// A route executed by the dealer that causes the settlement of the transaction
     DealerConfirm {},
-    /// A route that can be used by the buyer to update the face values before a seller has been added
-    UpdateFaceValueCents {
-        max_face_value_cents: Uint128,
-        min_face_value_cents: Uint128,
-        tick_size: Uint128,
-    },
     /// A route that can be used by the buyer to update the allowed seller's list before a seller has been added
     UpdateAllowedSellers { allowed_sellers: Vec<String> },
     /// A route used by the buyer to accept a seller's finalized list of pools

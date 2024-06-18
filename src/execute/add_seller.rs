@@ -1,14 +1,11 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    AcceptedValueExceedsMaxFaceValue, AcceptedValueLessThanMinFaceValue,
-    AcceptedValueMustBePositive, InvalidTickSizeValueMatch, SellerAlreadyExists,
-    UnauthorizedPrivateSeller,
+    AcceptedValueMustBePositive, SellerAlreadyExists, UnauthorizedPrivateSeller,
 };
 
 use crate::storage::state_store::{
     retrieve_contract_config, retrieve_optional_seller_state, save_seller_state, Seller,
 };
-use crate::util::helpers::is_valid_tick_size;
 use cosmwasm_std::{DepsMut, MessageInfo, Response, Uint128};
 
 pub fn execute_add_seller(
@@ -33,21 +30,6 @@ pub fn execute_add_seller(
     // Make sure the seller is proposing a value that is positive and non-zero
     if accepted_value_cents <= Uint128::new(0) {
         return Err(AcceptedValueMustBePositive);
-    }
-
-    // The seller shouldn't be able to propose a value lower than the min face value
-    if accepted_value_cents < config.min_face_value_cents {
-        return Err(AcceptedValueLessThanMinFaceValue);
-    }
-
-    // The seller shouldn't be able to propose a value higher than the max face value
-    if accepted_value_cents > config.max_face_value_cents {
-        return Err(AcceptedValueExceedsMaxFaceValue);
-    }
-
-    // The accepted value must be compatible with the tick size
-    if !is_valid_tick_size(config.tick_size, accepted_value_cents) {
-        return Err(InvalidTickSizeValueMatch);
     }
 
     // Store the seller information

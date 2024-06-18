@@ -3,9 +3,7 @@ mod execute_remove_as_seller_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::RemoveAsSeller;
-    use crate::storage::state_store::{
-        save_bid_list_state, save_contract_config, save_seller_state, Bid, Config, Seller,
-    };
+    use crate::storage::state_store::{save_contract_config, save_seller_state, Config, Seller};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
@@ -14,7 +12,6 @@ mod execute_remove_as_seller_tests {
     fn execute_remove_as_seller() {
         let mut deps = mock_provenance_dependencies();
         let seller_address = "seller-0";
-        let buyer_address = "contract_buyer";
         let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
@@ -26,13 +23,11 @@ mod execute_remove_as_seller_tests {
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(100000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 5,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
@@ -45,13 +40,11 @@ mod execute_remove_as_seller_tests {
                     allowed_sellers: vec![],
                     allowed_buyers: vec![],
                     token_denom: token_denom.to_string(),
-                    min_face_value_cents: Uint128::new(100000),
-                    max_face_value_cents: Uint128::new(650000000),
-                    tick_size: Uint128::new(1000),
+                    token_count: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
                     max_bid_count: 5,
-                    contract_admin: Addr::unchecked("contract-admin")
+                    contract_admin: Addr::unchecked("contract-admin"),
                 };
                 assert_eq!(response.attributes.len(), 1);
                 assert_eq!(
@@ -75,7 +68,6 @@ mod execute_remove_as_seller_tests {
     fn execute_remove_as_seller_not_private() {
         let mut deps = mock_provenance_dependencies();
         let seller_address = "allowed-seller-0";
-        let buyer_address = "contract_buyer";
         let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
@@ -87,13 +79,11 @@ mod execute_remove_as_seller_tests {
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(100000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
@@ -118,7 +108,6 @@ mod execute_remove_as_seller_tests {
     fn execute_remove_as_seller_not_in_list() {
         let mut deps = mock_provenance_dependencies();
         let seller_address = "allowed-seller-0";
-        let buyer_address = "contract_buyer";
         let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
@@ -130,13 +119,11 @@ mod execute_remove_as_seller_tests {
                 allowed_sellers: vec![Addr::unchecked("allowed-seller-1")],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(100000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
@@ -175,13 +162,11 @@ mod execute_remove_as_seller_tests {
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
                 token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(500000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 10,
-                contract_admin: Addr::unchecked("contract-admin")
+                contract_admin: Addr::unchecked("contract-admin"),
             },
         )
         .unwrap();
