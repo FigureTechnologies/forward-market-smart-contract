@@ -103,7 +103,7 @@ pub fn execute(
         ExecuteMsg::UpdateAllowedSellers { allowed_sellers } => {
             execute_update_allowed_sellers(deps, info, allowed_sellers)
         }
-        ExecuteMsg::AcceptFinalizedPools {} => execute_accept_finalized_pools(deps, info),
+        ExecuteMsg::AcceptFinalizedPools { offer_hash } => execute_accept_finalized_pools(deps, info, offer_hash),
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),
         ExecuteMsg::DealerReset {} => execute_dealer_reset(deps, env, info),
         ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, info),
