@@ -66,8 +66,8 @@ pub enum ContractError {
     #[error("The set of pools cannot be empty when finalizing the transaction")]
     InvalidFinalizationRequest,
 
-    /// Occurs if the list of approved sellers has any addresses while the contract is not marked as private
-    #[error("The list of approved sellers should be empty unless is_private = true")]
+    /// Occurs if the list of approved addresses is not empty while the visibility config for that list is private
+    #[error("The list of approved addresses should be empty unless the visibility config for that list is private ")]
     InvalidVisibilityConfig,
 
     /// Occurs if a face value or accepted value cannot be divided without remainder by the tick value

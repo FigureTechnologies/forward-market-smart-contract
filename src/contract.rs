@@ -14,6 +14,7 @@ use crate::execute::disable_contract::execute_disable_contract;
 use crate::execute::finalize_pools::execute_finalize_pools;
 use crate::execute::remove_as_seller::execute_remove_as_seller;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
+use crate::execute::update_allowed_buyers::execute_update_allowed_buyers;
 use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
 use crate::execute::update_face_value_cents::execute_update_face_value_cents;
 use crate::instantiate::instantiate_contract::instantiate_contract;
@@ -100,6 +101,9 @@ pub fn execute(
         ),
         ExecuteMsg::UpdateAllowedSellers { allowed_sellers } => {
             execute_update_allowed_sellers(deps, info, allowed_sellers)
+        }
+        ExecuteMsg::UpdateAllowedBuyers{ allowed_buyers } => {
+            execute_update_allowed_buyers(deps, info, allowed_buyers)
         }
         ExecuteMsg::AcceptFinalizedPools {} => execute_accept_finalized_pools(deps, info),
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),
