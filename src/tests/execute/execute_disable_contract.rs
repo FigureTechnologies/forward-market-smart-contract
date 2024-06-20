@@ -193,7 +193,7 @@ mod execute_disable_contract_tests {
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },
-            AcceptFinalizedPools {},
+            AcceptFinalizedPools { offer_hash: "".to_string() },
             RescindFinalizedPools {},
             DealerReset {},
         ]

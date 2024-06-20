@@ -11,6 +11,7 @@ use crate::execute::add_seller::execute_add_seller;
 use crate::execute::dealer_confirm::execute_dealer_confirm;
 use crate::execute::dealer_reset::execute_dealer_reset;
 use crate::execute::disable_contract::execute_disable_contract;
+use crate::execute::update_seller_offer_hash::execute_update_seller_offer_hash;
 use crate::execute::finalize_pools::execute_finalize_pools;
 use crate::execute::remove_as_seller::execute_remove_as_seller;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
@@ -82,6 +83,7 @@ pub fn execute(
             accepted_value_cents,
             offer_hash,
         } => execute_add_seller(deps, info, accepted_value_cents, offer_hash),
+        ExecuteMsg::UpdateSellerOfferHash { offer_hash } => execute_update_seller_offer_hash(deps, info, offer_hash),
         ExecuteMsg::RemoveAsSeller {} => execute_remove_as_seller(deps, info),
         ExecuteMsg::FinalizePools { pool_denoms } => {
             execute_finalize_pools(deps, env, info, &pool_denoms)
@@ -101,7 +103,7 @@ pub fn execute(
         ExecuteMsg::UpdateAllowedSellers { allowed_sellers } => {
             execute_update_allowed_sellers(deps, info, allowed_sellers)
         }
-        ExecuteMsg::AcceptFinalizedPools {} => execute_accept_finalized_pools(deps, info),
+        ExecuteMsg::AcceptFinalizedPools { offer_hash } => execute_accept_finalized_pools(deps, info, offer_hash),
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),
         ExecuteMsg::DealerReset {} => execute_dealer_reset(deps, env, info),
         ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, info),

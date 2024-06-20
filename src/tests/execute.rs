@@ -8,4 +8,5 @@ mod execute_update_allowed_sellers;
 mod execute_update_face_value;
 mod execute_add_bidder;
 mod execute_accept_bid;
+mod execute_update_seller_offer_hash;
 
