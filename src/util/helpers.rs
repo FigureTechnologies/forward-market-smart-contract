@@ -233,9 +233,10 @@ pub fn update_config_as_admin(
         return Err(UnauthorizedConfigUpdate);
     }
 
-    match retrieve_optional_seller_state(deps.storage)? {
-        None => {}
-        Some(_) => return Err(IllegalConfigUpdate),
+    let seller_state = retrieve_optional_seller_state(deps.storage)?;
+    let buyer_state = retrieve_optional_buyer_state(deps.storage)?;
+    if seller_state.is_some() && buyer_state.is_some() {
+        return Err(IllegalConfigUpdate)
     }
 
     save_contract_config(deps.storage, &updated_config)?;

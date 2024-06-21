@@ -36,8 +36,8 @@ pub enum ContractError {
     #[error("Only the contract admin can update the contract configuration")]
     UnauthorizedConfigUpdate,
 
-    /// Occurs if the contract admin attempts to modify configuration after the seller has already been added
-    #[error("Configuration cannot be updated once a seller has been established")]
+    /// Occurs if the contract admin attempts to modify configuration after a buyer and seller have been added
+    #[error("Configuration cannot be updated once a buyer and seller have been established")]
     IllegalConfigUpdate,
 
     /// Occurs if the sell attempts to accept a non-positive value for the contract
