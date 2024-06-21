@@ -16,7 +16,6 @@ use crate::execute::finalize_pools::execute_finalize_pools;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
 use crate::execute::update_allowed_buyers::execute_update_allowed_buyers;
 use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
-use crate::execute::update_face_value_cents::execute_update_face_value_cents;
 use crate::instantiate::instantiate_contract::instantiate_contract;
 use crate::msg::{ExecuteMsg, InstantiateContractMsg, QueryMsg};
 use crate::query::contract_state::query_contract_state;
@@ -88,17 +87,6 @@ pub fn execute(
             execute_finalize_pools(deps, env, info, &pool_denoms)
         }
         ExecuteMsg::DealerConfirm {} => execute_dealer_confirm(deps, env, info),
-        ExecuteMsg::UpdateFaceValueCents {
-            max_face_value_cents,
-            min_face_value_cents,
-            tick_size,
-        } => execute_update_face_value_cents(
-            deps,
-            info,
-            min_face_value_cents,
-            max_face_value_cents,
-            tick_size,
-        ),
         ExecuteMsg::UpdateAllowedSellers { allowed_sellers } => {
             execute_update_allowed_sellers(deps, info, allowed_sellers)
         }

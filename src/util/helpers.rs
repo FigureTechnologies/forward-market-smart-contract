@@ -1,7 +1,6 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    FaceValueMustBePositive, IllegalConfigUpdate, InvalidDenom, InvalidDenomOwnership,
-    InvalidMaxFaceValue, InvalidTickSizeValueMatch, UnauthorizedConfigUpdate,
+    IllegalConfigUpdate, InvalidDenom, InvalidDenomOwnership, UnauthorizedConfigUpdate,
 };
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
@@ -185,34 +184,6 @@ pub fn get_balance(deps: &DepsMut, denom: String) -> Result<HeldCoin, ContractEr
         coin: balance.coins.first().unwrap().clone(),
         address: balance.clone().address,
     })
-}
-
-pub fn validate_face_values(
-    min_face_value_cents: Uint128,
-    max_face_value_cents: Uint128,
-    tick_size: Uint128,
-) -> Result<(), ContractError> {
-    // Make sure the face value is positive
-    if min_face_value_cents <= Uint128::new(0) || max_face_value_cents <= Uint128::new(0) {
-        return Err(FaceValueMustBePositive);
-    }
-
-    // Max value must be greater or equal to the min value
-    if min_face_value_cents >= max_face_value_cents {
-        return Err(InvalidMaxFaceValue);
-    }
-
-    // Make sure the min and max face values are valid for the tick size
-    if !is_valid_tick_size(tick_size, min_face_value_cents)
-        || !is_valid_tick_size(tick_size, max_face_value_cents)
-    {
-        return Err(InvalidTickSizeValueMatch);
-    }
-    Ok(())
-}
-
-pub fn is_valid_tick_size(tick_size: Uint128, face_value_cents: Uint128) -> bool {
-    tick_size > Uint128::new(0) && face_value_cents % tick_size == Uint128::new(0)
 }
 
 pub fn is_seller(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {

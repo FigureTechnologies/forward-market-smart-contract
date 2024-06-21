@@ -40,14 +40,6 @@ pub enum ContractError {
     #[error("Configuration cannot be updated once a seller has been established")]
     IllegalConfigUpdate,
 
-    /// Occurs if a negative value for either the minimum or maximum face value is submitted
-    #[error("The face value of the forward market contract must be greater than 0")]
-    FaceValueMustBePositive,
-
-    /// Occurs if the max face value does not exceed or equal the minimum face value
-    #[error("The max face value of the forward market contract must be greater than or equal to the min face value")]
-    InvalidMaxFaceValue,
-
     /// Occurs if the sell attempts to accept a non-positive value for the contract
     #[error("The face value of the forward market contract must be greater than 0")]
     AcceptedValueMustBePositive,
@@ -71,8 +63,8 @@ pub enum ContractError {
     InvalidVisibilityConfig,
 
     /// Occurs if a face value or accepted value cannot be divided without remainder by the tick value
-    #[error("Tick size must divide the face value into a whole number")]
-    InvalidTickSizeValueMatch,
+    #[error("Token count must be greater than 0")]
+    InvalidTokenCount,
 
     /// Occurs if an attempt to finalize a list of pools is made after the pool has already been finalized by the seller
     #[error("The list of pools has already been finalized")]
