@@ -19,7 +19,7 @@ mod execute_dealer_confirm_tests {
 
     use crate::msg::ExecuteMsg::{
         AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, DealerReset,
-        FinalizePools, RemoveAsSeller, RescindFinalizedPools,
+        FinalizePools, RescindFinalizedPools,
         UpdateAllowedSellers, UpdateFaceValueCents,
     };
 
@@ -380,7 +380,6 @@ mod execute_dealer_confirm_tests {
                 accepted_value_cents: Uint128::new(1),
                 offer_hash: "mock-offer-hash".to_string(),
             },
-            RemoveAsSeller {},
             FinalizePools {
                 pool_denoms: vec![],
             },

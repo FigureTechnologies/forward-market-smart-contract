@@ -13,7 +13,6 @@ use crate::execute::dealer_reset::execute_dealer_reset;
 use crate::execute::disable_contract::execute_disable_contract;
 use crate::execute::update_seller_offer_hash::execute_update_seller_offer_hash;
 use crate::execute::finalize_pools::execute_finalize_pools;
-use crate::execute::remove_as_seller::execute_remove_as_seller;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
 use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
 use crate::execute::update_face_value_cents::execute_update_face_value_cents;
@@ -84,7 +83,6 @@ pub fn execute(
             offer_hash,
         } => execute_add_seller(deps, info, accepted_value_cents, offer_hash),
         ExecuteMsg::UpdateSellerOfferHash { offer_hash } => execute_update_seller_offer_hash(deps, info, offer_hash),
-        ExecuteMsg::RemoveAsSeller {} => execute_remove_as_seller(deps, info),
         ExecuteMsg::FinalizePools { pool_denoms } => {
             execute_finalize_pools(deps, env, info, &pool_denoms)
         }

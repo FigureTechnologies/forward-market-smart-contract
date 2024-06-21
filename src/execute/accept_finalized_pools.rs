@@ -1,6 +1,6 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalAcceptingParty, IllegalPoolAcceptanceRequest, InvalidOfferHash, PoolAlreadyAccepted};
-use crate::storage::state_store::{retrieve_optional_buyer_state, retrieve_seller_state, save_buyer_state, Buyer};
+use crate::storage::state_store::{retrieve_optional_buyer_state, retrieve_seller_state, save_buyer_state};
 use crate::util::helpers::{buyer_has_accepted, is_buyer, seller_has_finalized};
 use cosmwasm_std::{DepsMut, MessageInfo, Response};
 

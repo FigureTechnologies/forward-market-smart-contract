@@ -2,7 +2,7 @@ use crate::error::ContractError;
 use crate::error::ContractError::{
     BidPreviouslyAccepted, BidDoesNotExist, InvalidAgreementTermsHash, UnauthorizedAsSeller,
 };
-use crate::storage::state_store::{retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_buyer_state, retrieve_seller_state, save_buyer_state, Bid, Buyer, save_seller_state};
+use crate::storage::state_store::{retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_buyer_state, retrieve_seller_state, save_buyer_state, Bid, Buyer};
 use crate::util::helpers::{create_and_transfer_marker, is_seller};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use std::ops::Div;

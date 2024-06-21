@@ -45,8 +45,6 @@ pub enum ExecuteMsg {
     UpdateSellerOfferHash {
         offer_hash: String
     },
-    /// A route that allows the sender to remove themselves from the list of allowed sellers
-    RemoveAsSeller {},
     /// A route that allows the seller to finalize a list of pools
     FinalizePools { pool_denoms: Vec<String> },
     /// A route executed by the dealer that causes the settlement of the transaction
