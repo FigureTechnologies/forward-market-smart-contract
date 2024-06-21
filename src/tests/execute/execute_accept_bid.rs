@@ -4,10 +4,7 @@ mod execute_accept_buyer_tests {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::AcceptBid;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{
-        save_bid_list_state, save_contract_config, save_seller_state, save_transaction_state, Bid,
-        BidList, Config, Seller, TransactionState,
-    };
+    use crate::storage::state_store::{Bid, BidList, Config, save_bid_list_state, save_contract_config, save_seller_state, save_buyer_state, Seller, Buyer};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Uint128};
@@ -81,11 +78,8 @@ mod execute_accept_buyer_tests {
         match execute(deps.as_mut(), env, info, accept_bid_message) {
             Ok(_) => {
                 assert_eq!(
-                    query_contract_state(deps.as_ref())
-                        .unwrap()
-                        .transaction_state
-                        .unwrap(),
-                    TransactionState {
+                    query_contract_state(deps.as_ref()).unwrap().buyer.unwrap(),
+                    Buyer {
                         buyer_address: Addr::unchecked("existing-buyer-address-0"),
                         buyer_has_accepted_pools: false,
                         agreement_terms_hash: "mock-hash-existing-buyers-0".to_string(),
@@ -305,15 +299,11 @@ mod execute_accept_buyer_tests {
         )
         .unwrap();
 
-        save_transaction_state(
-            &mut deps.storage,
-            &TransactionState {
-                buyer_address: Addr::unchecked("buyer-address-0"),
-                buyer_has_accepted_pools: false,
-                agreement_terms_hash: "mock-hash-buyers-0".to_string(),
-            },
-        )
-        .unwrap();
+        save_buyer_state(&mut deps.storage, &Buyer {
+            buyer_address: Addr::unchecked("buyer-address-0"),
+            buyer_has_accepted_pools: false,
+            agreement_terms_hash: "mock-hash-buyers-0".to_string(),
+        }).unwrap();
 
         let accept_buyer_message = AcceptBid {
             bidder_address: "buyer-address-1".to_string(),

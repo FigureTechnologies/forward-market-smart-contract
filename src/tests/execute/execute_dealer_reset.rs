@@ -126,7 +126,7 @@ mod execute_dealer_reset_tests {
                     agreement_terms_hash: "".to_string(),
                 }];
                 assert_eq!(
-                    query_contract_state(deps.as_ref()).unwrap().buyers,
+                    query_contract_state(deps.as_ref()).unwrap().bids,
                     expected_buyers
                 );
             }

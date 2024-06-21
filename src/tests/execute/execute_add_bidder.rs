@@ -62,7 +62,7 @@ mod execute_add_bidder_tests {
         match execute(deps.as_mut(), env, info, add_bidder_message) {
             Ok(_) => {
                 assert_eq!(
-                    query_contract_state(deps.as_ref()).unwrap().buyers,
+                    query_contract_state(deps.as_ref()).unwrap().bids,
                     vec![
                         existing_bidder.clone(),
                         Bid {
@@ -118,11 +118,13 @@ mod execute_add_bidder_tests {
         match execute(deps.as_mut(), env, info, add_bidder_message) {
             Ok(_) => {
                 assert_eq!(
-                    query_contract_state(deps.as_ref()).unwrap().buyers,
-                    vec![Bid {
-                        buyer_address: Addr::unchecked("bidder_address"),
-                        agreement_terms_hash: "buyer-mock-hash".to_string(),
-                    }]
+                    query_contract_state(deps.as_ref()).unwrap().bids,
+                    vec![
+                        Bid {
+                            buyer_address: Addr::unchecked("bidder_address"),
+                            agreement_terms_hash: "buyer-mock-hash".to_string(),
+                        }
+                    ]
                 );
             }
             Err(error) => {

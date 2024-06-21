@@ -2,10 +2,7 @@ use crate::error::ContractError;
 use crate::error::ContractError::{
     BidDoesNotExist, BidPreviouslyAccepted, InvalidAgreementTermsHash, UnauthorizedAsSeller,
 };
-use crate::storage::state_store::{
-    retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_transaction_state,
-    save_transaction_state, Bid, TransactionState,
-};
+use crate::storage::state_store::{retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_buyer_state, save_buyer_state, Bid, Buyer};
 use crate::util::helpers::{create_and_transfer_marker, is_seller};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
@@ -44,21 +41,21 @@ pub fn execute_accept_bid(
     }
 
     // Return an error if the seller has already accepted a bid
-    match retrieve_optional_transaction_state(deps.storage)? {
+    match retrieve_optional_buyer_state(deps.storage)? {
         None => {}
-        Some(transaction_state) => {
+        Some(buyer) => {
             return Err(BidPreviouslyAccepted {
-                address: transaction_state.buyer_address.to_string(),
+                address: buyer.buyer_address.to_string(),
             })
         }
     }
 
-    let transaction_state = TransactionState {
+    let buyer = Buyer {
         buyer_address: bidder_address.clone(),
         buyer_has_accepted_pools: false,
-        agreement_terms_hash,
+        agreement_terms_hash: agreement_terms_hash.clone()
     };
-    save_transaction_state(deps.storage, &transaction_state)?;
+    save_buyer_state(deps.storage, &buyer)?;
 
     let config = retrieve_contract_config(deps.storage)?;
 
@@ -73,5 +70,5 @@ pub fn execute_accept_bid(
 
     Ok(Response::new()
         .add_messages(create_token_messages)
-        .add_attribute("transaction_state", format!("{:?}", transaction_state)))
+        .add_attribute("buyer", format!("{:?}", buyer)))
 }

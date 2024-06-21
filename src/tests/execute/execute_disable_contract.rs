@@ -4,7 +4,8 @@ mod execute_disable_contract_tests {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::{
         AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, DealerReset,
-        FinalizePools, RemoveAsSeller, RescindFinalizedPools, UpdateAllowedSellers,
+        FinalizePools, RescindFinalizedPools,
+        UpdateAllowedSellers,
     };
     use crate::storage::state_store::{
         retrieve_contract_config, save_contract_config, save_seller_state, Config, Seller,
@@ -169,7 +170,6 @@ mod execute_disable_contract_tests {
                 accepted_value_cents: Uint128::new(1),
                 offer_hash: "mock-offer-hash".to_string(),
             },
-            RemoveAsSeller {},
             FinalizePools {
                 pool_denoms: vec![],
             },
@@ -177,7 +177,7 @@ mod execute_disable_contract_tests {
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },
-            AcceptFinalizedPools {},
+            AcceptFinalizedPools { offer_hash: "".to_string() },
             RescindFinalizedPools {},
             DealerReset {},
         ]

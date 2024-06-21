@@ -171,6 +171,10 @@ pub enum ContractError {
     #[error("The agreement terms hash provided by the seller does not match the current agreement terms hash")]
     InvalidAgreementTermsHash,
 
+    /// Occurs if the buyer is agreeing to an offer hash that does not match the latest for the seller
+    #[error("The offer hash provided does not match the current offer hash of the seller")]
+    InvalidOfferHash,
+
     /// Occurs when a buyer attempts to submit a bid but the limit of allowed buyers has already been reached
     #[error("The limit of allowed buyers has already been reached")]
     MaxPrivateBuyersReached,
@@ -182,4 +186,8 @@ pub enum ContractError {
     /// Occurs when a seller attempts to accept a bid when a previous bid has already been accepted
     #[error("Cannot accept bid because a bid from address {address:?} was already accepted")]
     BidPreviouslyAccepted { address: String },
+
+    /// Occurs when a seller attempts to update an offer hash after a buyer has accepted the offer
+    #[error("The offer has cannot be updated after a buyer has accepted it")]
+    IllegalOfferHashUpdate
 }

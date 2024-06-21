@@ -5,7 +5,7 @@ use crate::error::ContractError::{
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
 use crate::storage::state_store::{
-    retrieve_contract_config, retrieve_optional_seller_state, retrieve_optional_transaction_state,
+    retrieve_contract_config, retrieve_optional_seller_state, retrieve_optional_buyer_state,
     save_contract_config, Config,
 };
 use bech32::ToBase32;
@@ -206,14 +206,14 @@ pub fn seller_has_finalized(deps: &DepsMut) -> Result<bool, ContractError> {
 }
 
 pub fn is_buyer(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
-    return match retrieve_optional_transaction_state(deps.storage)? {
+    return match retrieve_optional_buyer_state(deps.storage)? {
         None => Ok(false),
         Some(state) => Ok(state.buyer_address == info.sender),
     };
 }
 
 pub fn buyer_has_accepted(deps: &DepsMut) -> Result<bool, ContractError> {
-    return match retrieve_optional_transaction_state(deps.storage)? {
+    return match retrieve_optional_buyer_state(deps.storage)? {
         None => Ok(false),
         Some(state) => Ok(state.buyer_has_accepted_pools),
     };

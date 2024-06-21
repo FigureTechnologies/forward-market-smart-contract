@@ -74,29 +74,29 @@ pub fn save_settlement_data_state(
         })
 }
 
-pub fn retrieve_optional_transaction_state(
+pub fn retrieve_optional_buyer_state(
     storage: &dyn Storage,
-) -> Result<Option<TransactionState>, ContractError> {
-    TRANSACTION_STATE
+) -> Result<Option<Buyer>, ContractError> {
+    BUYER_STATE
         .may_load(storage)
         .map_err(|e| StorageError {
             message: format!("{e:?}"),
         })
 }
 
-pub fn save_transaction_state(
+pub fn save_buyer_state(
     storage: &mut dyn Storage,
-    transaction_state: &TransactionState,
+    buyer: &Buyer,
 ) -> Result<(), ContractError> {
-    TRANSACTION_STATE
-        .save(storage, transaction_state)
+    BUYER_STATE
+        .save(storage, buyer)
         .map_err(|e| StorageError {
             message: format!("{e:?}"),
         })
 }
 
-pub fn clear_transaction_state(storage: &mut dyn Storage) -> () {
-    TRANSACTION_STATE.remove(storage)
+pub fn clear_buyer_state(storage: &mut dyn Storage) -> () {
+    BUYER_STATE.remove(storage)
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -139,7 +139,7 @@ pub struct SettlementData {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
-pub struct TransactionState {
+pub struct Buyer {
     pub buyer_address: Addr,
     pub buyer_has_accepted_pools: bool,
     pub agreement_terms_hash: String,
@@ -149,4 +149,4 @@ pub const CONFIG: Item<Config> = Item::new("config");
 pub const SELLER: Item<Seller> = Item::new("seller");
 pub const BID_LIST: Item<BidList> = Item::new("buyer_list");
 pub const SETTLEMENT_DATA: Item<SettlementData> = Item::new("settlement_data");
-pub const TRANSACTION_STATE: Item<TransactionState> = Item::new("transaction_state");
+pub const BUYER_STATE: Item<Buyer> = Item::new("buyer");
