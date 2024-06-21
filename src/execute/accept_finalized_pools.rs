@@ -1,12 +1,13 @@
 use crate::error::ContractError;
-use crate::error::ContractError::{IllegalAcceptingParty, IllegalPoolAcceptanceRequest, PoolAlreadyAccepted};
-use crate::storage::state_store::{retrieve_optional_transaction_state, save_transaction_state, TransactionState};
+use crate::error::ContractError::{IllegalAcceptingParty, IllegalPoolAcceptanceRequest, InvalidOfferHash, PoolAlreadyAccepted};
+use crate::storage::state_store::{retrieve_optional_buyer_state, retrieve_seller_state, save_buyer_state};
 use crate::util::helpers::{buyer_has_accepted, is_buyer, seller_has_finalized};
 use cosmwasm_std::{DepsMut, MessageInfo, Response};
 
 pub fn execute_accept_finalized_pools(
     deps: DepsMut,
     info: MessageInfo,
+    offer_hash: String
 ) -> Result<Response, ContractError> {
     // Only the buyer can accept the finalized pool list
     if !is_buyer(&deps, &info)? {
@@ -23,16 +24,18 @@ pub fn execute_accept_finalized_pools(
         return Err(PoolAlreadyAccepted);
     }
 
-    let current_transaction_state = retrieve_optional_transaction_state(deps.storage)?.unwrap();
+    let mut current_buyer = retrieve_optional_buyer_state(deps.storage)?.unwrap();
 
-    let transaction_state = TransactionState {
-        buyer_address: current_transaction_state.buyer_address,
-        buyer_has_accepted_pools: true,
-        agreement_terms_hash: current_transaction_state.agreement_terms_hash
-    };
+    let seller_state = retrieve_seller_state(deps.storage)?;
+
+    if offer_hash != seller_state.offer_hash {
+        return Err(InvalidOfferHash)
+    }
+
+    current_buyer.buyer_has_accepted_pools = true;
 
     // Update the transaction state to reflect that the buyer has accepted
-    save_transaction_state(deps.storage, &transaction_state)?;
+    save_buyer_state(deps.storage, &current_buyer)?;
 
-    Ok(Response::new().add_attribute("transaction_state", format!("{:?}", transaction_state)))
+    Ok(Response::new().add_attribute("buyer", format!("{:?}", current_buyer)))
 }

@@ -1,4 +1,4 @@
-use crate::storage::state_store::{Bid, Config, Seller, SettlementData, TransactionState};
+use crate::storage::state_store::{Bid, Config, Seller, SettlementData, Buyer};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Uint128;
@@ -42,6 +42,9 @@ pub enum ExecuteMsg {
         accepted_value_cents: Uint128,
         offer_hash: String,
     },
+    UpdateSellerOfferHash {
+        offer_hash: String
+    },
     /// A route that allows the seller to finalize a list of pools
     FinalizePools { pool_denoms: Vec<String> },
     /// A route executed by the dealer that causes the settlement of the transaction
@@ -55,7 +58,7 @@ pub enum ExecuteMsg {
     /// A route that can be used by the buyer to update the allowed seller's list before a seller has been added
     UpdateAllowedSellers { allowed_sellers: Vec<String> },
     /// A route used by the buyer to accept a seller's finalized list of pools
-    AcceptFinalizedPools {},
+    AcceptFinalizedPools { offer_hash: String },
     /// A route used by the seller to rescind a finalized list of pools before the buyer has accepted
     RescindFinalizedPools {},
     /// A route used by the dealer to reset a contract, which will clear buyer acceptance, seller finalization, and
@@ -85,12 +88,12 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
-    pub buyers: Vec<Bid>,
+    pub bids: Vec<Bid>,
     pub seller: Option<Seller>,
     pub config: Config,
     pub settlement_data: Option<SettlementData>,
     pub version_info: VersionInfoV1,
-    pub transaction_state: Option<TransactionState>,
+    pub buyer: Option<Buyer>,
 }
 
 #[derive(Clone, Debug, PartialEq)]

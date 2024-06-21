@@ -1,7 +1,7 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalDealerResetRequest, InvalidDealerResetRequest};
 use crate::storage::state_store::{
-    clear_transaction_state, retrieve_optional_seller_state, retrieve_optional_transaction_state,
+    clear_buyer_state, retrieve_optional_seller_state, retrieve_optional_buyer_state,
     save_seller_state,
 };
 use crate::util::helpers::{create_send_coin_back_to_seller_messages, is_dealer};
@@ -37,9 +37,9 @@ pub fn execute_dealer_reset(
     updated_seller.pool_denoms = vec![];
     save_seller_state(deps.storage, &updated_seller)?;
 
-    clear_transaction_state(deps.storage);
+    clear_buyer_state(deps.storage);
 
-    match retrieve_optional_transaction_state(deps.storage)? {
+    match retrieve_optional_buyer_state(deps.storage)? {
         None => {}
         Some(_) => {}
     }

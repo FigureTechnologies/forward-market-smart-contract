@@ -2,7 +2,7 @@
 mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_bid_list_state, save_contract_config, save_seller_state, save_settlement_data_state, Bid, Config, Seller, SettlementData, BidList, save_transaction_state, TransactionState};
+    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_bid_list_state, save_contract_config, save_seller_state, save_settlement_data_state, Bid, Config, Seller, SettlementData, BidList, save_buyer_state, Buyer};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
@@ -71,9 +71,9 @@ mod execute_dealer_confirm_tests {
         )
         .unwrap();
 
-        save_transaction_state(
+        save_buyer_state(
             &mut deps.storage,
-            &TransactionState {
+            &Buyer {
                 buyer_address: Addr::unchecked(buyer_address),
                 buyer_has_accepted_pools: true,
                 agreement_terms_hash: "".to_string(),
@@ -234,9 +234,9 @@ mod execute_dealer_confirm_tests {
         )
         .unwrap();
 
-        save_transaction_state(
+        save_buyer_state(
             &mut deps.storage,
-            &TransactionState {
+            &Buyer {
                 buyer_address: Addr::unchecked(buyer_address),
                 buyer_has_accepted_pools: true,
                 agreement_terms_hash: "".to_string(),
@@ -392,7 +392,7 @@ mod execute_dealer_confirm_tests {
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },
-            AcceptFinalizedPools {},
+            AcceptFinalizedPools { offer_hash: "".to_string() },
             RescindFinalizedPools {},
             DealerReset {},
         ]
