@@ -26,7 +26,10 @@ pub fn retrieve_bid_list_state(storage: &dyn Storage) -> Result<BidList, Contrac
     })
 }
 
-pub fn save_bid_list_state(storage: &mut dyn Storage, buyer: &BidList) -> Result<(), ContractError> {
+pub fn save_bid_list_state(
+    storage: &mut dyn Storage,
+    buyer: &BidList,
+) -> Result<(), ContractError> {
     BID_LIST.save(storage, buyer).map_err(|e| StorageError {
         message: format!("{e:?}"),
     })
@@ -104,9 +107,7 @@ pub struct Config {
     pub allowed_buyers: Vec<Addr>,
     pub max_bid_count: i32,
     pub token_denom: String,
-    pub max_face_value_cents: Uint128,
-    pub min_face_value_cents: Uint128,
-    pub tick_size: Uint128,
+    pub token_count: Uint128,
     pub dealers: Vec<Addr>,
     pub is_disabled: bool,
     pub contract_admin: Addr,
@@ -141,7 +142,7 @@ pub struct SettlementData {
 pub struct Buyer {
     pub buyer_address: Addr,
     pub buyer_has_accepted_pools: bool,
-    pub agreement_terms_hash: String
+    pub agreement_terms_hash: String,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");

@@ -2,12 +2,12 @@
 mod execute_update_seller_offer_hash {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::msg::ExecuteMsg::{AddSeller, UpdateFaceValueCents, UpdateSellerOfferHash};
+    use crate::msg::ExecuteMsg::{UpdateSellerOfferHash};
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{save_bid_list_state, save_contract_config, Bid, Config, BidList, save_seller_state, Seller, retrieve_seller_state};
+    use crate::storage::state_store::{save_bid_list_state, save_contract_config, Config, BidList, save_seller_state, Seller};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, Response, Uint128};
+    use cosmwasm_std::{Addr, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -24,9 +24,7 @@ mod execute_update_seller_offer_hash {
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
                 token_denom: "test.forward.market.token".to_string(),
-                max_face_value_cents: Uint128::new(500000000),
-                min_face_value_cents: Uint128::new(100000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
@@ -91,9 +89,7 @@ mod execute_update_seller_offer_hash {
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
                 token_denom: "test.forward.market.token".to_string(),
-                max_face_value_cents: Uint128::new(500000000),
-                min_face_value_cents: Uint128::new(100000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,

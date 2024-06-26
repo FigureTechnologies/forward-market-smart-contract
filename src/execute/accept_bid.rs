@@ -1,11 +1,10 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    BidPreviouslyAccepted, BidDoesNotExist, InvalidAgreementTermsHash, UnauthorizedAsSeller,
+    BidDoesNotExist, BidPreviouslyAccepted, InvalidAgreementTermsHash, UnauthorizedAsSeller,
 };
-use crate::storage::state_store::{retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_buyer_state, retrieve_seller_state, save_buyer_state, Bid, Buyer};
+use crate::storage::state_store::{retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_buyer_state, save_buyer_state, Bid, Buyer};
 use crate::util::helpers::{create_and_transfer_marker, is_seller};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
-use std::ops::Div;
 
 pub fn execute_accept_bid(
     deps: DepsMut,
@@ -58,20 +57,13 @@ pub fn execute_accept_bid(
     };
     save_buyer_state(deps.storage, &buyer)?;
 
-    let seller_state = retrieve_seller_state(deps.storage)?;
-
     let config = retrieve_contract_config(deps.storage)?;
-
-    let number_of_coins = seller_state
-        .accepted_value_cents
-        .clone()
-        .div(config.tick_size.clone());
 
     // Now that we have a buyer, we can create the forward market token and give it to the buyer
     let create_token_messages = create_and_transfer_marker(
         env.contract.address.to_string(),
         config.token_denom,
-        number_of_coins,
+        config.token_count,
         bidder_address.to_string(),
         config.dealers.clone(),
     );

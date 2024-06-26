@@ -1,10 +1,11 @@
 use crate::error::ContractError;
-use crate::error::ContractError::{InvalidEmptyDealerConfig, InvalidVisibilityConfig};
+use crate::error::ContractError::{
+    InvalidEmptyDealerConfig, InvalidTokenCount, InvalidVisibilityConfig,
+};
 use crate::msg::InstantiateContractMsg;
 use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
-use crate::util::helpers::validate_face_values;
 use crate::version_info::{set_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
-use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, Response};
+use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, Response, Uint128};
 
 pub fn instantiate_contract(
     deps: DepsMut,
@@ -12,13 +13,6 @@ pub fn instantiate_contract(
     info: MessageInfo,
     msg: InstantiateContractMsg,
 ) -> Result<Response, ContractError> {
-    // Validate the tick size against the min and max values
-    validate_face_values(
-        msg.min_face_value_cents,
-        msg.max_face_value_cents,
-        msg.tick_size,
-    )?;
-
     // Convert the list of allowed sellers to addresses if the contract uses private sellers
     let mut allowed_sellers = vec![];
     if msg.use_private_sellers {
@@ -43,6 +37,11 @@ pub fn instantiate_contract(
     // Convert the list of dealers to addresses
     let dealer_addresses = validate_and_map_address(msg.dealers, &deps)?;
 
+    // The accepted value must be compatible with the tick size
+    if msg.token_count <= Uint128::new(0) {
+        return Err(InvalidTokenCount);
+    }
+
     // Store the initial configuration
     let config = Config {
         use_private_sellers: msg.use_private_sellers,
@@ -51,9 +50,7 @@ pub fn instantiate_contract(
         allowed_buyers,
         max_bid_count: msg.max_buyer_count,
         token_denom: msg.token_denom,
-        max_face_value_cents: msg.max_face_value_cents,
-        min_face_value_cents: msg.min_face_value_cents,
-        tick_size: msg.tick_size,
+        token_count: msg.token_count,
         dealers: dealer_addresses,
         is_disabled: false,
         contract_admin: info.sender,

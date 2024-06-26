@@ -5,11 +5,10 @@ mod execute_disable_contract_tests {
     use crate::msg::ExecuteMsg::{
         AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, DealerReset,
         FinalizePools, RescindFinalizedPools,
-        UpdateAllowedSellers, UpdateFaceValueCents,
+        UpdateAllowedSellers,
     };
     use crate::storage::state_store::{
-        retrieve_contract_config, save_bid_list_state, save_contract_config, save_seller_state, Bid,
-        Config, Seller,
+        retrieve_contract_config, save_contract_config, save_seller_state, Config, Seller,
     };
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Uint128};
@@ -29,13 +28,11 @@ mod execute_disable_contract_tests {
             allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
             allowed_buyers: vec![],
             token_denom: token_denom.into(),
-            max_face_value_cents: Uint128::new(550000000),
-            min_face_value_cents: Uint128::new(550000000),
-            tick_size: Uint128::new(1000),
+            token_count: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
             max_bid_count: 1,
-            contract_admin: Addr::unchecked(contract_admin)
+            contract_admin: Addr::unchecked(contract_admin),
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
 
@@ -56,7 +53,6 @@ mod execute_disable_contract_tests {
     fn execute_disable_contract_unauthorized() {
         let mut deps = mock_provenance_dependencies();
         let allowed_seller_address = "allowed-seller";
-        let buyer_address = "buyer-address";
         let token_denom = "test.forward.market.token";
         let info = mock_info(allowed_seller_address, &[]);
         let env = mock_env();
@@ -66,13 +62,11 @@ mod execute_disable_contract_tests {
             allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
             allowed_buyers: vec![],
             token_denom: token_denom.into(),
-            max_face_value_cents: Uint128::new(550000000),
-            min_face_value_cents: Uint128::new(550000000),
-            tick_size: Uint128::new(1000),
+            token_count: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
             max_bid_count: 1,
-            contract_admin: Addr::unchecked("contract-admin")
+            contract_admin: Addr::unchecked("contract-admin"),
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
 
@@ -109,13 +103,11 @@ mod execute_disable_contract_tests {
             allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
             allowed_buyers: vec![],
             token_denom: token_denom.into(),
-            max_face_value_cents: Uint128::new(550000000),
-            min_face_value_cents: Uint128::new(350000000),
-            tick_size: Uint128::new(1000),
+            token_count: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
             max_bid_count: 5,
-            contract_admin: Addr::unchecked(contract_admin)
+            contract_admin: Addr::unchecked(contract_admin),
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
 
@@ -163,13 +155,11 @@ mod execute_disable_contract_tests {
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
                 token_denom: "denom".into(),
-                max_face_value_cents: Uint128::new(550000000),
-                min_face_value_cents: Uint128::new(550000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: true,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked(contract_admin)
+                contract_admin: Addr::unchecked(contract_admin),
             },
         )
         .unwrap();
@@ -184,11 +174,6 @@ mod execute_disable_contract_tests {
                 pool_denoms: vec![],
             },
             DealerConfirm {},
-            UpdateFaceValueCents {
-                max_face_value_cents: Uint128::new(1),
-                min_face_value_cents: Uint128::new(1),
-                tick_size: Uint128::new(1),
-            },
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },

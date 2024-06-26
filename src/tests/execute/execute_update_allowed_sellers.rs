@@ -4,7 +4,7 @@ mod execute_update_allowed_sellers {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::UpdateAllowedSellers;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{save_bid_list_state, save_contract_config, Bid, Config, BidList};
+    use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{Addr, Attribute, Uint128};
@@ -24,13 +24,11 @@ mod execute_update_allowed_sellers {
                 allowed_sellers: vec![Addr::unchecked("allowed-seller-0")],
                 allowed_buyers: vec![],
                 token_denom: "test.forward.market.token".into(),
-                max_face_value_cents: Uint128::new(9000000000),
-                min_face_value_cents: Uint128::new(500000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 8,
-                contract_admin: info.sender.clone()
+                contract_admin: info.sender.clone(),
             },
         )
         .unwrap();
@@ -43,9 +41,7 @@ mod execute_update_allowed_sellers {
             },
         )
         .unwrap();
-        save_bid_list_state(&mut deps.storage, &BidList {
-            bids: vec![],
-        }).unwrap();
+        save_bid_list_state(&mut deps.storage, &BidList { bids: vec![] }).unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
             allowed_sellers: vec!["allowed-seller-2".into()],
@@ -59,13 +55,11 @@ mod execute_update_allowed_sellers {
                     allowed_sellers: vec![Addr::unchecked("allowed-seller-2")],
                     allowed_buyers: vec![],
                     token_denom: "test.forward.market.token".to_string(),
-                    min_face_value_cents: Uint128::new(500000000),
-                    max_face_value_cents: Uint128::new(9000000000),
-                    tick_size: Uint128::new(1000),
+                    token_count: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
                     max_bid_count: 8,
-                    contract_admin: info.sender.clone()
+                    contract_admin: info.sender.clone(),
                 };
                 assert_eq!(response.attributes.len(), 1);
                 assert_eq!(
@@ -101,13 +95,11 @@ mod execute_update_allowed_sellers {
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
                 token_denom: "test.forward.market.token".into(),
-                max_face_value_cents: Uint128::new(500000000),
-                min_face_value_cents: Uint128::new(200000000),
-                tick_size: Uint128::new(1000),
+                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 5,
-                contract_admin: info.sender.clone()
+                contract_admin: info.sender.clone(),
             },
         )
         .unwrap();
