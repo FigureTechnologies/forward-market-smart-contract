@@ -23,7 +23,7 @@ pub fn instantiate_contract(
 
     // Convert the list of allowed buyers to addresses if the contract uses private buyers
     let mut allowed_buyers = vec![];
-    if msg.use_private_sellers {
+    if msg.use_private_buyers {
         allowed_buyers = validate_and_map_address(msg.allowed_buyers, &deps)?;
     } else if !msg.allowed_buyers.is_empty() {
         return Err(InvalidVisibilityConfig);
