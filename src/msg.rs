@@ -44,8 +44,10 @@ pub enum ExecuteMsg {
     FinalizePools { pool_denoms: Vec<String> },
     /// A route executed by the dealer that causes the settlement of the transaction
     DealerConfirm {},
-    /// A route that can be used by the buyer to update the allowed seller's list before a seller has been added
+    /// A route that can be used by the contract admin to update the allowed seller's list
     UpdateAllowedSellers { allowed_sellers: Vec<String> },
+    /// A route that can be used by the contract admin to update the allowed buyer's list
+    UpdateAllowedBuyers { allowed_buyers: Vec<String> },
     /// A route used by the buyer to accept a seller's finalized list of pools
     AcceptFinalizedPools { offer_hash: String },
     /// A route used by the seller to rescind a finalized list of pools before the buyer has accepted

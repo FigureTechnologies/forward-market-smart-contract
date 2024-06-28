@@ -14,6 +14,7 @@ use crate::execute::disable_contract::execute_disable_contract;
 use crate::execute::update_seller_offer_hash::execute_update_seller_offer_hash;
 use crate::execute::finalize_pools::execute_finalize_pools;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
+use crate::execute::update_allowed_buyers::execute_update_allowed_buyers;
 use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
 use crate::instantiate::instantiate_contract::instantiate_contract;
 use crate::msg::{ExecuteMsg, InstantiateContractMsg, QueryMsg};
@@ -88,6 +89,9 @@ pub fn execute(
         ExecuteMsg::DealerConfirm {} => execute_dealer_confirm(deps, env, info),
         ExecuteMsg::UpdateAllowedSellers { allowed_sellers } => {
             execute_update_allowed_sellers(deps, info, allowed_sellers)
+        }
+        ExecuteMsg::UpdateAllowedBuyers{ allowed_buyers } => {
+            execute_update_allowed_buyers(deps, info, allowed_buyers)
         }
         ExecuteMsg::AcceptFinalizedPools { offer_hash } => execute_accept_finalized_pools(deps, info, offer_hash),
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),

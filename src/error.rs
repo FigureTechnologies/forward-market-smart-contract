@@ -36,8 +36,8 @@ pub enum ContractError {
     #[error("Only the contract admin can update the contract configuration")]
     UnauthorizedConfigUpdate,
 
-    /// Occurs if the contract admin attempts to modify configuration after the seller has already been added
-    #[error("Configuration cannot be updated once a seller has been established")]
+    /// Occurs if the contract admin attempts to modify configuration after a buyer and seller have been added
+    #[error("Configuration cannot be updated once a buyer and seller have been established")]
     IllegalConfigUpdate,
 
     /// Occurs if the sell attempts to accept a non-positive value for the contract
@@ -58,8 +58,8 @@ pub enum ContractError {
     #[error("The set of pools cannot be empty when finalizing the transaction")]
     InvalidFinalizationRequest,
 
-    /// Occurs if the list of approved sellers has any addresses while the contract is not marked as private
-    #[error("The list of approved sellers should be empty unless is_private = true")]
+    /// Occurs if the list of approved addresses is not empty while the visibility config for that list is private
+    #[error("The list of approved addresses should be empty unless the visibility config for that list is private ")]
     InvalidVisibilityConfig,
 
     /// Occurs if a face value or accepted value cannot be divided without remainder by the tick value
