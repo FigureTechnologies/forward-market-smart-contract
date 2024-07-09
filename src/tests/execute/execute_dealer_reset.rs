@@ -2,7 +2,6 @@
 mod execute_dealer_reset_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::msg::ExecuteMsg::DealerReset;
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{
         save_bid_list_state, save_contract_config, save_seller_state, Bid, BidList, Config, Seller,

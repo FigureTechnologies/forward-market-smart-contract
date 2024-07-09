@@ -1,9 +1,6 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalDealerResetRequest, InvalidDealerResetRequest};
-use crate::storage::state_store::{
-    clear_buyer_state, retrieve_optional_seller_state, retrieve_optional_buyer_state,
-    save_seller_state,
-};
+use crate::storage::state_store::{clear_buyer_state, retrieve_optional_seller_state, retrieve_optional_buyer_state, save_seller_state, retrieve_contract_config, save_contract_config};
 use crate::util::helpers::{create_send_coin_back_to_seller_messages, is_dealer};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
@@ -16,7 +13,7 @@ pub fn execute_dealer_reset(
         return Err(IllegalDealerResetRequest);
     }
 
-    let mut updated_seller = match retrieve_optional_seller_state(deps.storage)? {
+    let mut seller = match retrieve_optional_seller_state(deps.storage)? {
         None => return Err(InvalidDealerResetRequest),
         Some(seller) => seller,
     };
@@ -24,8 +21,8 @@ pub fn execute_dealer_reset(
     let transfer_messages = create_send_coin_back_to_seller_messages(
         &deps,
         env.contract.address.to_string(),
-        updated_seller.seller_address.to_string(),
-        updated_seller.pool_denoms,
+        seller.seller_address.to_string(),
+        seller.pool_denoms,
     )?;
 
     let mut response = Response::new();
@@ -34,15 +31,15 @@ pub fn execute_dealer_reset(
     }
 
     // The contract no longer owns the denoms, so clear the list
-    updated_seller.pool_denoms = vec![];
-    save_seller_state(deps.storage, &updated_seller)?;
+    seller.pool_denoms = vec![];
+    save_seller_state(deps.storage, &seller)?;
 
     clear_buyer_state(deps.storage);
 
-    match retrieve_optional_buyer_state(deps.storage)? {
-        None => {}
-        Some(_) => {}
-    }
+    // Disable the contract
+    let mut updated_contract_config = retrieve_contract_config(deps.storage)?;
+    updated_contract_config.is_disabled = true;
+    save_contract_config(deps.storage, &updated_contract_config)?;
 
-    Ok(response.add_attribute("seller_state", format!("{:?}", updated_seller)))
+    Ok(response.add_attribute("seller_state", format!("{:?}", seller)))
 }

@@ -52,9 +52,6 @@ pub enum ExecuteMsg {
     AcceptFinalizedPools { offer_hash: String },
     /// A route used by the seller to rescind a finalized list of pools before the buyer has accepted
     RescindFinalizedPools {},
-    /// A route used by the dealer to reset a contract, which will clear buyer acceptance, seller finalization, and
-    /// return the coins in escrow by the contract back to the seller
-    DealerReset {},
     /// A route used by either the buyer or a dealer to disable the contract. The seller must not have a
     /// finalized list of pools in order for the contract to be disabled (if the seller does have a
     /// finalized list of pools, either the seller must rescind the offer or a dealer must reset the

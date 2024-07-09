@@ -9,7 +9,6 @@ use crate::execute::accept_finalized_pools::execute_accept_finalized_pools;
 use crate::execute::add_bidder::execute_add_bidder;
 use crate::execute::add_seller::execute_add_seller;
 use crate::execute::dealer_confirm::execute_dealer_confirm;
-use crate::execute::dealer_reset::execute_dealer_reset;
 use crate::execute::disable_contract::execute_disable_contract;
 use crate::execute::update_seller_offer_hash::execute_update_seller_offer_hash;
 use crate::execute::finalize_pools::execute_finalize_pools;
@@ -95,8 +94,7 @@ pub fn execute(
         }
         ExecuteMsg::AcceptFinalizedPools { offer_hash } => execute_accept_finalized_pools(deps, info, offer_hash),
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),
-        ExecuteMsg::DealerReset {} => execute_dealer_reset(deps, env, info),
-        ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, info),
+        ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, env, info),
         ExecuteMsg::AcceptBid {
             bidder_address,
             agreement_terms_hash,
