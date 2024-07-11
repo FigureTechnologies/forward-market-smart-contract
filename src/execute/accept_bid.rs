@@ -1,9 +1,7 @@
 use crate::error::ContractError;
-use crate::error::ContractError::{
-    BidDoesNotExist, BidPreviouslyAccepted, InvalidAgreementTermsHash, UnauthorizedAsSeller,
-};
-use crate::storage::state_store::{retrieve_bid_list_state, retrieve_contract_config, retrieve_optional_buyer_state, save_buyer_state, Bid, Buyer};
-use crate::util::helpers::{create_and_transfer_marker, is_seller};
+use crate::error::ContractError::{BidDoesNotExist, BidPreviouslyAccepted, InvalidAgreementTermsHash, TokensNotMinted, UnauthorizedAsSeller};
+use crate::storage::state_store::{retrieve_bid_list_state, retrieve_optional_buyer_state, save_buyer_state, Bid, Buyer, retrieve_optional_token_data_state};
+use crate::util::helpers::{create_transfer_tokens_message, is_seller};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn execute_accept_bid(
@@ -17,6 +15,13 @@ pub fn execute_accept_bid(
     if !is_seller(&deps, &info)? {
         return Err(UnauthorizedAsSeller);
     }
+
+    let token_data = match retrieve_optional_token_data_state(deps.storage)? {
+        None => {
+            return Err(TokensNotMinted)
+        }
+        Some(token_data) => { token_data }
+    };
 
     let bidder_address = deps.api.addr_validate(&bidder_address_str)?;
 
@@ -57,15 +62,12 @@ pub fn execute_accept_bid(
     };
     save_buyer_state(deps.storage, &buyer)?;
 
-    let config = retrieve_contract_config(deps.storage)?;
-
     // Now that we have a buyer, we can create the forward market token and give it to the buyer
-    let create_token_messages = create_and_transfer_marker(
+    let create_token_messages = create_transfer_tokens_message(
         env.contract.address.to_string(),
-        config.token_denom,
-        config.token_count,
-        bidder_address.to_string(),
-        config.dealers.clone(),
+        token_data.token_denom,
+        token_data.token_count,
+        bidder_address.to_string()
     );
 
     Ok(Response::new()

@@ -20,8 +20,6 @@ mod instantiate_tests {
             use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
             allowed_buyers: vec![],
-            token_denom: "test.forward.market.token".to_string(),
-            token_count: Uint128::new(1000),
             dealers: vec!["dealer-address".to_string()],
             max_buyer_count: 1,
         };
@@ -36,8 +34,6 @@ mod instantiate_tests {
                         Addr::unchecked("allowed-seller-1"),
                     ],
                     allowed_buyers: vec![],
-                    token_denom: "test.forward.market.token".to_string(),
-                    token_count: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
                     max_bid_count: 1,
@@ -82,8 +78,6 @@ mod instantiate_tests {
             use_private_buyers: false,
             allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
             allowed_buyers: vec![],
-            token_denom: "test.forward.market.token".to_string(),
-            token_count: Uint128::new(1000),
             dealers: vec!["dealer-address".to_string()],
             max_buyer_count: 1,
         };
@@ -97,37 +91,6 @@ mod instantiate_tests {
                 ContractError::InvalidVisibilityConfig => {}
                 _ => {
                     panic!("returned an unexpected error when seller list is populated but visibility is not private")
-                }
-            },
-        }
-    }
-
-    #[test]
-    fn instantiate_invalid_token_count() {
-        let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_buyer", &[]);
-        let env = mock_env();
-        let instantiate_msg = InstantiateContractMsg {
-            use_private_sellers: true,
-            use_private_buyers: false,
-            allowed_sellers: vec!["allowed-seller-0".into(), "allowed-seller-1".into()],
-            allowed_buyers: vec![],
-            token_denom: "test.forward.market.token".to_string(),
-            token_count: Uint128::new(0),
-            dealers: vec!["dealer-address".to_string()],
-            max_buyer_count: 5,
-        };
-        let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
-        match init_response {
-            Ok(_) => {
-                panic!("failed to detect invalid tick size that causes face_value_cents / tick_size to have a \
-                    remainder")
-            }
-            Err(error) => match error {
-                ContractError::InvalidTokenCount => {}
-                _ => {
-                    panic!("returned an unexpected error when invalid tick size causes face_value_cents / tick_size to \
-                        have a remainder")
                 }
             },
         }

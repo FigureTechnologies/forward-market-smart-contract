@@ -99,6 +99,35 @@ pub fn clear_buyer_state(storage: &mut dyn Storage) -> () {
     BUYER_STATE.remove(storage)
 }
 
+pub fn save_token_data_state(
+    storage: &mut dyn Storage,
+    token_data: &TokenData,
+) -> Result<(), ContractError> {
+    TOKEN_DATA
+        .save(storage, token_data)
+        .map_err(|e| StorageError {
+            message: format!("{e:?}"),
+        })
+}
+
+pub fn retrieve_optional_token_data_state(
+    storage: &dyn Storage,
+) -> Result<Option<TokenData>, ContractError> {
+    TOKEN_DATA
+        .may_load(storage)
+        .map_err(|e| StorageError {
+            message: format!("{e:?}"),
+        })
+}
+
+pub fn retrieve_token_data_state(
+    storage: &dyn Storage,
+) -> Result<TokenData, ContractError> {
+    TOKEN_DATA.load(storage).map_err(|e| StorageError {
+        message: format!("{e:?}"),
+    })
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct Config {
     pub use_private_sellers: bool,
@@ -106,8 +135,6 @@ pub struct Config {
     pub allowed_sellers: Vec<Addr>,
     pub allowed_buyers: Vec<Addr>,
     pub max_bid_count: i32,
-    pub token_denom: String,
-    pub token_count: Uint128,
     pub dealers: Vec<Addr>,
     pub is_disabled: bool,
     pub contract_admin: Addr,
@@ -133,6 +160,12 @@ pub struct Bid {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+pub struct TokenData {
+    pub token_denom: String,
+    pub token_count: Uint128,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct SettlementData {
     pub block_height: u64,
     pub settling_dealer: Addr,
@@ -150,3 +183,5 @@ pub const SELLER: Item<Seller> = Item::new("seller");
 pub const BID_LIST: Item<BidList> = Item::new("buyer_list");
 pub const SETTLEMENT_DATA: Item<SettlementData> = Item::new("settlement_data");
 pub const BUYER_STATE: Item<Buyer> = Item::new("buyer");
+pub const TOKEN_DATA: Item<TokenData> = Item::new("token_data");
+

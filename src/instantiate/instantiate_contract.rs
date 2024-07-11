@@ -1,11 +1,11 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    InvalidEmptyDealerConfig, InvalidTokenCount, InvalidVisibilityConfig,
+    InvalidEmptyDealerConfig, InvalidVisibilityConfig,
 };
 use crate::msg::InstantiateContractMsg;
 use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
 use crate::version_info::{set_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
-use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, Response, Uint128};
+use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, Response};
 
 pub fn instantiate_contract(
     deps: DepsMut,
@@ -37,10 +37,6 @@ pub fn instantiate_contract(
     // Convert the list of dealers to addresses
     let dealer_addresses = validate_and_map_address(msg.dealers, &deps)?;
 
-    // The accepted value must be compatible with the tick size
-    if msg.token_count <= Uint128::new(0) {
-        return Err(InvalidTokenCount);
-    }
 
     // Store the initial configuration
     let config = Config {
@@ -49,8 +45,6 @@ pub fn instantiate_contract(
         allowed_sellers,
         allowed_buyers,
         max_bid_count: msg.max_buyer_count,
-        token_denom: msg.token_denom,
-        token_count: msg.token_count,
         dealers: dealer_addresses,
         is_disabled: false,
         contract_admin: info.sender,
