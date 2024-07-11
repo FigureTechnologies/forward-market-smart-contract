@@ -62,7 +62,7 @@ pub fn execute_accept_bid(
     };
     save_buyer_state(deps.storage, &buyer)?;
 
-    // Now that we have a buyer, we can create the forward market token and give it to the buyer
+    // Now that we have a buyer, we can give them the forward market tokens
     let create_token_messages = create_transfer_tokens_message(
         env.contract.address.to_string(),
         token_data.token_denom,
