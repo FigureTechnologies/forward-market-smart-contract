@@ -1,4 +1,4 @@
-use crate::storage::state_store::{Bid, Config, Seller, SettlementData, Buyer};
+use crate::storage::state_store::{Bid, Config, Seller, SettlementData, Buyer, TokenData};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Uint128;
@@ -80,6 +80,7 @@ pub struct GetContractStateResponse {
     pub settlement_data: Option<SettlementData>,
     pub version_info: VersionInfoV1,
     pub buyer: Option<Buyer>,
+    pub token_data: Option<TokenData>
 }
 
 #[derive(Clone, Debug, PartialEq)]

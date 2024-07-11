@@ -9,7 +9,7 @@ mod execute_add_bidder_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Uint128};
+    use cosmwasm_std::{Addr};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]

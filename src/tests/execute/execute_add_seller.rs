@@ -19,7 +19,6 @@ mod execute_add_seller_tests {
         let env = mock_env();
         let dealer_address = "dealer_address";
         let buyer_address = "buyer_address";
-        let token_denom = "test.forward.market.token";
         let accepted_value_cents = Uint128::new(400000000);
         let add_seller_msg = AddSeller {
             accepted_value_cents,
@@ -141,7 +140,6 @@ mod execute_add_seller_tests {
             accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
         };
-        let token_denom = "test.forward.market.token";
 
         save_contract_config(
             &mut deps.storage,

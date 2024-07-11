@@ -30,7 +30,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -199,7 +198,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -286,7 +284,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info("not-the-dealer", &[]);
         let env = mock_env();
         save_contract_config(

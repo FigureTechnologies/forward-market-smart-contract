@@ -19,7 +19,6 @@ mod execute_finalize_pools_tests {
         let mut deps = mock_provenance_dependencies();
         let seller_address = "allowed-seller-0";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -103,7 +102,6 @@ mod execute_finalize_pools_tests {
     fn execute_finalize_pool_invalid_list() {
         let mut deps = mock_provenance_dependencies();
         let seller_address = "allowed-seller-0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(seller_address, &[]);
         let env = mock_env();
 
@@ -161,7 +159,6 @@ mod execute_finalize_pools_tests {
         let mut deps = mock_provenance_dependencies();
         let unauthorized_seller_address = "unauthorized-seller";
         let allowed_seller_address = "allowed-seller";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(unauthorized_seller_address, &[]);
         let env = mock_env();
         save_contract_config(

@@ -7,7 +7,7 @@ mod instantiate_tests {
     use crate::storage::state_store::Config;
     use crate::version_info::{get_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, Uint128};
+    use cosmwasm_std::{Addr, Attribute};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
