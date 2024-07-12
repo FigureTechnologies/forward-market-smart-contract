@@ -3,7 +3,6 @@ pub mod accept_finalized_pools;
 pub mod add_bidder;
 pub mod add_seller;
 pub mod dealer_confirm;
-pub mod dealer_reset;
 pub mod disable_contract;
 pub mod finalize_pools;
 pub mod rescind_finalized_pools;

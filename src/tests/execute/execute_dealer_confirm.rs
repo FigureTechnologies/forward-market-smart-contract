@@ -21,7 +21,7 @@ mod execute_dealer_confirm_tests {
     };
 
     use crate::msg::ExecuteMsg::{
-        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, DealerReset,
+        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm,
         FinalizePools, RescindFinalizedPools,
         UpdateAllowedSellers,
     };
@@ -402,7 +402,6 @@ mod execute_dealer_confirm_tests {
             },
             AcceptFinalizedPools { offer_hash: "".to_string() },
             RescindFinalizedPools {},
-            DealerReset {},
         ]
         .into_iter()
         .for_each(|command| -> () {
