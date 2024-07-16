@@ -23,17 +23,11 @@ use provwasm_std::types::provenance::marker::v1::{
 use provwasm_std::types::provenance::metadata::v1::{MetadataQuerier, ValueOwnershipResponse};
 use uuid::Uuid;
 
-pub fn create_and_transfer_marker(
-    contract_address: String,
-    denom: String,
-    amount: Uint128,
-    owner_address: String,
-    dealer_list: Vec<Addr>,
-) -> Vec<CosmosMsg> {
+pub fn create_mint_tokens_messages(token_denom: String, token_count: Uint128, dealer_list: Vec<Addr>, contract_address: String) -> Vec<CosmosMsg> {
     let mut messages: Vec<CosmosMsg> = vec![];
     let coin = Coin {
-        denom: denom.clone(),
-        amount: amount.to_string(),
+        denom: token_denom.clone(),
+        amount: token_count.to_string(),
     };
 
     let mut access_grants = vec![];
@@ -73,25 +67,34 @@ pub fn create_and_transfer_marker(
     }));
 
     messages.push(CosmosMsg::from(MsgFinalizeRequest {
-        denom: denom.clone(),
+        denom: token_denom.clone(),
         administrator: contract_address.clone(),
     }));
 
     messages.push(CosmosMsg::from(MsgActivateRequest {
-        denom: denom.clone(),
+        denom: token_denom.clone(),
         administrator: contract_address.clone(),
-    }));
-
-    messages.push(CosmosMsg::from(MsgWithdrawRequest {
-        denom: denom.to_string(),
-        administrator: contract_address.clone(),
-        to_address: owner_address.clone(),
-        amount: vec![Coin {
-            denom: denom.clone(),
-            amount: amount.to_string(),
-        }],
     }));
     messages
+}
+
+pub fn create_transfer_tokens_message(
+    contract_address: String,
+    denom: String,
+    amount: Uint128,
+    owner_address: String,
+) -> Vec<CosmosMsg> {
+    return vec![
+        CosmosMsg::from(MsgWithdrawRequest {
+            denom: denom.to_string(),
+            administrator: contract_address.clone(),
+            to_address: owner_address.clone(),
+            amount: vec![Coin {
+                denom: denom.clone(),
+                amount: amount.to_string(),
+            }],
+        })
+    ];
 }
 
 pub fn get_owned_scopes(

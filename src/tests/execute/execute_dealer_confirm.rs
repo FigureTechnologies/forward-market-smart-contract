@@ -2,10 +2,7 @@
 mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::storage::state_store::{
-        retrieve_optional_settlement_data_state, save_bid_list_state,
-        save_contract_config, save_seller_state, save_settlement_data_state,
-        Bid, Config, Seller, SettlementData, BidList, save_buyer_state, Buyer};
+    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_bid_list_state, save_contract_config, save_seller_state, save_settlement_data_state, Bid, Config, Seller, SettlementData, BidList, save_buyer_state, Buyer, save_token_data_state, TokenData};
     use cosmwasm_std::testing::{mock_env, mock_info};
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
@@ -33,7 +30,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -43,8 +39,6 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked(seller_address)],
                 allowed_buyers: vec![],
-                token_denom: token_denom.into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 3,
@@ -85,6 +79,11 @@ mod execute_dealer_confirm_tests {
             },
         )
         .unwrap();
+
+        save_token_data_state(&mut deps.storage, &TokenData {
+            token_denom: "test.token.fm".to_string(),
+            token_count: Uint128::new(10),
+        }).unwrap();
 
         let cb = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
             let message = QueryMarkerRequest::try_from(bin.clone()).unwrap();
@@ -199,7 +198,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(dealer_address, &[]);
         let env = mock_env();
         save_contract_config(
@@ -209,8 +207,6 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked("different_seller")],
                 allowed_buyers: vec![],
-                token_denom: token_denom.into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 2,
@@ -252,6 +248,11 @@ mod execute_dealer_confirm_tests {
         )
         .unwrap();
 
+        save_token_data_state(&mut deps.storage, &TokenData {
+            token_denom: "test.token.fm".to_string(),
+            token_count: Uint128::new(10),
+        }).unwrap();
+
         match execute(
             deps.as_mut(),
             env.clone(),
@@ -283,7 +284,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = "allowed-seller-0";
         let buyer_address = "contract_buyer";
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = mock_info("not-the-dealer", &[]);
         let env = mock_env();
         save_contract_config(
@@ -293,8 +293,6 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked("different_seller")],
                 allowed_buyers: vec![],
-                token_denom: token_denom.into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 5,
@@ -359,8 +357,6 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: "denom".into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 50,

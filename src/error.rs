@@ -1,4 +1,4 @@
-use cosmwasm_std::StdError;
+use cosmwasm_std::{StdError};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -35,6 +35,10 @@ pub enum ContractError {
     /// Occurs if anyone other than the contract admin attempts to modify contract configuration options
     #[error("Only the contract admin can update the contract configuration")]
     UnauthorizedConfigUpdate,
+
+    /// Occurs if anyone other than the contract admin attempts to mint the tokens for the contract
+    #[error("Only the contract admin can mint the tokens for the forward market transaction")]
+    UnauthorizedToMint,
 
     /// Occurs if the contract admin attempts to modify configuration after a buyer and seller have been added
     #[error("Configuration cannot be updated once a buyer and seller have been established")]
@@ -189,5 +193,13 @@ pub enum ContractError {
 
     /// Occurs when a seller attempts to update an offer hash after a buyer has accepted the offer
     #[error("The offer has cannot be updated after a buyer has accepted it")]
-    IllegalOfferHashUpdate
+    IllegalOfferHashUpdate,
+
+    /// Occurs when tokens for the contract have previously been minted
+    #[error("Tokens for the contract were already minted for token denom {token_denom:?}")]
+    TokensAlreadyMinted { token_denom: String },
+
+    /// Occurs when a seller tries to accept a bid before the tokens have been minted
+    #[error("Bid cannot be accepted until the admin has completed the MintTokens action")]
+    TokensNotMinted
 }

@@ -9,7 +9,7 @@ mod execute_add_bidder_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Uint128};
+    use cosmwasm_std::{Addr};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -25,8 +25,6 @@ mod execute_add_bidder_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: "test.forward.market.token".to_string(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
@@ -91,8 +89,6 @@ mod execute_add_bidder_tests {
                 use_private_buyers: true,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![Addr::unchecked("bidder_address")],
-                token_denom: "test.forward.market.token".to_string(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
@@ -146,8 +142,6 @@ mod execute_add_bidder_tests {
                 use_private_buyers: true,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![Addr::unchecked("bidder_address_0")],
-                token_denom: "test.forward.market.token".to_string(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
@@ -198,8 +192,6 @@ mod execute_add_bidder_tests {
                 use_private_buyers: true,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![Addr::unchecked("bidder_address")],
-                token_denom: "test.forward.market.token".to_string(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,

@@ -7,7 +7,7 @@ mod execute_update_allowed_sellers {
     use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, Uint128};
+    use cosmwasm_std::{Addr, Attribute};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -23,8 +23,6 @@ mod execute_update_allowed_sellers {
                 use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked("allowed-seller-0")],
                 allowed_buyers: vec![],
-                token_denom: "test.forward.market.token".into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 8,
@@ -54,8 +52,6 @@ mod execute_update_allowed_sellers {
                     use_private_buyers: false,
                     allowed_sellers: vec![Addr::unchecked("allowed-seller-2")],
                     allowed_buyers: vec![],
-                    token_denom: "test.forward.market.token".to_string(),
-                    token_count: Uint128::new(1000),
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
                     max_bid_count: 8,
@@ -94,8 +90,6 @@ mod execute_update_allowed_sellers {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: "test.forward.market.token".into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 5,

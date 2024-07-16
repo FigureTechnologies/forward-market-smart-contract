@@ -1,4 +1,4 @@
-use crate::storage::state_store::{Bid, Config, Seller, SettlementData, Buyer};
+use crate::storage::state_store::{Bid, Config, Seller, SettlementData, Buyer, TokenData};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Uint128;
@@ -21,10 +21,6 @@ pub struct InstantiateContractMsg {
     pub allowed_buyers: Vec<String>,
     /// The max number of potential buyers allowed to submit bids to the contract
     pub max_buyer_count: i32,
-    /// The denom of the marker that all seller assets with be transferred to upon successful confirmation by the dealer
-    pub token_denom: String,
-    /// The number of coins that will represent the forward market
-    pub token_count: Uint128,
     /// The list of addresses allowed to confirm and reset the contract
     pub dealers: Vec<String>,
 }
@@ -64,6 +60,8 @@ pub enum ExecuteMsg {
     },
     /// A route used by a potential buyer to add their bid to the list of buyer bids
     AddBid { agreement_terms_hash: String },
+    /// A route used the admin of the contract to mint the tokens used in the forward market transaction
+    MintTokens { token_count: Uint128, token_denom: String }
 }
 
 /// All defined payloads to be used when querying routes on this contract instance.
@@ -82,6 +80,7 @@ pub struct GetContractStateResponse {
     pub settlement_data: Option<SettlementData>,
     pub version_info: VersionInfoV1,
     pub buyer: Option<Buyer>,
+    pub token_data: Option<TokenData>
 }
 
 #[derive(Clone, Debug, PartialEq)]

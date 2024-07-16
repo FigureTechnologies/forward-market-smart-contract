@@ -19,7 +19,6 @@ mod execute_add_seller_tests {
         let env = mock_env();
         let dealer_address = "dealer_address";
         let buyer_address = "buyer_address";
-        let token_denom = "test.forward.market.token";
         let accepted_value_cents = Uint128::new(400000000);
         let add_seller_msg = AddSeller {
             accepted_value_cents,
@@ -33,8 +32,6 @@ mod execute_add_seller_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: token_denom.into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 3,
@@ -94,8 +91,6 @@ mod execute_add_seller_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: "test.forward.market.token".into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,
@@ -145,7 +140,6 @@ mod execute_add_seller_tests {
             accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
         };
-        let token_denom = "test.forward.market.token";
 
         save_contract_config(
             &mut deps.storage,
@@ -154,8 +148,6 @@ mod execute_add_seller_tests {
                 use_private_buyers: true,
                 allowed_sellers: vec![Addr::unchecked("private-seller-0")],
                 allowed_buyers: vec![],
-                token_denom: token_denom.into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 2,
@@ -220,8 +212,6 @@ mod execute_add_seller_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: "test.forward.market.token".into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 5,

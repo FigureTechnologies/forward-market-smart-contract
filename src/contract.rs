@@ -12,6 +12,7 @@ use crate::execute::dealer_confirm::execute_dealer_confirm;
 use crate::execute::disable_contract::execute_disable_contract;
 use crate::execute::update_seller_offer_hash::execute_update_seller_offer_hash;
 use crate::execute::finalize_pools::execute_finalize_pools;
+use crate::execute::mint_tokens::execute_mint_tokens;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
 use crate::execute::update_allowed_buyers::execute_update_allowed_buyers;
 use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
@@ -102,6 +103,7 @@ pub fn execute(
         ExecuteMsg::AddBid {
             agreement_terms_hash,
         } => execute_add_bidder(deps, info, agreement_terms_hash),
+        ExecuteMsg::MintTokens { token_count, token_denom } => execute_mint_tokens(deps, env, info, token_count, token_denom)
     }
 }
 

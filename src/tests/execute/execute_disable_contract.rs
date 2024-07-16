@@ -21,7 +21,6 @@ mod execute_disable_contract_tests {
         let mut deps = mock_provenance_dependencies();
         let allowed_seller_address = "allowed-seller";
         let contract_admin = "contract-admin";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(contract_admin, &[]);
         let env = mock_env();
         let config = Config {
@@ -29,8 +28,6 @@ mod execute_disable_contract_tests {
             use_private_buyers: false,
             allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
             allowed_buyers: vec![],
-            token_denom: token_denom.into(),
-            token_count: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
             max_bid_count: 1,
@@ -55,7 +52,6 @@ mod execute_disable_contract_tests {
     fn execute_disable_contract_unauthorized() {
         let mut deps = mock_provenance_dependencies();
         let allowed_seller_address = "allowed-seller";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(allowed_seller_address, &[]);
         let env = mock_env();
         let config = Config {
@@ -63,8 +59,6 @@ mod execute_disable_contract_tests {
             use_private_buyers: false,
             allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
             allowed_buyers: vec![],
-            token_denom: token_denom.into(),
-            token_count: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
             max_bid_count: 1,
@@ -96,7 +90,6 @@ mod execute_disable_contract_tests {
         let mut deps = mock_provenance_dependencies();
         let allowed_seller_address = "allowed-seller";
         let contract_admin = "contract-admin";
-        let token_denom = "test.forward.market.token";
         let info = mock_info(contract_admin, &[]);
         let env = mock_env();
         let config = Config {
@@ -104,8 +97,6 @@ mod execute_disable_contract_tests {
             use_private_buyers: false,
             allowed_sellers: vec![Addr::unchecked(allowed_seller_address)],
             allowed_buyers: vec![],
-            token_denom: token_denom.to_string(),
-            token_count: Uint128::new(1000),
             dealers: vec![Addr::unchecked("dealer-address")],
             is_disabled: false,
             max_bid_count: 5,
@@ -170,7 +161,7 @@ mod execute_disable_contract_tests {
             .insert("/provenance.marker.v1.Query/Holding".to_string(), cb);
 
         match execute(deps.as_mut(), env.clone(), info, ContractDisable {}) {
-            Ok(response) => {
+            Ok(_) => {
                 let expected_seller_state = Seller {
                     seller_address: Addr::unchecked(allowed_seller_address),
                     accepted_value_cents: Uint128::new(450000000),
@@ -201,8 +192,6 @@ mod execute_disable_contract_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                token_denom: "denom".into(),
-                token_count: Uint128::new(1000),
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: true,
                 max_bid_count: 3,
