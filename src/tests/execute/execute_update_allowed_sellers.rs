@@ -7,20 +7,26 @@ mod execute_update_allowed_sellers {
     use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, Uint128};
+    use cosmwasm_std::{Addr, Attribute, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
     fn update_allowed_sellers() {
         let mut deps = mock_provenance_dependencies();
-        let buyer_address = "contract-buyer";
-        let info = mock_info(buyer_address, &[]);
+        let buyer_address = deps.api.addr_make("contract-buyer");
+        let info = MessageInfo {
+            sender: buyer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
+        let allowed_seller_0_addr = deps.api.addr_make("allowed-seller-0");
+        let allowed_seller_1_addr = deps.api.addr_make("allowed-seller-1");
+
         save_contract_config(
             &mut deps.storage,
             &Config {
                 is_private: true,
-                allowed_sellers: vec![Addr::unchecked("allowed-seller-0")],
+                allowed_sellers: vec![allowed_seller_0_addr],
                 agreement_terms_hash: "mock-terms-hash".to_string(),
                 token_denom: "test.forward.market.token".into(),
                 max_face_value_cents: Uint128::new(9000000000),
@@ -44,21 +50,21 @@ mod execute_update_allowed_sellers {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked("contract-buyer"),
+                buyer_address: buyer_address.clone(),
                 has_accepted_pools: false,
             },
         )
         .unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
-            allowed_sellers: vec!["allowed-seller-2".into()],
+            allowed_sellers: vec![allowed_seller_1_addr.to_string()],
         };
 
         match execute(deps.as_mut(), env, info, update_allowed_sellers) {
             Ok(response) => {
                 let expected_config_attributes = Config {
                     is_private: true,
-                    allowed_sellers: vec![Addr::unchecked("allowed-seller-2")],
+                    allowed_sellers: vec![allowed_seller_1_addr],
                     agreement_terms_hash: "mock-terms-hash".to_string(),
                     token_denom: "test.forward.market.token".to_string(),
                     min_face_value_cents: Uint128::new(500000000),
@@ -90,8 +96,11 @@ mod execute_update_allowed_sellers {
     #[test]
     fn update_allowed_sellers_not_private() {
         let mut deps = mock_provenance_dependencies();
-        let buyer_address = "contract-buyer";
-        let info = mock_info(buyer_address, &[]);
+        let buyer_address = deps.api.addr_make("contract-buyer");
+        let info = MessageInfo {
+            sender: buyer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -103,7 +112,7 @@ mod execute_update_allowed_sellers {
                 max_face_value_cents: Uint128::new(500000000),
                 min_face_value_cents: Uint128::new(200000000),
                 tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
             },
         )
@@ -112,14 +121,14 @@ mod execute_update_allowed_sellers {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked("contract_buyer"),
+                buyer_address: buyer_address.clone(),
                 has_accepted_pools: false,
             },
         )
         .unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
-            allowed_sellers: vec!["allowed-seller-2".into()],
+            allowed_sellers: vec![deps.api.addr_make("allowed-seller-2").to_string()],
         };
         match execute(deps.as_mut(), env, info, update_allowed_sellers) {
             Ok(_) => {

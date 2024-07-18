@@ -74,6 +74,9 @@ pub fn create_and_transfer_marker(
         allow_governance_control: true,
         allow_forced_transfer: false,
         required_attributes: vec![],
+        usd_cents: 0,
+        volume: 0,
+        usd_mills: 0,
     }));
 
     messages.push(CosmosMsg::from(MsgFinalizeRequest {
@@ -107,6 +110,7 @@ pub fn get_owned_scopes(
     let metadata_querier = MetadataQuerier::new(querier);
     metadata_querier.value_ownership(
         marker_address,
+        true,
         Some(PageRequest {
             key: vec![],
             offset,

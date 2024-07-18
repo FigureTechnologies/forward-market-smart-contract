@@ -8,7 +8,7 @@ mod execute_add_seller_tests {
         Config, Seller,
     };
     use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, CosmosMsg, Uint128};
+    use cosmwasm_std::{Addr, Attribute, CosmosMsg, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
     use provwasm_std::types::provenance::marker::v1::{
@@ -20,10 +20,14 @@ mod execute_add_seller_tests {
     #[test]
     fn add_seller_to_public_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_seller", &[]);
+        let contract_seller_addr = deps.api.addr_make("contract-seller");
+        let info = MessageInfo {
+            sender: contract_seller_addr.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
-        let buyer_address = "contract_buyer";
-        let dealer_address = "dealer_address";
+        let buyer_address = deps.api.addr_make("contract_buyer");
+        let dealer_address = deps.api.addr_make("dealer_address");
         let token_denom = "test.forward.market.token";
         let accepted_value_cents = Uint128::new(400000000);
         let add_seller_msg = AddSeller {
@@ -44,7 +48,7 @@ mod execute_add_seller_tests {
                 max_face_value_cents: Uint128::new(500000000),
                 min_face_value_cents: Uint128::new(100000000),
                 tick_size,
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
             },
         )
@@ -53,7 +57,7 @@ mod execute_add_seller_tests {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked("contract_buyer"),
+                buyer_address: buyer_address.clone(),
                 has_accepted_pools: false,
             },
         )
@@ -98,6 +102,9 @@ mod execute_add_seller_tests {
                             allow_governance_control: true,
                             allow_forced_transfer: false,
                             required_attributes: vec![],
+                            usd_cents: 0,
+                            volume: 0,
+                            usd_mills: 0,
                         })
                     );
                     assert_eq!(
@@ -128,7 +135,7 @@ mod execute_add_seller_tests {
                         })
                     );
                     let expected_seller_info = Seller {
-                        seller_address: Addr::unchecked("contract_seller"),
+                        seller_address: contract_seller_addr.clone(),
                         accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
@@ -190,9 +197,12 @@ mod execute_add_seller_tests {
     }
 
     #[test]
-    fn add_duplicate_seller() {
+    fn add_second_seller() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_seller", &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make("contract-seller"),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -204,7 +214,7 @@ mod execute_add_seller_tests {
                 max_face_value_cents: Uint128::new(500000000),
                 min_face_value_cents: Uint128::new(300000),
                 tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
             },
         )
@@ -213,7 +223,7 @@ mod execute_add_seller_tests {
         save_seller_state(
             &mut deps.storage,
             &Seller {
-                seller_address: Addr::unchecked("existing_seller"),
+                seller_address: deps.api.addr_make("existing_seller"),
                 accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
@@ -242,11 +252,15 @@ mod execute_add_seller_tests {
     #[test]
     fn add_seller_to_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("private-seller-0", &[]);
-        let buyer_address = "contract_buyer";
+        let seller_address = deps.api.addr_make("private-seller-0");
+        let info = MessageInfo {
+            sender: seller_address.clone(),
+            funds: vec![],
+        };
+        let buyer_address = deps.api.addr_make("contract-buyer");
         let env = mock_env();
         let accepted_value_cents = Uint128::new(100000000);
-        let dealer_address = "dealer-address";
+        let dealer_address = deps.api.addr_make("dealer-address");
         let add_seller_msg = AddSeller {
             accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
@@ -260,13 +274,13 @@ mod execute_add_seller_tests {
             &mut deps.storage,
             &Config {
                 is_private: true,
-                allowed_sellers: vec![Addr::unchecked("private-seller-0")],
+                allowed_sellers: vec![seller_address.clone()],
                 agreement_terms_hash: "mock-terms-hash".to_string(),
                 token_denom: token_denom.into(),
                 max_face_value_cents: Uint128::new(1500000000),
                 min_face_value_cents: Uint128::new(200000),
                 tick_size,
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
             },
         )
@@ -275,7 +289,7 @@ mod execute_add_seller_tests {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked("contract_buyer"),
+                buyer_address: buyer_address.clone(),
                 has_accepted_pools: false,
             },
         )
@@ -297,7 +311,7 @@ mod execute_add_seller_tests {
                         marker_type: MarkerType::Coin as i32,
                         access_list: vec![
                             AccessGrant {
-                                address: dealer_address.to_string(),
+                                address: dealer_address.clone().to_string(),
                                 permissions: vec![
                                     Access::Withdraw as i32,
                                     Access::Deposit as i32,
@@ -319,6 +333,9 @@ mod execute_add_seller_tests {
                         allow_governance_control: true,
                         allow_forced_transfer: false,
                         required_attributes: vec![],
+                        usd_cents: 0,
+                        volume: 0,
+                        usd_mills: 0,
                     })
                 );
                 assert_eq!(
