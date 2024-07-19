@@ -30,7 +30,7 @@ pub fn execute_accept_bid(
     let bid: Option<Bid> = bid_list
         .bids
         .into_iter()
-        .find(|existing_bid| -> bool { existing_bid.buyer_address == bidder_address_str });
+        .find(|existing_bid| -> bool { existing_bid.buyer_address.to_string() == bidder_address_str });
 
     match bid {
         None => {
