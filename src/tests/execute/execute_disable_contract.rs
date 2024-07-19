@@ -11,8 +11,8 @@ mod execute_disable_contract_tests {
         retrieve_contract_config, save_buyer_state, save_contract_config, save_seller_state, Buyer,
         Config, Seller,
     };
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, MessageInfo, Uint128};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -179,7 +179,10 @@ mod execute_disable_contract_tests {
     #[test]
     fn disallow_all_executions_when_disabled() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("", &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make(""),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,

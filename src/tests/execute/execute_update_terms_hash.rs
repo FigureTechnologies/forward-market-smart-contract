@@ -6,8 +6,8 @@ mod execute_update_agreement_terms_hash {
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, MessageInfo, Uint128};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{Attribute, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -26,10 +26,7 @@ mod execute_update_agreement_terms_hash {
             &mut deps.storage,
             &Config {
                 is_private: true,
-                allowed_sellers: vec![
-                    seller_address_0.clone(),
-                    seller_address_1.clone(),
-                ],
+                allowed_sellers: vec![seller_address_0.clone(), seller_address_1.clone()],
                 agreement_terms_hash: "mock-terms-hash".to_string(),
                 token_denom: "test.forward.market.token".into(),
                 max_face_value_cents: Uint128::new(500000000),
@@ -66,10 +63,7 @@ mod execute_update_agreement_terms_hash {
             Ok(response) => {
                 let expected_config_attributes = Config {
                     is_private: true,
-                    allowed_sellers: vec![
-                        seller_address_0.clone(),
-                        seller_address_1.clone(),
-                    ],
+                    allowed_sellers: vec![seller_address_0.clone(), seller_address_1.clone()],
                     agreement_terms_hash: "updated-mock-terms-hash".to_string(),
                     token_denom: "test.forward.market.token".to_string(),
                     min_face_value_cents: Uint128::new(100000000),

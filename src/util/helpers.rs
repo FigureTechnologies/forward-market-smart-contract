@@ -42,10 +42,7 @@ pub fn create_and_transfer_marker(
         // Give the dealers access to withdraw and transfer only
         access_grants.push(AccessGrant {
             address: access_address.to_string(),
-            permissions: vec![
-                Access::Withdraw as i32,
-                Access::Deposit as i32,
-            ],
+            permissions: vec![Access::Withdraw as i32, Access::Deposit as i32],
         })
     }
 

@@ -4,8 +4,10 @@ mod execute_finalize_pools_tests {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::FinalizePools;
     use crate::storage::state_store::{save_contract_config, save_seller_state, Config, Seller};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{to_json_binary, Addr, Attribute, Binary, ContractResult, SystemResult, Uint128, MessageInfo};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{
+        to_json_binary, Attribute, Binary, ContractResult, MessageInfo, SystemResult, Uint128,
+    };
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
     use provwasm_std::types::provenance::marker::v1::{
@@ -19,7 +21,7 @@ mod execute_finalize_pools_tests {
         let pool_denom = "test.token.asset.pool.0";
         let token_denom = "test.forward.market.token";
         let info = MessageInfo {
-            sender:seller_address.clone(),
+            sender: seller_address.clone(),
             funds: vec![],
         };
         let env = mock_env();

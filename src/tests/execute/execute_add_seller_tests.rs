@@ -7,7 +7,7 @@ mod execute_add_seller_tests {
         retrieve_seller_state, save_buyer_state, save_contract_config, save_seller_state, Buyer,
         Config, Seller,
     };
-    use cosmwasm_std::testing::{mock_env, mock_info};
+    use cosmwasm_std::testing::mock_env;
     use cosmwasm_std::{Addr, Attribute, CosmosMsg, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
@@ -159,7 +159,10 @@ mod execute_add_seller_tests {
     #[test]
     fn add_seller_with_invalid_accepted_value() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_seller", &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make("contract-seller"),
+            funds: vec![],
+        };
         let env = mock_env();
         let add_seller_msg = AddSeller {
             accepted_value_cents: Uint128::new(900000000),
@@ -312,10 +315,7 @@ mod execute_add_seller_tests {
                         access_list: vec![
                             AccessGrant {
                                 address: dealer_address.clone().to_string(),
-                                permissions: vec![
-                                    Access::Withdraw as i32,
-                                    Access::Deposit as i32,
-                                ],
+                                permissions: vec![Access::Withdraw as i32, Access::Deposit as i32,],
                             },
                             AccessGrant {
                                 address: contract_address.to_string(),
@@ -375,7 +375,10 @@ mod execute_add_seller_tests {
     #[test]
     fn add_invalid_seller_to_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("private-seller-0", &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make("private-seller-0"),
+            funds: vec![],
+        };
         let env = mock_env();
         let add_seller_msg = AddSeller {
             accepted_value_cents: Uint128::new(100000000),
@@ -393,7 +396,7 @@ mod execute_add_seller_tests {
                 max_face_value_cents: Uint128::new(500000000),
                 min_face_value_cents: Uint128::new(300000000),
                 tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
             },
         )
@@ -417,7 +420,11 @@ mod execute_add_seller_tests {
     #[test]
     fn add_seller_with_invalid_agreement_hash() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("private-seller-0", &[]);
+        let seller_address = deps.api.addr_make("private-seller-0");
+        let info = MessageInfo {
+            sender: seller_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         let add_seller_msg = AddSeller {
             accepted_value_cents: Uint128::new(400000000),
@@ -429,13 +436,13 @@ mod execute_add_seller_tests {
             &mut deps.storage,
             &Config {
                 is_private: true,
-                allowed_sellers: vec![Addr::unchecked("private-seller-0")],
+                allowed_sellers: vec![seller_address.clone()],
                 agreement_terms_hash: "hash-B".to_string(),
                 token_denom: "test.forward.market.token".into(),
                 max_face_value_cents: Uint128::new(500000000),
                 min_face_value_cents: Uint128::new(300000000),
                 tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
             },
         )

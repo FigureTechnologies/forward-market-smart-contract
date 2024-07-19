@@ -6,8 +6,8 @@ mod execute_remove_as_seller_tests {
     use crate::storage::state_store::{
         save_buyer_state, save_contract_config, save_seller_state, Buyer, Config, Seller,
     };
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, MessageInfo, Uint128};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{Attribute, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -85,7 +85,7 @@ mod execute_remove_as_seller_tests {
         let buyer_address = deps.api.addr_make("contract_buyer");
         let token_denom = "test.forward.market.token";
         let info = MessageInfo {
-            sender:seller_address.clone(),
+            sender: seller_address.clone(),
             funds: vec![],
         };
         let env = mock_env();

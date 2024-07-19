@@ -6,8 +6,8 @@ mod execute_dealer_confirm_tests {
         retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config,
         save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData,
     };
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{to_json_binary, Binary, ContractResult, SystemResult, MessageInfo};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::shim::Any;
@@ -305,12 +305,7 @@ mod execute_dealer_confirm_tests {
             },
         )
         .unwrap();
-        match execute(
-            deps.as_mut(),
-            env.clone(),
-            info,
-            DealerConfirm {},
-        ) {
+        match execute(deps.as_mut(), env.clone(), info, DealerConfirm {}) {
             Ok(_) => {
                 panic!(
                     "failed to return an error when an unauthorized seller attempted to confirm the contract"
@@ -331,7 +326,10 @@ mod execute_dealer_confirm_tests {
     fn disallow_all_executions_after_settlement() {
         let mut deps = mock_provenance_dependencies();
         let dealer_address = deps.api.addr_make("dealer-address");
-        let info = mock_info("", &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make(""),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,

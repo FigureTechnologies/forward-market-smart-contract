@@ -6,7 +6,7 @@ mod instantiate_tests {
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{retrieve_buyer_state, Config};
     use crate::version_info::{get_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
-    use cosmwasm_std::testing::{mock_env, mock_info};
+    use cosmwasm_std::testing::mock_env;
     use cosmwasm_std::{Addr, Attribute, MessageInfo, Storage, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
@@ -24,7 +24,10 @@ mod instantiate_tests {
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
             is_private: true,
-            allowed_sellers: vec![seller_address_0.clone().to_string(), seller_address_1.clone().to_string()],
+            allowed_sellers: vec![
+                seller_address_0.clone().to_string(),
+                seller_address_1.clone().to_string(),
+            ],
             agreement_terms_hash: "mock-terms-hash".to_string(),
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(1000000),
@@ -37,10 +40,7 @@ mod instantiate_tests {
             Ok(response) => {
                 let expected_config_attributes = Config {
                     is_private: true,
-                    allowed_sellers: vec![
-                        seller_address_0.clone(),
-                        seller_address_1.clone(),
-                    ],
+                    allowed_sellers: vec![seller_address_0.clone(), seller_address_1.clone()],
                     agreement_terms_hash: "mock-terms-hash".to_string(),
                     token_denom: "test.forward.market.token".to_string(),
                     min_face_value_cents: Uint128::new(1000000),
@@ -72,10 +72,7 @@ mod instantiate_tests {
                     expected_version_info
                 );
 
-                assert_eq!(
-                    get_buyer_address(&deps.storage),
-                    buyer_address.clone()
-                )
+                assert_eq!(get_buyer_address(&deps.storage), buyer_address.clone())
             }
             Err(error) => {
                 panic!("failed to initialize: {:?}", error)
@@ -94,7 +91,10 @@ mod instantiate_tests {
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
             is_private: false,
-            allowed_sellers: vec![deps.api.addr_make("allowed-seller-0").to_string(), deps.api.addr_make("allowed-seller-1").to_string()],
+            allowed_sellers: vec![
+                deps.api.addr_make("allowed-seller-0").to_string(),
+                deps.api.addr_make("allowed-seller-1").to_string(),
+            ],
             agreement_terms_hash: "mock-terms-hash".to_string(),
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(1000000),
@@ -128,7 +128,10 @@ mod instantiate_tests {
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
             is_private: true,
-            allowed_sellers: vec![deps.api.addr_make("allowed-seller-0").to_string(), deps.api.addr_make("allowed-seller-1").to_string()],
+            allowed_sellers: vec![
+                deps.api.addr_make("allowed-seller-0").to_string(),
+                deps.api.addr_make("allowed-seller-1").to_string(),
+            ],
             agreement_terms_hash: "mock-terms-hash".to_string(),
             token_denom: "test.forward.market.token".to_string(),
             min_face_value_cents: Uint128::new(0),
