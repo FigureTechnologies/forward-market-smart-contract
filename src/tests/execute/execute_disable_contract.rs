@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod execute_disable_contract_tests {
-    use std::fmt::Binary;
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::{
@@ -9,7 +8,7 @@ mod execute_disable_contract_tests {
         UpdateAllowedSellers,
     };
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{ContractResult, MessageInfo, SystemResult, to_json_binary, Uint128};
+    use cosmwasm_std::{Binary, ContractResult, MessageInfo, SystemResult, to_json_binary, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
     use provwasm_std::types::provenance::marker::v1::{Balance, QueryHoldingRequest, QueryHoldingResponse};
@@ -151,7 +150,7 @@ mod execute_disable_contract_tests {
         )
             .unwrap();
 
-        let cb = Box::new(|bin: &dyn Binary| -> SystemResult<ContractResult<dyn Binary>> {
+        let cb = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
             let message = QueryHoldingRequest::try_from(bin.clone()).unwrap();
 
             let response = if message.id == "test.denom.pool.0".to_string() {

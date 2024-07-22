@@ -55,7 +55,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked(buyer_address),
+                    buyer_address: buyer_address.clone(),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -368,7 +368,7 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![dealer_address],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 50,
                 contract_admin: deps.api.addr_make("contract-admin"),
