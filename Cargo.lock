@@ -969,8 +969,9 @@ dependencies = [
 
 [[package]]
 name = "provwasm-common"
-version = "0.1.0"
-source = "git+https://github.com/provenance-io/provwasm?tag=v2.3.0-rc1#40ffc8fc46dbe676b70a4fbd7b6a8deeb9b572d4"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f64b62100d22d0d1725330b8822d31bd63bb92eb044fc5606b8a7b3e14837ee8"
 dependencies = [
  "cosmwasm-std",
 ]
@@ -978,7 +979,8 @@ dependencies = [
 [[package]]
 name = "provwasm-mocks"
 version = "2.3.0"
-source = "git+https://github.com/provenance-io/provwasm?tag=v2.3.0-rc1#40ffc8fc46dbe676b70a4fbd7b6a8deeb9b572d4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c7d48d2a4ac41401e81145df5e95e208f949a5ded894146b783f775ef3d1a30"
 dependencies = [
  "cosmwasm-std",
  "provwasm-common",
@@ -990,7 +992,8 @@ dependencies = [
 [[package]]
 name = "provwasm-proc-macro"
 version = "0.1.2"
-source = "git+https://github.com/provenance-io/provwasm?tag=v2.3.0-rc1#40ffc8fc46dbe676b70a4fbd7b6a8deeb9b572d4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7eced1494a23e220b86475b58cf74e9f3ddb9dce2ee686662abe83bd07855f08"
 dependencies = [
  "itertools 0.11.0",
  "proc-macro2",
@@ -1003,7 +1006,8 @@ dependencies = [
 [[package]]
 name = "provwasm-std"
 version = "2.3.0"
-source = "git+https://github.com/provenance-io/provwasm?tag=v2.3.0-rc1#40ffc8fc46dbe676b70a4fbd7b6a8deeb9b572d4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3934ce53a63366af277c28f753302dda811eefeea61e7e5f0e95a3248b831ef"
 dependencies = [
  "base64 0.21.7",
  "chrono",
