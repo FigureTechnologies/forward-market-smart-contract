@@ -16,7 +16,8 @@ use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
 use crate::execute::update_face_value_cents::execute_update_face_value_cents;
 use crate::execute::update_terms_hash::execute_update_terms_hash;
 use crate::instantiate::instantiate_contract::instantiate_contract;
-use crate::msg::{ExecuteMsg, InstantiateContractMsg, QueryMsg};
+use crate::migrate::migrate::migrate_contract;
+use crate::msg::{ExecuteMsg, InstantiateContractMsg, QueryMsg, MigrateMsg};
 use crate::query::contract_state::query_contract_state;
 use crate::storage::state_store::{
     retrieve_contract_config, retrieve_optional_settlement_data_state,
@@ -136,3 +137,22 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> Result<Binary, ContractErr
         QueryMsg::GetContractState {} => Ok(to_json_binary(&query_contract_state(deps)?)?),
     }
 }
+
+/// The entry point used when the contract admin migrates an existing instance of this contract to
+/// a new stored code instance on chain.
+///
+/// # Parameters
+///
+/// * `deps` A dependencies object provided by the cosmwasm framework.  Allows access to useful
+/// resources like contract internal storage and a querier to retrieve blockchain objects.
+/// * `env` An environment object provided by the cosmwasm framework.  Describes the contract's
+/// details, as well as blockchain information at the time of the transaction.
+/// * `msg` A custom migration message defined by this contract that will map the desired operation
+/// to the proper contract logic.
+#[entry_point]
+pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, ContractError> {
+    match msg {
+        MigrateMsg::ContractUpgrade {} => migrate_contract(deps),
+    }
+}
+

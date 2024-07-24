@@ -174,4 +174,8 @@ pub enum ContractError {
     /// Occurs if the seller is agreeing to a terms hash that does not match the latest
     #[error("The agreement terms hash provided by the seller does not match the current agreement terms hash")]
     InvalidAgreementTermsHash,
+
+    /// Occurs when a migration is attempted for an unsupported version
+    #[error("Migration does not support {version:?} version")]
+    IllegalMigrationVersion {version: String}
 }
