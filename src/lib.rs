@@ -27,6 +27,6 @@ mod storage;
 // Defines the tests for the contract
 pub mod tests;
 // Utility methods that give access to shared logic
+mod migrate;
 pub mod util;
 pub mod version_info;
-mod migrate;

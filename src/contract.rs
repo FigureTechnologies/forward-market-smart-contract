@@ -17,7 +17,7 @@ use crate::execute::update_face_value_cents::execute_update_face_value_cents;
 use crate::execute::update_terms_hash::execute_update_terms_hash;
 use crate::instantiate::instantiate_contract::instantiate_contract;
 use crate::migrate::migrate::migrate_contract;
-use crate::msg::{ExecuteMsg, InstantiateContractMsg, QueryMsg, MigrateMsg};
+use crate::msg::{ExecuteMsg, InstantiateContractMsg, MigrateMsg, QueryMsg};
 use crate::query::contract_state::query_contract_state;
 use crate::storage::state_store::{
     retrieve_contract_config, retrieve_optional_settlement_data_state,
@@ -155,4 +155,3 @@ pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, Co
         MigrateMsg::ContractUpgrade {} => migrate_contract(deps),
     }
 }
-

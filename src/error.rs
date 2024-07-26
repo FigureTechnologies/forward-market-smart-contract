@@ -177,5 +177,5 @@ pub enum ContractError {
 
     /// Occurs when a migration is attempted for an unsupported version
     #[error("Migration does not support {version:?} version")]
-    IllegalMigrationVersion {version: String}
+    IllegalMigrationVersion { version: String },
 }
