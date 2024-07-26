@@ -2,11 +2,10 @@
 mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_bid_list_state, save_contract_config, save_seller_state, save_settlement_data_state, Bid, Config, Seller, SettlementData, BidList, save_buyer_state, Buyer, save_token_data_state, TokenData};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{to_json_binary, Binary, ContractResult, SystemResult};
+    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config, save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData, Bid, BidList, save_bid_list_state, save_token_data_state, TokenData};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
-    use prost::Message;
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::shim::Any;
     use provwasm_std::types::cosmos::auth::v1beta1::BaseAccount;
@@ -26,20 +25,24 @@ mod execute_dealer_confirm_tests {
     #[test]
     fn execute_dealer_confirm() {
         let mut deps = mock_provenance_dependencies();
-        let dealer_address = "dealer-address";
-        let seller_address = "allowed-seller-0";
-        let buyer_address = "contract_buyer";
+        let dealer_address = deps.api.addr_make("dealer-address");
+        let seller_address = deps.api.addr_make("allowed-seller-0");
+        let buyer_address = deps.api.addr_make("contract_buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let info = mock_info(dealer_address, &[]);
+        let token_denom = "test.forward.market.token";
+        let info = MessageInfo {
+            sender: dealer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
             &Config {
                 use_private_sellers: true,
                 use_private_buyers: false,
-                allowed_sellers: vec![Addr::unchecked(seller_address)],
+                allowed_sellers: vec![seller_address.clone()],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 3,
                 contract_admin: Addr::unchecked("contract_admin"),
@@ -52,7 +55,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked(buyer_address),
+                    buyer_address: buyer_address.clone(),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -62,7 +65,7 @@ mod execute_dealer_confirm_tests {
         save_seller_state(
             &mut deps.storage,
             &Seller {
-                seller_address: Addr::unchecked(seller_address),
+                seller_address: seller_address.clone(),
                 accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
@@ -73,7 +76,7 @@ mod execute_dealer_confirm_tests {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
+                buyer_address: buyer_address.clone(),
                 buyer_has_accepted_pools: true,
                 agreement_terms_hash: "".to_string(),
             },
@@ -87,10 +90,10 @@ mod execute_dealer_confirm_tests {
 
         let cb = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
             let message = QueryMarkerRequest::try_from(bin.clone()).unwrap();
-
+            let inner_deps = mock_provenance_dependencies();
             let expected_marker = MarkerAccount {
                 base_account: Some(BaseAccount {
-                    address: "base_addr".to_string(),
+                    address: inner_deps.api.addr_make("base_addr").to_string(),
                     pub_key: None,
                     account_number: 1,
                     sequence: 0,
@@ -113,7 +116,7 @@ mod execute_dealer_confirm_tests {
             let response = QueryMarkerResponse {
                 marker: Some(Any {
                     type_url: "/provenance.marker.v1.MarkerAccount".to_string(),
-                    value: expected_marker.encode_to_vec(),
+                    value: expected_marker.to_proto_bytes(),
                 }),
             };
 
@@ -122,12 +125,13 @@ mod execute_dealer_confirm_tests {
         });
 
         let cb_holding = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
+            let inner_deps = mock_provenance_dependencies();
             let message = QueryHoldingRequest::try_from(bin.clone()).unwrap();
 
             let response = if message.id == "test.token.asset.pool.0" {
                 QueryHoldingResponse {
                     balances: vec![Balance {
-                        address: seller_address.to_string(),
+                        address: inner_deps.api.addr_make("seller_address").to_string(),
                         coins: vec![Coin {
                             denom: "test.token.asset.pool.0".to_string(),
                             amount: "1".to_string(),
@@ -167,13 +171,13 @@ mod execute_dealer_confirm_tests {
                         }),
                         administrator: env.contract.address.to_string(),
                         from_address: env.contract.address.to_string(),
-                        to_address: "base_addr".to_string(),
+                        to_address: deps.api.addr_make("base_addr").to_string(),
                     })
                 );
 
                 let expected_settlement_data = SettlementData {
                     block_height: 12345,
-                    settling_dealer: Addr::unchecked(dealer_address),
+                    settling_dealer: dealer_address.clone(),
                 };
                 assert_eq!(
                     expected_settlement_data,
@@ -194,23 +198,27 @@ mod execute_dealer_confirm_tests {
     #[test]
     fn execute_seller_confirm_invalid_seller() {
         let mut deps = mock_provenance_dependencies();
-        let dealer_address = "dealer-address";
-        let seller_address = "allowed-seller-0";
-        let buyer_address = "contract_buyer";
+        let dealer_address = deps.api.addr_make("dealer-address");
+        let seller_address = deps.api.addr_make("allowed-seller-0");
+        let buyer_address = deps.api.addr_make("contract-buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let info = mock_info(dealer_address, &[]);
+        let token_denom = "test.forward.market.token";
+        let info = MessageInfo {
+            sender: dealer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
             &Config {
                 use_private_sellers: true,
                 use_private_buyers: false,
-                allowed_sellers: vec![Addr::unchecked("different_seller")],
+                allowed_sellers: vec![deps.api.addr_make("different-seller")],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -220,7 +228,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked(buyer_address),
+                    buyer_address: buyer_address.clone(),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -230,7 +238,7 @@ mod execute_dealer_confirm_tests {
         save_seller_state(
             &mut deps.storage,
             &Seller {
-                seller_address: Addr::unchecked(seller_address),
+                seller_address: seller_address.clone(),
                 accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
@@ -278,13 +286,17 @@ mod execute_dealer_confirm_tests {
     }
 
     #[test]
-    fn execute_seller_confirm_unauthorized_seller() {
+    fn execute_seller_confirm_unauthorized_dealer() {
         let mut deps = mock_provenance_dependencies();
-        let dealer_address = "dealer-address";
-        let seller_address = "allowed-seller-0";
-        let buyer_address = "contract_buyer";
+        let dealer_address = deps.api.addr_make("dealer-address");
+        let seller_address = deps.api.addr_make("allowed-seller-0");
+        let buyer_address = deps.api.addr_make("contract_buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let info = mock_info("not-the-dealer", &[]);
+        let token_denom = "test.forward.market.token";
+        let info = MessageInfo {
+            sender: deps.api.addr_make("not-the-dealer"),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -293,7 +305,7 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![Addr::unchecked("different_seller")],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 5,
                 contract_admin: Addr::unchecked("contract-admin"),
@@ -306,7 +318,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked(buyer_address),
+                    buyer_address: buyer_address.clone(),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -316,19 +328,14 @@ mod execute_dealer_confirm_tests {
         save_seller_state(
             &mut deps.storage,
             &Seller {
-                seller_address: Addr::unchecked(seller_address),
+                seller_address: seller_address.clone(),
                 accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
             },
         )
         .unwrap();
-        match execute(
-            deps.as_mut(),
-            env.clone(),
-            info,
-            crate::msg::ExecuteMsg::DealerConfirm {},
-        ) {
+        match execute(deps.as_mut(), env.clone(), info, DealerConfirm {}) {
             Ok(_) => {
                 panic!(
                     "failed to return an error when an unauthorized seller attempted to confirm the contract"
@@ -348,7 +355,11 @@ mod execute_dealer_confirm_tests {
     #[test]
     fn disallow_all_executions_after_settlement() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("", &[]);
+        let dealer_address = deps.api.addr_make("dealer-address");
+        let info = MessageInfo {
+            sender: deps.api.addr_make(""),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -357,10 +368,10 @@ mod execute_dealer_confirm_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 50,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -368,7 +379,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked("buyer-address"),
+                    buyer_address: deps.api.addr_make("buyer-address"),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -378,7 +389,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &SettlementData {
                 block_height: 1,
-                settling_dealer: Addr::unchecked("dealer-address"),
+                settling_dealer: dealer_address.clone(),
             },
         )
         .unwrap();

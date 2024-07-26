@@ -6,22 +6,28 @@ mod execute_update_allowed_sellers {
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{Addr, Attribute, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
     fn update_allowed_sellers() {
         let mut deps = mock_provenance_dependencies();
-        let contract_admin = "contract-admin";
-        let info = mock_info(contract_admin, &[]);
+        let buyer_address = deps.api.addr_make("contract-buyer");
+        let info = MessageInfo {
+            sender: buyer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
+        let allowed_seller_0_addr = deps.api.addr_make("allowed-seller-0");
+        let allowed_seller_1_addr = deps.api.addr_make("allowed-seller-1");
+
         save_contract_config(
             &mut deps.storage,
             &Config {
                 use_private_sellers: true,
                 use_private_buyers: false,
-                allowed_sellers: vec![Addr::unchecked("allowed-seller-0")],
+                allowed_sellers: vec![allowed_seller_0_addr],
                 allowed_buyers: vec![],
                 dealers: vec![Addr::unchecked("dealer-address")],
                 is_disabled: false,
@@ -39,10 +45,11 @@ mod execute_update_allowed_sellers {
             },
         )
         .unwrap();
+
         save_bid_list_state(&mut deps.storage, &BidList { bids: vec![] }).unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
-            allowed_sellers: vec!["allowed-seller-2".into()],
+            allowed_sellers: vec![allowed_seller_1_addr.to_string()],
         };
 
         match execute(deps.as_mut(), env, info.clone(), update_allowed_sellers) {
@@ -50,7 +57,7 @@ mod execute_update_allowed_sellers {
                 let expected_config_attributes = Config {
                     use_private_sellers: true,
                     use_private_buyers: false,
-                    allowed_sellers: vec![Addr::unchecked("allowed-seller-2")],
+                    allowed_sellers: vec![allowed_seller_1_addr],
                     allowed_buyers: vec![],
                     dealers: vec![Addr::unchecked("dealer-address")],
                     is_disabled: false,
@@ -80,8 +87,11 @@ mod execute_update_allowed_sellers {
     #[test]
     fn update_allowed_sellers_not_private() {
         let mut deps = mock_provenance_dependencies();
-        let admin_address = "contract-admin";
-        let info = mock_info(admin_address, &[]);
+        let buyer_address = deps.api.addr_make("contract-buyer");
+        let info = MessageInfo {
+            sender: buyer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -90,7 +100,7 @@ mod execute_update_allowed_sellers {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 5,
                 contract_admin: info.sender.clone(),
@@ -99,7 +109,7 @@ mod execute_update_allowed_sellers {
         .unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
-            allowed_sellers: vec!["allowed-seller-2".into()],
+            allowed_sellers: vec![deps.api.addr_make("allowed-seller-2").to_string()],
         };
         match execute(deps.as_mut(), env, info, update_allowed_sellers) {
             Ok(_) => {

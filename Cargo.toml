@@ -1,6 +1,6 @@
 [package]
 name = "forward_market_contract"
-version = "1.0.0"
+version = "0.1.2"
 authors = ["Jordon Tolotti <jtolotti@figure.com>"]
 edition = "2021"
 
@@ -19,8 +19,6 @@ incremental = false
 overflow-checks = true
 
 [features]
-# for more explicit tests, cargo test --features=backtraces
-backtraces = ["cosmwasm-std/backtraces"]
 # use library feature to disable all instantiate/execute/query exports
 library = []
 
@@ -32,14 +30,14 @@ optimize = """docker run --rm -v "$(pwd)":/code \
 """
 
 [dependencies]
-cosmwasm-schema = "1.2.8"
-cosmwasm-std = { version = "1.2.5", features = ["stargate"]}
-cw-storage-plus = "1.1.0"
-cw2 = "1.0.0"
+cosmwasm-schema = "2.1.0"
+cosmwasm-std = { version = "2.1.0"}
+cw-storage-plus = "2.0.0"
+cw2 = "2.0.0"
 schemars = "0.8.15"
 serde = { version = "1.0.189", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.49" }
-provwasm-std = { version = "=2.1.0"}
+provwasm-std = { git = "https://github.com/provenance-io/provwasm", tag = "v2.3.0-rc1" }
 sha2 = "0.10.8"
 hex = "0.4.3"
 bech32 = "0.9.1"
@@ -47,6 +45,7 @@ rust_decimal = "1.29.0"
 uuid = { version = "1.7.0", features = ["v1"] }
 log = "0.4.21"
 
+
 [dev-dependencies]
-provwasm-mocks = { version = "=2.1.0" }
+provwasm-mocks = { git = "https://github.com/provenance-io/provwasm", tag = "v2.3.0-rc1" }
 prost = { version = "=0.11.9", default-features = false }
