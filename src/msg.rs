@@ -76,6 +76,15 @@ pub enum QueryMsg {
     GetContractState {},
 }
 
+/// All defined payloads to be used when migrating to a new instance of this contract.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum MigrateMsg {
+    /// The standard migration route that modifies the [contract state](crate::store::contract_state::ContractStateV1)
+    /// to include the new values defined in a target code instance.
+    ContractUpgrade {},
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
     pub buyer: Buyer,

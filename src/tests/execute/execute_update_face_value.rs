@@ -6,26 +6,32 @@ mod execute_update_face_value {
     use crate::query::contract_state::query_contract_state;
     use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Attribute, Uint128};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{Attribute, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
     fn update_face_value_cents() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_buyer", &[]);
+        let buyer_address = deps.api.addr_make("contract-buyer");
+        let seller_address = deps.api.addr_make("allowed-seller-0");
+        let dealer_address = deps.api.addr_make("dealer-address");
+        let info = MessageInfo {
+            sender: buyer_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
             &Config {
                 is_private: true,
-                allowed_sellers: vec![Addr::unchecked("allowed-seller-0")],
+                allowed_sellers: vec![seller_address.clone()],
                 agreement_terms_hash: "mock-terms-hash".to_string(),
                 token_denom: "test.forward.market.token".into(),
                 max_face_value_cents: Uint128::new(9000000000),
                 min_face_value_cents: Uint128::new(500000000),
                 tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
             },
         )
@@ -43,7 +49,7 @@ mod execute_update_face_value {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked("contract_buyer"),
+                buyer_address: buyer_address.clone(),
                 has_accepted_pools: false,
             },
         )
@@ -59,13 +65,13 @@ mod execute_update_face_value {
             Ok(response) => {
                 let expected_config_attributes = Config {
                     is_private: true,
-                    allowed_sellers: vec![Addr::unchecked("allowed-seller-0")],
+                    allowed_sellers: vec![seller_address.clone()],
                     agreement_terms_hash: "mock-terms-hash".to_string(),
                     token_denom: "test.forward.market.token".to_string(),
                     min_face_value_cents: Uint128::new(7500000000),
                     max_face_value_cents: Uint128::new(8500000000),
                     tick_size: Uint128::new(1000),
-                    dealers: vec![Addr::unchecked("dealer-address")],
+                    dealers: vec![dealer_address.clone()],
                     is_disabled: false,
                 };
                 assert_eq!(response.attributes.len(), 1);
@@ -90,22 +96,25 @@ mod execute_update_face_value {
     #[test]
     fn update_face_value_with_unauthorized_buyer() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("contract_buyer_1", &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make("contract-buyer-1"),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
             &Config {
                 is_private: true,
                 allowed_sellers: vec![
-                    Addr::unchecked("allowed-seller-0"),
-                    Addr::unchecked("allowed-seller-1"),
+                    deps.api.addr_make("allowed-seller-0"),
+                    deps.api.addr_make("allowed-seller-1"),
                 ],
                 agreement_terms_hash: "mock-terms-hash".to_string(),
                 token_denom: "test.forward.market.token".into(),
                 max_face_value_cents: Uint128::new(500000000),
                 min_face_value_cents: Uint128::new(100000000),
                 tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
             },
         )
@@ -114,7 +123,7 @@ mod execute_update_face_value {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked("contract_buyer_0"),
+                buyer_address: deps.api.addr_make("contract_buyer_0"),
                 has_accepted_pools: false,
             },
         )
