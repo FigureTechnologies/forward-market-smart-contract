@@ -45,7 +45,6 @@ mod execute_accept_buyer_tests {
             &mut deps.storage,
             &Seller {
                 seller_address,
-                accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec!["mock.denom".to_string()],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -130,7 +129,6 @@ mod execute_accept_buyer_tests {
             &mut deps.storage,
             &Seller {
                 seller_address,
-                accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec!["mock.denom".to_string()],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -207,7 +205,6 @@ mod execute_accept_buyer_tests {
             &mut deps.storage,
             &Seller {
                 seller_address,
-                accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec!["mock.denom".to_string()],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -282,7 +279,6 @@ mod execute_accept_buyer_tests {
             &mut deps.storage,
             &Seller {
                 seller_address,
-                accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec!["mock.denom".to_string()],
                 offer_hash: "mock-offer-hash".to_string(),
             },

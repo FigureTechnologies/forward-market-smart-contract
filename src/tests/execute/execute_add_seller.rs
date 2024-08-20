@@ -19,9 +19,7 @@ mod execute_add_seller_tests {
         let env = mock_env();
         let dealer_address = "dealer_address";
         let buyer_address = "buyer_address";
-        let accepted_value_cents = Uint128::new(400000000);
         let add_seller_msg = AddSeller {
-            accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
         };
 
@@ -66,7 +64,6 @@ mod execute_add_seller_tests {
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
                         seller_address: Addr::unchecked("private-seller-0"),
-                        accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
                     }
@@ -103,7 +100,6 @@ mod execute_add_seller_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: Addr::unchecked("existing_seller"),
-                accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -111,7 +107,6 @@ mod execute_add_seller_tests {
         .unwrap();
 
         let add_seller_msg = AddSeller {
-            accepted_value_cents: Uint128::new(200000000),
             offer_hash: "mock-offer-hash".to_string(),
         };
         match execute(deps.as_mut(), env, info, add_seller_msg) {
@@ -134,10 +129,8 @@ mod execute_add_seller_tests {
         let info = mock_info("private-seller-0", &[]);
         let buyer_address = "contract_buyer";
         let env = mock_env();
-        let accepted_value_cents = Uint128::new(100000000);
         let dealer_address = "dealer-address";
         let add_seller_msg = AddSeller {
-            accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
         };
 
@@ -182,7 +175,6 @@ mod execute_add_seller_tests {
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
                         seller_address: Addr::unchecked("private-seller-0"),
-                        accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
                     }
@@ -201,7 +193,6 @@ mod execute_add_seller_tests {
         let info = mock_info(contract_admin, &[]);
         let env = mock_env();
         let add_seller_msg = AddSeller {
-            accepted_value_cents: Uint128::new(100000000),
             offer_hash: "mock-offer-hash".to_string(),
         };
 

@@ -44,7 +44,6 @@ mod execute_update_seller_offer_hash {
 
         save_seller_state(&mut deps.storage, &Seller {
             seller_address: Addr::unchecked("public-seller-0"),
-            accepted_value_cents: Uint128::new(200000000),
             pool_denoms: vec!["test.denom.mock".to_string()],
             offer_hash: "to-be-replaced".to_string(),
         }).unwrap();
@@ -61,7 +60,6 @@ mod execute_update_seller_offer_hash {
                    query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                    Seller {
                        seller_address: Addr::unchecked("public-seller-0"),
-                       accepted_value_cents: Uint128::new(200000000),
                        pool_denoms: vec!["test.denom.mock".to_string()],
                        offer_hash: "new-hash".to_string(),
                    }
@@ -107,7 +105,6 @@ mod execute_update_seller_offer_hash {
 
         save_seller_state(&mut deps.storage, &Seller {
             seller_address: Addr::unchecked("public-seller-0"),
-            accepted_value_cents: Uint128::new(200000000),
             pool_denoms: vec!["test.denom.mock".to_string()],
             offer_hash: "to-be-replaced".to_string(),
         }).unwrap();

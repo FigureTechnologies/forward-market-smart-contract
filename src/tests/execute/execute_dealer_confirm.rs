@@ -66,7 +66,6 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -239,7 +238,6 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -329,7 +327,6 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -397,7 +394,6 @@ mod execute_dealer_confirm_tests {
         [
             ContractDisable {},
             AddSeller {
-                accepted_value_cents: Uint128::new(1),
                 offer_hash: "mock-offer-hash".to_string(),
             },
             FinalizePools {

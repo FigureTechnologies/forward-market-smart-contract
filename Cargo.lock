@@ -662,7 +662,7 @@ checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
 
 [[package]]
 name = "forward_market_contract"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "bech32 0.9.1",
  "cosmwasm-schema",

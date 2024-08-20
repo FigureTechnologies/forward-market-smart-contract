@@ -123,7 +123,6 @@ mod execute_disable_contract_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: allowed_seller_address.clone(),
-                accepted_value_cents: Uint128::new(450000000),
                 pool_denoms: vec!["test.denom.pool.0".to_string()],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -180,7 +179,6 @@ mod execute_disable_contract_tests {
             Ok(_) => {
                 let expected_seller_state = Seller {
                     seller_address: allowed_seller_address.clone(),
-                    accepted_value_cents: Uint128::new(450000000),
                     pool_denoms: vec![],
                     offer_hash: "mock-offer-hash".to_string(),
                 };
@@ -220,7 +218,6 @@ mod execute_disable_contract_tests {
         [
             ContractDisable {},
             AddSeller {
-                accepted_value_cents: Uint128::new(1),
                 offer_hash: "mock-offer-hash".to_string(),
             },
             FinalizePools {
