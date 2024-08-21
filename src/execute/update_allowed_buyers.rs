@@ -12,7 +12,7 @@ pub fn execute_update_allowed_buyers(
     let config = retrieve_contract_config(deps.storage)?;
 
     let mut updated_buyers = vec![];
-    if config.use_private_buyers{
+    if config.use_private_buyers {
         for buyer_str in allowed_buyers {
             let seller_addr = deps.api.addr_validate(&buyer_str)?;
             updated_buyers.push(seller_addr)

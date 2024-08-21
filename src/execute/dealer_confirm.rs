@@ -3,7 +3,10 @@ use crate::error::ContractError::{
     IllegalConfirmationRequest, InvalidConfirmationRequest, MissingMarkerBaseAccount,
     UnauthorizedPrivateSeller,
 };
-use crate::storage::state_store::{retrieve_contract_config, retrieve_seller_state, retrieve_token_data_state, save_settlement_data_state, SettlementData};
+use crate::storage::state_store::{
+    retrieve_contract_config, retrieve_seller_state, retrieve_token_data_state,
+    save_settlement_data_state, SettlementData,
+};
 use crate::util::helpers::{
     buyer_has_accepted, get_balance, get_marker, is_dealer, seller_has_finalized,
 };

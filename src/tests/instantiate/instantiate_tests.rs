@@ -7,27 +7,30 @@ mod instantiate_tests {
     use crate::storage::state_store::Config;
     use crate::version_info::{get_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, Attribute, MessageInfo, Storage, Uint128};
+    use cosmwasm_std::{Attribute, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
     fn instantiate_private_forward_market_contract() {
         let mut deps = mock_provenance_dependencies();
-        let buyer_address = deps.api.addr_make("contract-buyer");
+        let admin_address = deps.api.addr_make("contract-admin");
         let seller_address_0 = deps.api.addr_make("allowed-seller-0");
         let seller_address_1 = deps.api.addr_make("allowed-seller-1");
         let dealer_address = deps.api.addr_make("dealer-address");
         let info = MessageInfo {
-            sender: buyer_address.clone(),
+            sender: admin_address.clone(),
             funds: vec![],
         };
         let env = mock_env();
         let instantiate_msg = InstantiateContractMsg {
             use_private_sellers: true,
             use_private_buyers: false,
-            allowed_sellers: vec![seller_address_0.clone().to_string(), seller_address_1.clone().to_string()],
+            allowed_sellers: vec![
+                seller_address_0.clone().to_string(),
+                seller_address_1.clone().to_string(),
+            ],
             allowed_buyers: vec![],
-            dealers: vec!["dealer-address".to_string()],
+            dealers: vec![dealer_address.to_string()],
             max_buyer_count: 1,
         };
         let init_response = instantiate(deps.as_mut(), env, info, instantiate_msg);
@@ -41,7 +44,7 @@ mod instantiate_tests {
                     dealers: vec![dealer_address.clone()],
                     is_disabled: false,
                     max_bid_count: 1,
-                    contract_admin: Addr::unchecked("contract-admin"),
+                    contract_admin: admin_address.clone(),
                 };
                 assert_eq!(response.attributes.len(), 1);
                 assert_eq!(

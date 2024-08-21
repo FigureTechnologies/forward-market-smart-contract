@@ -5,9 +5,8 @@ pub mod add_seller;
 pub mod dealer_confirm;
 pub mod disable_contract;
 pub mod finalize_pools;
-pub mod rescind_finalized_pools;
-pub mod update_allowed_sellers;
-pub mod update_allowed_buyers;
-pub mod update_seller_offer_hash;
 pub mod mint_tokens;
-
+pub mod rescind_finalized_pools;
+pub mod update_allowed_buyers;
+pub mod update_allowed_sellers;
+pub mod update_seller_offer_hash;

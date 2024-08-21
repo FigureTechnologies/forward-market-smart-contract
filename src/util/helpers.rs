@@ -5,7 +5,7 @@ use crate::error::ContractError::{
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
 use crate::storage::state_store::{
-    retrieve_contract_config, retrieve_optional_seller_state, retrieve_optional_buyer_state,
+    retrieve_contract_config, retrieve_optional_buyer_state, retrieve_optional_seller_state,
     save_contract_config, Config,
 };
 use bech32::ToBase32;
@@ -23,7 +23,12 @@ use provwasm_std::types::provenance::marker::v1::{
 use provwasm_std::types::provenance::metadata::v1::{MetadataQuerier, ValueOwnershipResponse};
 use uuid::Uuid;
 
-pub fn create_mint_tokens_messages(token_denom: String, token_count: Uint128, dealer_list: Vec<Addr>, contract_address: String) -> Vec<CosmosMsg> {
+pub fn create_mint_tokens_messages(
+    token_denom: String,
+    token_count: Uint128,
+    dealer_list: Vec<Addr>,
+    contract_address: String,
+) -> Vec<CosmosMsg> {
     let mut messages: Vec<CosmosMsg> = vec![];
     let coin = Coin {
         denom: token_denom.clone(),
@@ -87,17 +92,15 @@ pub fn create_transfer_tokens_message(
     amount: Uint128,
     owner_address: String,
 ) -> Vec<CosmosMsg> {
-    return vec![
-        CosmosMsg::from(MsgWithdrawRequest {
-            denom: denom.to_string(),
-            administrator: contract_address.clone(),
-            to_address: owner_address.clone(),
-            amount: vec![Coin {
-                denom: denom.clone(),
-                amount: amount.to_string(),
-            }],
-        })
-    ];
+    return vec![CosmosMsg::from(MsgWithdrawRequest {
+        denom: denom.to_string(),
+        administrator: contract_address.clone(),
+        to_address: owner_address.clone(),
+        amount: vec![Coin {
+            denom: denom.clone(),
+            amount: amount.to_string(),
+        }],
+    })];
 }
 
 pub fn get_owned_scopes(
@@ -243,7 +246,7 @@ pub fn update_config_as_admin(
     let seller_state = retrieve_optional_seller_state(deps.storage)?;
     let buyer_state = retrieve_optional_buyer_state(deps.storage)?;
     if seller_state.is_some() && buyer_state.is_some() {
-        return Err(IllegalConfigUpdate)
+        return Err(IllegalConfigUpdate);
     }
 
     save_contract_config(deps.storage, &updated_config)?;

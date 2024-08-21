@@ -2,7 +2,11 @@
 mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
-    use crate::storage::state_store::{retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config, save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData, Bid, BidList, save_bid_list_state, save_token_data_state, TokenData};
+    use crate::storage::state_store::{
+        retrieve_optional_settlement_data_state, save_bid_list_state, save_buyer_state,
+        save_contract_config, save_seller_state, save_settlement_data_state, save_token_data_state,
+        Bid, BidList, Buyer, Config, Seller, SettlementData, TokenData,
+    };
     use cosmwasm_std::testing::mock_env;
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
     use cosmwasm_std::{Addr, CosmosMsg, Uint128};
@@ -17,9 +21,8 @@ mod execute_dealer_confirm_tests {
     };
 
     use crate::msg::ExecuteMsg::{
-        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm,
-        FinalizePools, RescindFinalizedPools,
-        UpdateAllowedSellers,
+        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, FinalizePools,
+        RescindFinalizedPools, UpdateAllowedSellers,
     };
 
     #[test]
@@ -29,7 +32,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = deps.api.addr_make("allowed-seller-0");
         let buyer_address = deps.api.addr_make("contract_buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: dealer_address.clone(),
             funds: vec![],
@@ -83,10 +85,14 @@ mod execute_dealer_confirm_tests {
         )
         .unwrap();
 
-        save_token_data_state(&mut deps.storage, &TokenData {
-            token_denom: "test.token.fm".to_string(),
-            token_count: Uint128::new(10),
-        }).unwrap();
+        save_token_data_state(
+            &mut deps.storage,
+            &TokenData {
+                token_denom: "test.token.fm".to_string(),
+                token_count: Uint128::new(10),
+            },
+        )
+        .unwrap();
 
         let cb = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
             let message = QueryMarkerRequest::try_from(bin.clone()).unwrap();
@@ -202,7 +208,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = deps.api.addr_make("allowed-seller-0");
         let buyer_address = deps.api.addr_make("contract-buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: dealer_address.clone(),
             funds: vec![],
@@ -256,10 +261,14 @@ mod execute_dealer_confirm_tests {
         )
         .unwrap();
 
-        save_token_data_state(&mut deps.storage, &TokenData {
-            token_denom: "test.token.fm".to_string(),
-            token_count: Uint128::new(10),
-        }).unwrap();
+        save_token_data_state(
+            &mut deps.storage,
+            &TokenData {
+                token_denom: "test.token.fm".to_string(),
+                token_count: Uint128::new(10),
+            },
+        )
+        .unwrap();
 
         match execute(
             deps.as_mut(),
@@ -292,7 +301,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = deps.api.addr_make("allowed-seller-0");
         let buyer_address = deps.api.addr_make("contract_buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: deps.api.addr_make("not-the-dealer"),
             funds: vec![],
@@ -407,7 +415,9 @@ mod execute_dealer_confirm_tests {
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },
-            AcceptFinalizedPools { offer_hash: "".to_string() },
+            AcceptFinalizedPools {
+                offer_hash: "".to_string(),
+            },
             RescindFinalizedPools {},
         ]
         .into_iter()

@@ -19,7 +19,6 @@ mod execute_finalize_pools_tests {
         let mut deps = mock_provenance_dependencies();
         let seller_address = deps.api.addr_make("allowed-seller-0");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: seller_address.clone(),
             funds: vec![],
@@ -107,7 +106,6 @@ mod execute_finalize_pools_tests {
     fn execute_finalize_pool_invalid_list() {
         let mut deps = mock_provenance_dependencies();
         let seller_address = deps.api.addr_make("allowed-seller-0");
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: seller_address.clone(),
             funds: vec![],
@@ -168,7 +166,6 @@ mod execute_finalize_pools_tests {
         let mut deps = mock_provenance_dependencies();
         let unauthorized_seller_address = deps.api.addr_make("unauthorized-seller");
         let allowed_seller_address = deps.api.addr_make("allowed-seller");
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: unauthorized_seller_address.clone(),
             funds: vec![],

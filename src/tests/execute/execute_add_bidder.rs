@@ -8,14 +8,18 @@ mod execute_add_bidder_tests {
         save_bid_list_state, save_contract_config, Bid, BidList, Config,
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{Addr, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
     fn add_bidders_to_public_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("bidder_address", &[]);
+        let bidder_address = deps.api.addr_make("bidder-address");
+        let info = MessageInfo {
+            sender: bidder_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
 
         save_contract_config(
@@ -25,10 +29,10 @@ mod execute_add_bidder_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -43,7 +47,7 @@ mod execute_add_bidder_tests {
         .unwrap();
 
         let existing_bidder = Bid {
-            buyer_address: Addr::unchecked("existing-buyer-address"),
+            buyer_address: deps.api.addr_make("existing-buyer-address"),
             agreement_terms_hash: "mock-hash-existing-buyers".to_string(),
         };
         save_bid_list_state(
@@ -64,7 +68,7 @@ mod execute_add_bidder_tests {
                     vec![
                         existing_bidder.clone(),
                         Bid {
-                            buyer_address: Addr::unchecked("bidder_address"),
+                            buyer_address: bidder_address.clone(),
                             agreement_terms_hash: "buyer-mock-hash".to_string(),
                         }
                     ]
@@ -79,7 +83,11 @@ mod execute_add_bidder_tests {
     #[test]
     fn add_bidders_to_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("bidder_address", &[]);
+        let bidder_address = deps.api.addr_make("bidder-address");
+        let info = MessageInfo {
+            sender: bidder_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
 
         save_contract_config(
@@ -88,11 +96,11 @@ mod execute_add_bidder_tests {
                 use_private_sellers: false,
                 use_private_buyers: true,
                 allowed_sellers: vec![],
-                allowed_buyers: vec![Addr::unchecked("bidder_address")],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                allowed_buyers: vec![bidder_address.clone()],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -115,12 +123,10 @@ mod execute_add_bidder_tests {
             Ok(_) => {
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().bids,
-                    vec![
-                        Bid {
-                            buyer_address: Addr::unchecked("bidder_address"),
-                            agreement_terms_hash: "buyer-mock-hash".to_string(),
-                        }
-                    ]
+                    vec![Bid {
+                        buyer_address: bidder_address.clone(),
+                        agreement_terms_hash: "buyer-mock-hash".to_string(),
+                    }]
                 );
             }
             Err(error) => {
@@ -132,7 +138,11 @@ mod execute_add_bidder_tests {
     #[test]
     fn reject_disallowed_bidder_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("bidder_address", &[]);
+        let bidder_address = deps.api.addr_make("bidder-address");
+        let info = MessageInfo {
+            sender: bidder_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
 
         save_contract_config(
@@ -141,11 +151,11 @@ mod execute_add_bidder_tests {
                 use_private_sellers: false,
                 use_private_buyers: true,
                 allowed_sellers: vec![],
-                allowed_buyers: vec![Addr::unchecked("bidder_address_0")],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                allowed_buyers: vec![deps.api.addr_make("allowed-bidder-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -182,7 +192,11 @@ mod execute_add_bidder_tests {
     #[test]
     fn reject_over_max_bidders_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("bidder_address", &[]);
+        let bidder_address = deps.api.addr_make("bidder-address");
+        let info = MessageInfo {
+            sender: bidder_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
 
         save_contract_config(
@@ -191,11 +205,11 @@ mod execute_add_bidder_tests {
                 use_private_sellers: false,
                 use_private_buyers: true,
                 allowed_sellers: vec![],
-                allowed_buyers: vec![Addr::unchecked("bidder_address")],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                allowed_buyers: vec![bidder_address.clone()],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();

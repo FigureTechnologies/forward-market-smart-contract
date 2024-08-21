@@ -8,17 +8,21 @@ mod execute_add_seller_tests {
         save_bid_list_state, save_contract_config, save_seller_state, Bid, BidList, Config, Seller,
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
-    use cosmwasm_std::testing::{mock_env, mock_info};
-    use cosmwasm_std::{Addr, Uint128};
+    use cosmwasm_std::testing::mock_env;
+    use cosmwasm_std::{Addr, MessageInfo, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
     fn add_seller_to_public_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let info = mock_info("private-seller-0", &[]);
+        let seller_address = deps.api.addr_make("private-seller-0");
+        let info = MessageInfo {
+            sender: seller_address.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
-        let dealer_address = "dealer_address";
-        let buyer_address = "buyer_address";
+        let dealer_address = deps.api.addr_make("dealer_address");
+        let buyer_address = deps.api.addr_make("buyer_address");
         let accepted_value_cents = Uint128::new(400000000);
         let add_seller_msg = AddSeller {
             accepted_value_cents,
@@ -32,10 +36,10 @@ mod execute_add_seller_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -53,7 +57,7 @@ mod execute_add_seller_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked(buyer_address),
+                    buyer_address: buyer_address.clone(),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -65,7 +69,7 @@ mod execute_add_seller_tests {
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
-                        seller_address: Addr::unchecked("private-seller-0"),
+                        seller_address: seller_address.clone(),
                         accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
@@ -81,8 +85,11 @@ mod execute_add_seller_tests {
     #[test]
     fn add_duplicate_seller() {
         let mut deps = mock_provenance_dependencies();
-        let contract_admin = "contract_admin";
-        let info = mock_info(contract_admin, &[]);
+        let contract_admin = deps.api.addr_make("contract-admin");
+        let info = MessageInfo {
+            sender: contract_admin.clone(),
+            funds: vec![],
+        };
         let env = mock_env();
         save_contract_config(
             &mut deps.storage,
@@ -91,10 +98,10 @@ mod execute_add_seller_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked(contract_admin),
+                contract_admin: contract_admin.clone(),
             },
         )
         .unwrap();
@@ -131,8 +138,12 @@ mod execute_add_seller_tests {
     fn add_seller_to_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
         let contract_admin = "contract_admin";
-        let info = mock_info("private-seller-0", &[]);
-        let buyer_address = "contract_buyer";
+        let seller_address = deps.api.addr_make("private-seller-0");
+        let info = MessageInfo {
+            sender: seller_address.clone(),
+            funds: vec![],
+        };
+        let buyer_address = deps.api.addr_make("contract-buyer");
         let env = mock_env();
         let accepted_value_cents = Uint128::new(100000000);
         let dealer_address = "dealer-address";
@@ -146,12 +157,12 @@ mod execute_add_seller_tests {
             &Config {
                 use_private_sellers: true,
                 use_private_buyers: true,
-                allowed_sellers: vec![Addr::unchecked("private-seller-0")],
+                allowed_sellers: vec![seller_address.clone()],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked(dealer_address)],
+                dealers: vec![deps.api.addr_make(dealer_address)],
                 is_disabled: false,
                 max_bid_count: 2,
-                contract_admin: Addr::unchecked(contract_admin),
+                contract_admin: deps.api.addr_make(contract_admin),
             },
         )
         .unwrap();
@@ -169,7 +180,7 @@ mod execute_add_seller_tests {
             &mut deps.storage,
             &BidList {
                 bids: vec![Bid {
-                    buyer_address: Addr::unchecked(buyer_address),
+                    buyer_address: buyer_address.clone(),
                     agreement_terms_hash: "".to_string(),
                 }],
             },
@@ -181,7 +192,7 @@ mod execute_add_seller_tests {
                 assert_eq!(
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
-                        seller_address: Addr::unchecked("private-seller-0"),
+                        seller_address: seller_address.clone(),
                         accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
@@ -198,7 +209,10 @@ mod execute_add_seller_tests {
     fn add_invalid_seller_to_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
         let contract_admin = "contract-admin";
-        let info = mock_info(contract_admin, &[]);
+        let info = MessageInfo {
+            sender: deps.api.addr_make(contract_admin),
+            funds: vec![],
+        };
         let env = mock_env();
         let add_seller_msg = AddSeller {
             accepted_value_cents: Uint128::new(100000000),

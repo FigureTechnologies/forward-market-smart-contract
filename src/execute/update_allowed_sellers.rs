@@ -1,7 +1,7 @@
 use crate::error::ContractError;
 use crate::error::ContractError::InvalidVisibilityConfig;
 use crate::storage::state_store::retrieve_contract_config;
-use crate::util::helpers::{update_config_as_admin};
+use crate::util::helpers::update_config_as_admin;
 use cosmwasm_std::{DepsMut, MessageInfo, Response};
 
 pub fn execute_update_allowed_sellers(

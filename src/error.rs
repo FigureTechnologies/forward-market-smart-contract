@@ -1,4 +1,4 @@
-use cosmwasm_std::{StdError};
+use cosmwasm_std::StdError;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -201,5 +201,9 @@ pub enum ContractError {
 
     /// Occurs when a seller tries to accept a bid before the tokens have been minted
     #[error("Bid cannot be accepted until the admin has completed the MintTokens action")]
-    TokensNotMinted
+    TokensNotMinted,
+
+    /// Occurs when a migration is attempted for an unsupported version
+    #[error("Migration does not support {version:?} version")]
+    IllegalMigrationVersion { version: String },
 }
