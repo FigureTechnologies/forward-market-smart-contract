@@ -13,9 +13,7 @@ mod execute_disable_contract_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{
-        to_json_binary, Binary, ContractResult, MessageInfo, SystemResult, Uint128,
-    };
+    use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
     use provwasm_std::types::provenance::marker::v1::{
@@ -127,7 +125,6 @@ mod execute_disable_contract_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: allowed_seller_address.clone(),
-                accepted_value_cents: Uint128::new(450000000),
                 pool_denoms: vec!["test.denom.pool.0".to_string()],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -184,7 +181,6 @@ mod execute_disable_contract_tests {
             Ok(_) => {
                 let expected_seller_state = Seller {
                     seller_address: allowed_seller_address.clone(),
-                    accepted_value_cents: Uint128::new(450000000),
                     pool_denoms: vec![],
                     offer_hash: "mock-offer-hash".to_string(),
                 };
@@ -224,7 +220,6 @@ mod execute_disable_contract_tests {
         [
             ContractDisable {},
             AddSeller {
-                accepted_value_cents: Uint128::new(1),
                 offer_hash: "mock-offer-hash".to_string(),
             },
             FinalizePools {

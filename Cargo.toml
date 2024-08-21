@@ -1,6 +1,6 @@
 [package]
 name = "forward_market_contract"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Jordon Tolotti <jtolotti@figure.com>"]
 edition = "2021"
 

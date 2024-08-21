@@ -6,7 +6,7 @@ mod execute_finalize_pools_tests {
     use crate::storage::state_store::{save_contract_config, save_seller_state, Config, Seller};
     use cosmwasm_std::testing::mock_env;
     use cosmwasm_std::{
-        to_json_binary, Attribute, Binary, ContractResult, MessageInfo, SystemResult, Uint128,
+        to_json_binary, Attribute, Binary, ContractResult, MessageInfo, SystemResult,
     };
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
@@ -44,7 +44,6 @@ mod execute_finalize_pools_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(650000000),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -86,7 +85,6 @@ mod execute_finalize_pools_tests {
             Ok(response) => {
                 let expected_seller_state = Seller {
                     seller_address: seller_address.clone(),
-                    accepted_value_cents: Uint128::new(650000000),
                     pool_denoms: vec![pool_denom.into()],
                     offer_hash: "mock-offer-hash".to_string(),
                 };
@@ -131,7 +129,6 @@ mod execute_finalize_pools_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(650000000),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -190,7 +187,6 @@ mod execute_finalize_pools_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: allowed_seller_address.clone(),
-                accepted_value_cents: Uint128::new(650000000),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },

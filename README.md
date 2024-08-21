@@ -48,34 +48,19 @@ Example instantiation payload:
 
 ## Contract Execution
 ### AddSeller
-#### Adds the sender as the seller on the contract. Along with the sender being added, an accepted value of the contract is also submitted
+#### Adds the sender as the seller on the contract. Along with the sender being added, a hash of the offer terms is added
 
-* `accepted_value_cents`: The amount of the face value the seller is willing to provide. This must be between the min and max face values defied by the contract
 * `offer_hash`: A hash generated from the offer terms that are stored in block vault
-* `agreement_terms_hash`: The hash generated from the agreement terms that the seller is agreeing to
 
 Example execution payload:
 
 ```json
 {
   "AddSeller": {
-    "accepted_value_cents": 70_000_000,
     "offer_hash": "b1c2d3e4",
-    "agreement_terms_hash": "a1b2c3d4"
   }
 }
 
-```
-
-### RemoveAsSeller
-#### Allows the sender to remove themselves from the list of allowed sellers. No arguments are required
-
-Example execution payload:
-
-```json
-{
-  "RemoveAsSeller": {}
-}
 ```
 
 ### FinalizePools

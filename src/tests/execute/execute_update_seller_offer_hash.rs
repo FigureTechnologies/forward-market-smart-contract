@@ -9,7 +9,7 @@ mod execute_update_seller_offer_hash {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, MessageInfo, Uint128};
+    use cosmwasm_std::{Addr, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -52,7 +52,6 @@ mod execute_update_seller_offer_hash {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_addr.clone(),
-                accepted_value_cents: Uint128::new(200000000),
                 pool_denoms: vec!["test.denom.mock".to_string()],
                 offer_hash: "to-be-replaced".to_string(),
             },
@@ -68,7 +67,6 @@ mod execute_update_seller_offer_hash {
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
                         seller_address: seller_addr.clone(),
-                        accepted_value_cents: Uint128::new(200000000),
                         pool_denoms: vec!["test.denom.mock".to_string()],
                         offer_hash: "new-hash".to_string(),
                     }
@@ -119,7 +117,6 @@ mod execute_update_seller_offer_hash {
             &mut deps.storage,
             &Seller {
                 seller_address: Addr::unchecked("public-seller-0"),
-                accepted_value_cents: Uint128::new(200000000),
                 pool_denoms: vec!["test.denom.mock".to_string()],
                 offer_hash: "to-be-replaced".to_string(),
             },

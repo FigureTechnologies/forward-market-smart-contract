@@ -132,7 +132,6 @@ pub struct Config {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct Seller {
     pub seller_address: Addr,
-    pub accepted_value_cents: Uint128,
     pub pool_denoms: Vec<String>,
     pub offer_hash: String,
 }

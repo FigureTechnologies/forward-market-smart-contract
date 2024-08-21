@@ -79,10 +79,7 @@ pub fn execute(
         return Err(InvalidContractExecution);
     }
     match msg {
-        ExecuteMsg::AddSeller {
-            accepted_value_cents,
-            offer_hash,
-        } => execute_add_seller(deps, info, accepted_value_cents, offer_hash),
+        ExecuteMsg::AddSeller { offer_hash } => execute_add_seller(deps, info, offer_hash),
         ExecuteMsg::UpdateSellerOfferHash { offer_hash } => {
             execute_update_seller_offer_hash(deps, info, offer_hash)
         }

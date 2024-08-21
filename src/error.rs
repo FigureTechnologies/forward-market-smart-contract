@@ -44,20 +44,6 @@ pub enum ContractError {
     #[error("Configuration cannot be updated once a buyer and seller have been established")]
     IllegalConfigUpdate,
 
-    /// Occurs if the sell attempts to accept a non-positive value for the contract
-    #[error("The face value of the forward market contract must be greater than 0")]
-    AcceptedValueMustBePositive,
-
-    /// Occurs if the seller tries to accept a value that exceeds the max value defined by the buyer
-    #[error("The face value of the forward market contract must be less than the max face value")]
-    AcceptedValueExceedsMaxFaceValue,
-
-    /// Occurs if the seller tries to accept a value that does not exceed or equal the min value defined by the buyer
-    #[error(
-        "The accepted value of the forward market contract cannot be less than the min face value"
-    )]
-    AcceptedValueLessThanMinFaceValue,
-
     /// Occurs if the seller tries to finalize without adding any asset pools
     #[error("The set of pools cannot be empty when finalizing the transaction")]
     InvalidFinalizationRequest,

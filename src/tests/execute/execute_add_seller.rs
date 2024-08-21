@@ -9,7 +9,7 @@ mod execute_add_seller_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, MessageInfo, Uint128};
+    use cosmwasm_std::{Addr, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -23,9 +23,8 @@ mod execute_add_seller_tests {
         let env = mock_env();
         let dealer_address = deps.api.addr_make("dealer_address");
         let buyer_address = deps.api.addr_make("buyer_address");
-        let accepted_value_cents = Uint128::new(400000000);
+
         let add_seller_msg = AddSeller {
-            accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
         };
 
@@ -70,7 +69,6 @@ mod execute_add_seller_tests {
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
                         seller_address: seller_address.clone(),
-                        accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
                     }
@@ -110,7 +108,6 @@ mod execute_add_seller_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: Addr::unchecked("existing_seller"),
-                accepted_value_cents: Uint128::new(100000000),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -118,7 +115,6 @@ mod execute_add_seller_tests {
         .unwrap();
 
         let add_seller_msg = AddSeller {
-            accepted_value_cents: Uint128::new(200000000),
             offer_hash: "mock-offer-hash".to_string(),
         };
         match execute(deps.as_mut(), env, info, add_seller_msg) {
@@ -145,10 +141,8 @@ mod execute_add_seller_tests {
         };
         let buyer_address = deps.api.addr_make("contract-buyer");
         let env = mock_env();
-        let accepted_value_cents = Uint128::new(100000000);
         let dealer_address = "dealer-address";
         let add_seller_msg = AddSeller {
-            accepted_value_cents,
             offer_hash: "mock-offer-hash".to_string(),
         };
 
@@ -193,7 +187,6 @@ mod execute_add_seller_tests {
                     query_contract_state(deps.as_ref()).unwrap().seller.unwrap(),
                     Seller {
                         seller_address: seller_address.clone(),
-                        accepted_value_cents,
                         pool_denoms: vec![],
                         offer_hash: "mock-offer-hash".to_string(),
                     }
@@ -215,7 +208,6 @@ mod execute_add_seller_tests {
         };
         let env = mock_env();
         let add_seller_msg = AddSeller {
-            accepted_value_cents: Uint128::new(100000000),
             offer_hash: "mock-offer-hash".to_string(),
         };
 

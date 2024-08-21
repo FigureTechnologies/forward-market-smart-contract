@@ -30,7 +30,6 @@ pub struct InstantiateContractMsg {
 pub enum ExecuteMsg {
     /// A route that adds the sender as the seller on the contract
     AddSeller {
-        accepted_value_cents: Uint128,
         offer_hash: String,
     },
     UpdateSellerOfferHash {
