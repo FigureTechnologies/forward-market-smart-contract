@@ -7,7 +7,7 @@ mod execute_update_allowed_sellers {
     use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, Attribute, MessageInfo, Uint128};
+    use cosmwasm_std::{Addr, Attribute, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]

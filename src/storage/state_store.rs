@@ -77,22 +77,15 @@ pub fn save_settlement_data_state(
 pub fn retrieve_optional_buyer_state(
     storage: &dyn Storage,
 ) -> Result<Option<Buyer>, ContractError> {
-    BUYER_STATE
-        .may_load(storage)
-        .map_err(|e| StorageError {
-            message: format!("{e:?}"),
-        })
+    BUYER_STATE.may_load(storage).map_err(|e| StorageError {
+        message: format!("{e:?}"),
+    })
 }
 
-pub fn save_buyer_state(
-    storage: &mut dyn Storage,
-    buyer: &Buyer,
-) -> Result<(), ContractError> {
-    BUYER_STATE
-        .save(storage, buyer)
-        .map_err(|e| StorageError {
-            message: format!("{e:?}"),
-        })
+pub fn save_buyer_state(storage: &mut dyn Storage, buyer: &Buyer) -> Result<(), ContractError> {
+    BUYER_STATE.save(storage, buyer).map_err(|e| StorageError {
+        message: format!("{e:?}"),
+    })
 }
 
 pub fn clear_buyer_state(storage: &mut dyn Storage) -> () {
@@ -113,16 +106,12 @@ pub fn save_token_data_state(
 pub fn retrieve_optional_token_data_state(
     storage: &dyn Storage,
 ) -> Result<Option<TokenData>, ContractError> {
-    TOKEN_DATA
-        .may_load(storage)
-        .map_err(|e| StorageError {
-            message: format!("{e:?}"),
-        })
+    TOKEN_DATA.may_load(storage).map_err(|e| StorageError {
+        message: format!("{e:?}"),
+    })
 }
 
-pub fn retrieve_token_data_state(
-    storage: &dyn Storage,
-) -> Result<TokenData, ContractError> {
+pub fn retrieve_token_data_state(storage: &dyn Storage) -> Result<TokenData, ContractError> {
     TOKEN_DATA.load(storage).map_err(|e| StorageError {
         message: format!("{e:?}"),
     })
@@ -183,4 +172,3 @@ pub const BID_LIST: Item<BidList> = Item::new("buyer_list");
 pub const SETTLEMENT_DATA: Item<SettlementData> = Item::new("settlement_data");
 pub const BUYER_STATE: Item<Buyer> = Item::new("buyer");
 pub const TOKEN_DATA: Item<TokenData> = Item::new("token_data");
-

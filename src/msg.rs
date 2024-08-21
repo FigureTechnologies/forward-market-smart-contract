@@ -1,4 +1,4 @@
-use crate::storage::state_store::{Bid, Config, Seller, SettlementData, Buyer, TokenData};
+use crate::storage::state_store::{Bid, Buyer, Config, Seller, SettlementData, TokenData};
 use crate::version_info::VersionInfoV1;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Uint128;
@@ -33,18 +33,26 @@ pub enum ExecuteMsg {
         offer_hash: String,
     },
     UpdateSellerOfferHash {
-        offer_hash: String
+        offer_hash: String,
     },
     /// A route that allows the seller to finalize a list of pools
-    FinalizePools { pool_denoms: Vec<String> },
+    FinalizePools {
+        pool_denoms: Vec<String>,
+    },
     /// A route executed by the dealer that causes the settlement of the transaction
     DealerConfirm {},
     /// A route that can be used by the contract admin to update the allowed seller's list
-    UpdateAllowedSellers { allowed_sellers: Vec<String> },
+    UpdateAllowedSellers {
+        allowed_sellers: Vec<String>,
+    },
     /// A route that can be used by the contract admin to update the allowed buyer's list
-    UpdateAllowedBuyers { allowed_buyers: Vec<String> },
+    UpdateAllowedBuyers {
+        allowed_buyers: Vec<String>,
+    },
     /// A route used by the buyer to accept a seller's finalized list of pools
-    AcceptFinalizedPools { offer_hash: String },
+    AcceptFinalizedPools {
+        offer_hash: String,
+    },
     /// A route used by the seller to rescind a finalized list of pools before the buyer has accepted
     RescindFinalizedPools {},
     /// A route used by either the buyer or a dealer to disable the contract. The seller must not have a
@@ -58,9 +66,14 @@ pub enum ExecuteMsg {
         agreement_terms_hash: String,
     },
     /// A route used by a potential buyer to add their bid to the list of buyer bids
-    AddBid { agreement_terms_hash: String },
+    AddBid {
+        agreement_terms_hash: String,
+    },
     /// A route used the admin of the contract to mint the tokens used in the forward market transaction
-    MintTokens { token_count: Uint128, token_denom: String }
+    MintTokens {
+        token_count: Uint128,
+        token_denom: String,
+    },
 }
 
 /// All defined payloads to be used when querying routes on this contract instance.
@@ -71,6 +84,15 @@ pub enum QueryMsg {
     GetContractState {},
 }
 
+/// All defined payloads to be used when migrating to a new instance of this contract.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum MigrateMsg {
+    /// The standard migration route that modifies the [contract state](crate::store::contract_state::ContractStateV1)
+    /// to include the new values defined in a target code instance.
+    ContractUpgrade {},
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GetContractStateResponse {
     pub bids: Vec<Bid>,
@@ -79,7 +101,7 @@ pub struct GetContractStateResponse {
     pub settlement_data: Option<SettlementData>,
     pub version_info: VersionInfoV1,
     pub buyer: Option<Buyer>,
-    pub token_data: Option<TokenData>
+    pub token_data: Option<TokenData>,
 }
 
 #[derive(Clone, Debug, PartialEq)]

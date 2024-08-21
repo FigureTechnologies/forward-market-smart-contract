@@ -1,7 +1,5 @@
 use crate::error::ContractError;
-use crate::error::ContractError::{
-    SellerAlreadyExists, UnauthorizedPrivateSeller,
-};
+use crate::error::ContractError::{SellerAlreadyExists, UnauthorizedPrivateSeller};
 
 use crate::storage::state_store::{
     retrieve_contract_config, retrieve_optional_seller_state, save_seller_state, Seller,

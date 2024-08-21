@@ -1,7 +1,5 @@
 use crate::error::ContractError;
-use crate::error::ContractError::{
-    InvalidEmptyDealerConfig, InvalidVisibilityConfig,
-};
+use crate::error::ContractError::{InvalidEmptyDealerConfig, InvalidVisibilityConfig};
 use crate::msg::InstantiateContractMsg;
 use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
 use crate::version_info::{set_version_info, VersionInfoV1, CRATE_NAME, PACKAGE_VERSION};
@@ -36,7 +34,6 @@ pub fn instantiate_contract(
 
     // Convert the list of dealers to addresses
     let dealer_addresses = validate_and_map_address(msg.dealers, &deps)?;
-
 
     // Store the initial configuration
     let config = Config {

@@ -1,13 +1,18 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{InvalidDealerResetRequest, UnauthorizedDisableRequest};
-use crate::storage::state_store::{clear_buyer_state, retrieve_contract_config, retrieve_optional_seller_state, save_contract_config, save_seller_state};
-use crate::util::helpers::{create_send_coin_back_to_seller_messages, is_contract_admin, is_dealer, seller_has_finalized};
+use crate::storage::state_store::{
+    clear_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
+    save_contract_config, save_seller_state,
+};
+use crate::util::helpers::{
+    create_send_coin_back_to_seller_messages, is_contract_admin, is_dealer, seller_has_finalized,
+};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn execute_disable_contract(
     deps: DepsMut,
     env: Env,
-    info: MessageInfo
+    info: MessageInfo,
 ) -> Result<Response, ContractError> {
     // In order to disable the contract you must be either the contract admin or a dealer
     if !is_contract_admin(&deps, &info)? && !is_dealer(&deps, &info)? {

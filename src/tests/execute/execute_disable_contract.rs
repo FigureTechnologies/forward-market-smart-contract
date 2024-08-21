@@ -3,25 +3,28 @@ mod execute_disable_contract_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::{
-        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm,
-        FinalizePools, RescindFinalizedPools,
-        UpdateAllowedSellers,
+        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, FinalizePools,
+        RescindFinalizedPools, UpdateAllowedSellers,
     };
+    use crate::query::contract_state::query_contract_state;
+    use crate::storage::state_store::{
+        retrieve_contract_config, save_bid_list_state, save_contract_config, save_seller_state,
+        Bid, BidList, Config, Seller,
+    };
+    use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Binary, ContractResult, MessageInfo, SystemResult, to_json_binary, Uint128};
+    use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::types::cosmos::base::v1beta1::Coin;
-    use provwasm_std::types::provenance::marker::v1::{Balance, QueryHoldingRequest, QueryHoldingResponse};
-    use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{Bid, BidList, Config, retrieve_contract_config, save_bid_list_state, save_contract_config, save_seller_state, Seller};
-    use crate::version_info::{set_version_info, VersionInfoV1};
+    use provwasm_std::types::provenance::marker::v1::{
+        Balance, QueryHoldingRequest, QueryHoldingResponse,
+    };
 
     #[test]
     fn execute_disable_contract() {
         let mut deps = mock_provenance_dependencies();
         let contract_admin = deps.api.addr_make("contract-admin");
         let allowed_seller_address = deps.api.addr_make("allowed-seller");
-        let buyer_address = deps.api.addr_make("buyer-address");
 
         let env = mock_env();
         let config = Config {
@@ -35,9 +38,8 @@ mod execute_disable_contract_tests {
             contract_admin: contract_admin.clone(),
         };
 
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
-            sender: buyer_address.clone(),
+            sender: contract_admin.clone(),
             funds: vec![],
         };
 
@@ -60,7 +62,6 @@ mod execute_disable_contract_tests {
     fn execute_disable_contract_unauthorized() {
         let mut deps = mock_provenance_dependencies();
         let allowed_seller_address = deps.api.addr_make("allowed-seller");
-        let buyer_address = deps.api.addr_make("buyer-address");
         let info = MessageInfo {
             sender: allowed_seller_address.clone(),
             funds: vec![],
@@ -101,9 +102,10 @@ mod execute_disable_contract_tests {
     fn execute_disable_contract_seller_already_finalized() {
         let mut deps = mock_provenance_dependencies();
         let allowed_seller_address = deps.api.addr_make("allowed-seller");
+        let contract_admin_address = deps.api.addr_make("contract-admin");
         let buyer_address = deps.api.addr_make("buyer-address");
         let info = MessageInfo {
-            sender: buyer_address.clone(),
+            sender: contract_admin_address.clone(),
             funds: vec![],
         };
         let env = mock_env();
@@ -115,7 +117,7 @@ mod execute_disable_contract_tests {
             dealers: vec![deps.api.addr_make("dealer-address")],
             is_disabled: false,
             max_bid_count: 5,
-            contract_admin: deps.api.addr_make("contract-admin"),
+            contract_admin: contract_admin_address.clone(),
         };
         save_contract_config(&mut deps.storage, &config).unwrap();
 
@@ -136,7 +138,7 @@ mod execute_disable_contract_tests {
                 version: "0.0.0".to_string(),
             },
         )
-            .unwrap();
+        .unwrap();
 
         save_bid_list_state(
             &mut deps.storage,
@@ -147,7 +149,7 @@ mod execute_disable_contract_tests {
                 }],
             },
         )
-            .unwrap();
+        .unwrap();
 
         let cb = Box::new(|bin: &Binary| -> SystemResult<ContractResult<Binary>> {
             let message = QueryHoldingRequest::try_from(bin.clone()).unwrap();
@@ -227,7 +229,9 @@ mod execute_disable_contract_tests {
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },
-            AcceptFinalizedPools { offer_hash: "".to_string() },
+            AcceptFinalizedPools {
+                offer_hash: "".to_string(),
+            },
             RescindFinalizedPools {},
         ]
         .into_iter()

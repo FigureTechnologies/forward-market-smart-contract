@@ -1,8 +1,10 @@
-use cosmwasm_std::{DepsMut, MessageInfo, Response};
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalOfferHashUpdate, UnauthorizedAsSeller};
-use crate::storage::state_store::{retrieve_optional_buyer_state, retrieve_seller_state, save_seller_state};
+use crate::storage::state_store::{
+    retrieve_optional_buyer_state, retrieve_seller_state, save_seller_state,
+};
 use crate::util::helpers::is_seller;
+use cosmwasm_std::{DepsMut, MessageInfo, Response};
 
 pub fn execute_update_seller_offer_hash(
     deps: DepsMut,
@@ -19,7 +21,7 @@ pub fn execute_update_seller_offer_hash(
         None => {}
         Some(buyer) => {
             if buyer.buyer_has_accepted_pools {
-                return Err(IllegalOfferHashUpdate)
+                return Err(IllegalOfferHashUpdate);
             }
         }
     }
