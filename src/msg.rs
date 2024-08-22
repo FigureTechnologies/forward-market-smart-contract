@@ -32,6 +32,7 @@ pub enum ExecuteMsg {
     AddSeller {
         offer_hash: String,
     },
+    /// A route that allows the seller to update the offer hash prior to accepting a bid
     UpdateSellerOfferHash {
         offer_hash: String,
     },
@@ -55,12 +56,11 @@ pub enum ExecuteMsg {
     },
     /// A route used by the seller to rescind a finalized list of pools before the buyer has accepted
     RescindFinalizedPools {},
-    /// A route used by either the buyer or a dealer to disable the contract. The seller must not have a
+    /// A route used by either the admin or a dealer to disable the contract. The seller must not have a
     /// finalized list of pools in order for the contract to be disabled (if the seller does have a
-    /// finalized list of pools, either the seller must rescind the offer or a dealer must reset the
-    /// contract before the disable operation will be allowed).
+    /// finalized list of pools, the seller must rescind the offer before the disable operation will be allowed).
     ContractDisable {},
-    /// A route used by the seller to accept a bid from a buyer in the list of buyer bids
+    /// A route used by the seller to accept a bid from a bidder in the list of buyer bids
     AcceptBid {
         bidder_address: String,
         agreement_terms_hash: String,

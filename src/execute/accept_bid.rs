@@ -22,6 +22,8 @@ pub fn execute_accept_bid(
         return Err(UnauthorizedAsSeller);
     }
 
+    // Tokens must be minted before bid acceptance because the FM token is sent to the buyer
+    // upon bid acceptance
     let token_data = match retrieve_optional_token_data_state(deps.storage)? {
         None => return Err(TokensNotMinted),
         Some(token_data) => token_data,
@@ -41,6 +43,8 @@ pub fn execute_accept_bid(
                 address: bidder_address.to_string(),
             });
         }
+        // Check the provided hash against the hash in the state to make sure the seller is
+        // accepting the terms the agree to
         Some(bid_state) => {
             if bid_state.agreement_terms_hash != agreement_terms_hash {
                 return Err(InvalidAgreementTermsHash);

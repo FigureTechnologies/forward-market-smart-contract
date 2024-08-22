@@ -4,11 +4,12 @@
 //! conjunction with [Provwasm](#https://github.com/provenance-io/provwasm) to create a wasm smart
 //! contract that can be deployed to and interact with the Provenance Blockchain.
 //!
-//! This contract provides functionality for creating a forward market contract for a single buyer and seller.
-//! A contract is instantiated by a buyer and then accepted by a seller. A buyer may allow any seller or mark
-//! the contract as private and only allow sellers of their choosing. The contract also requires a dealer, which
-//! is a party that will trigger the settlement of the contract once both parties have accepted the terms of the
-//! contract.
+//! This contract provides functionality for creating a forward market transaction.
+//! A contract is instantiated by the contract admin. The accepting of a contract by the seller and
+//! the adding of bids by potential buyers can happen in any order. When a seller has been added
+//! and there are potential buyer bids, a seller can accept one of the bids. The contract also
+//! requires a dealer, which is a party that will trigger the settlement of the contract once both
+//! parties have accepted the terms of the contract.
 
 /// The entry point of all commands sent to the contract
 pub mod contract;
