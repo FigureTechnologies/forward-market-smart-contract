@@ -29,31 +29,19 @@ pub struct InstantiateContractMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum ExecuteMsg {
     /// A route that adds the sender as the seller on the contract
-    AddSeller {
-        offer_hash: String,
-    },
+    AddSeller { offer_hash: String },
     /// A route that allows the seller to update the offer hash prior to accepting a bid
-    UpdateSellerOfferHash {
-        offer_hash: String,
-    },
+    UpdateSellerOfferHash { offer_hash: String },
     /// A route that allows the seller to finalize a list of pools
-    FinalizePools {
-        pool_denoms: Vec<String>,
-    },
+    FinalizePools { pool_denoms: Vec<String> },
     /// A route executed by the dealer that causes the settlement of the transaction
     DealerConfirm {},
     /// A route that can be used by the contract admin to update the allowed seller's list
-    UpdateAllowedSellers {
-        allowed_sellers: Vec<String>,
-    },
+    UpdateAllowedSellers { allowed_sellers: Vec<String> },
     /// A route that can be used by the contract admin to update the allowed buyer's list
-    UpdateAllowedBuyers {
-        allowed_buyers: Vec<String>,
-    },
+    UpdateAllowedBuyers { allowed_buyers: Vec<String> },
     /// A route used by the buyer to accept a seller's finalized list of pools
-    AcceptFinalizedPools {
-        offer_hash: String,
-    },
+    AcceptFinalizedPools { offer_hash: String },
     /// A route used by the seller to rescind a finalized list of pools before the buyer has accepted
     RescindFinalizedPools {},
     /// A route used by either the admin or a dealer to disable the contract. The seller must not have a
@@ -66,9 +54,7 @@ pub enum ExecuteMsg {
         agreement_terms_hash: String,
     },
     /// A route used by a potential buyer to add their bid to the list of buyer bids
-    AddBid {
-        agreement_terms_hash: String,
-    },
+    AddBid { agreement_terms_hash: String },
     /// A route used the admin of the contract to mint the tokens used in the forward market transaction
     MintTokens {
         token_count: Uint128,

@@ -9,7 +9,7 @@ mod execute_add_seller_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{MessageInfo};
+    use cosmwasm_std::MessageInfo;
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
