@@ -9,7 +9,7 @@ mod execute_update_seller_offer_hash {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, MessageInfo};
+    use cosmwasm_std::{MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -94,10 +94,10 @@ mod execute_update_seller_offer_hash {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
@@ -116,7 +116,7 @@ mod execute_update_seller_offer_hash {
         save_seller_state(
             &mut deps.storage,
             &Seller {
-                seller_address: Addr::unchecked("public-seller-0"),
+                seller_address: deps.api.addr_make("public-seller-0"),
                 pool_denoms: vec!["test.denom.mock".to_string()],
                 offer_hash: "to-be-replaced".to_string(),
             },

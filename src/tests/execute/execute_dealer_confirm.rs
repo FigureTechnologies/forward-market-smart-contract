@@ -9,7 +9,7 @@ mod execute_dealer_confirm_tests {
     };
     use cosmwasm_std::testing::mock_env;
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
-    use cosmwasm_std::{Addr, CosmosMsg, Uint128};
+    use cosmwasm_std::{CosmosMsg, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::shim::Any;
     use provwasm_std::types::cosmos::auth::v1beta1::BaseAccount;
@@ -47,7 +47,7 @@ mod execute_dealer_confirm_tests {
                 dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 3,
-                contract_admin: Addr::unchecked("contract_admin"),
+                contract_admin: deps.api.addr_make("contract_admin"),
             },
         )
         .unwrap();
@@ -252,7 +252,7 @@ mod execute_dealer_confirm_tests {
         save_buyer_state(
             &mut deps.storage,
             &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
+                buyer_address: buyer_address.clone(),
                 buyer_has_accepted_pools: true,
                 agreement_terms_hash: "".to_string(),
             },
@@ -309,12 +309,12 @@ mod execute_dealer_confirm_tests {
             &Config {
                 use_private_sellers: true,
                 use_private_buyers: false,
-                allowed_sellers: vec![Addr::unchecked("different_seller")],
+                allowed_sellers: vec![deps.api.addr_make("different_seller")],
                 allowed_buyers: vec![],
                 dealers: vec![dealer_address.clone()],
                 is_disabled: false,
                 max_bid_count: 5,
-                contract_admin: Addr::unchecked("contract-admin"),
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();

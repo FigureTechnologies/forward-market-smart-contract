@@ -7,7 +7,7 @@ mod execute_update_allowed_sellers {
     use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, Attribute, MessageInfo};
+    use cosmwasm_std::{Attribute, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -29,7 +29,7 @@ mod execute_update_allowed_sellers {
                 use_private_buyers: false,
                 allowed_sellers: vec![allowed_seller_0_addr],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 8,
                 contract_admin: info.sender.clone(),
@@ -59,7 +59,7 @@ mod execute_update_allowed_sellers {
                     use_private_buyers: false,
                     allowed_sellers: vec![allowed_seller_1_addr],
                     allowed_buyers: vec![],
-                    dealers: vec![Addr::unchecked("dealer-address")],
+                    dealers: vec![deps.api.addr_make("dealer-address")],
                     is_disabled: false,
                     max_bid_count: 8,
                     contract_admin: info.sender.clone(),

@@ -9,7 +9,7 @@ mod execute_add_seller_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, MessageInfo};
+    use cosmwasm_std::{MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -107,7 +107,7 @@ mod execute_add_seller_tests {
         save_seller_state(
             &mut deps.storage,
             &Seller {
-                seller_address: Addr::unchecked("existing_seller"),
+                seller_address: deps.api.addr_make("existing_seller"),
                 pool_denoms: vec![],
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -201,9 +201,9 @@ mod execute_add_seller_tests {
     #[test]
     fn add_invalid_seller_to_private_forward_market() {
         let mut deps = mock_provenance_dependencies();
-        let contract_admin = "contract-admin";
+        let contract_admin = deps.api.addr_make("contract-admin");
         let info = MessageInfo {
-            sender: deps.api.addr_make(contract_admin),
+            sender: contract_admin.clone(),
             funds: vec![],
         };
         let env = mock_env();
@@ -218,10 +218,10 @@ mod execute_add_seller_tests {
                 use_private_buyers: false,
                 allowed_sellers: vec![],
                 allowed_buyers: vec![],
-                dealers: vec![Addr::unchecked("dealer-address")],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
                 max_bid_count: 5,
-                contract_admin: Addr::unchecked(contract_admin),
+                contract_admin: contract_admin.clone(),
             },
         )
         .unwrap();

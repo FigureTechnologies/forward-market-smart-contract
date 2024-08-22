@@ -9,7 +9,7 @@ mod execute_add_bidder_tests {
     };
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, MessageInfo};
+    use cosmwasm_std::{MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -228,11 +228,11 @@ mod execute_add_bidder_tests {
             &BidList {
                 bids: vec![
                     Bid {
-                        buyer_address: Addr::unchecked("existing-buyer-address-0"),
+                        buyer_address: deps.api.addr_make("existing-buyer-address-0"),
                         agreement_terms_hash: "mock-hash-existing-buyers-0".to_string(),
                     },
                     Bid {
-                        buyer_address: Addr::unchecked("existing-buyer-address-1"),
+                        buyer_address: deps.api.addr_make("existing-buyer-address-1"),
                         agreement_terms_hash: "mock-hash-existing-buyers-1".to_string(),
                     },
                 ],
