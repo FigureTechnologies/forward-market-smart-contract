@@ -3,12 +3,13 @@ mod execute_dealer_confirm_tests {
     use crate::contract::execute;
     use crate::error::ContractError;
     use crate::storage::state_store::{
-        retrieve_optional_settlement_data_state, save_buyer_state, save_contract_config,
-        save_seller_state, save_settlement_data_state, Buyer, Config, Seller, SettlementData,
+        retrieve_optional_settlement_data_state, save_bid_list_state, save_buyer_state,
+        save_contract_config, save_seller_state, save_settlement_data_state, save_token_data_state,
+        Bid, BidList, Buyer, Config, Seller, SettlementData, TokenData,
     };
     use cosmwasm_std::testing::mock_env;
     use cosmwasm_std::{to_json_binary, Binary, ContractResult, MessageInfo, SystemResult};
-    use cosmwasm_std::{Addr, CosmosMsg, Uint128};
+    use cosmwasm_std::{CosmosMsg, Uint128};
     use provwasm_mocks::mock_provenance_dependencies;
     use provwasm_std::shim::Any;
     use provwasm_std::types::cosmos::auth::v1beta1::BaseAccount;
@@ -20,9 +21,8 @@ mod execute_dealer_confirm_tests {
     };
 
     use crate::msg::ExecuteMsg::{
-        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, DealerReset,
-        FinalizePools, RemoveAsSeller, RescindFinalizedPools, UpdateAgreementTermsHash,
-        UpdateAllowedSellers, UpdateFaceValueCents,
+        AcceptFinalizedPools, AddSeller, ContractDisable, DealerConfirm, FinalizePools,
+        RescindFinalizedPools, UpdateAllowedSellers,
     };
 
     #[test]
@@ -32,7 +32,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = deps.api.addr_make("allowed-seller-0");
         let buyer_address = deps.api.addr_make("contract_buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: dealer_address.clone(),
             funds: vec![],
@@ -41,25 +40,26 @@ mod execute_dealer_confirm_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
+                use_private_sellers: true,
+                use_private_buyers: false,
                 allowed_sellers: vec![seller_address.clone()],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
-                token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(100000),
-                tick_size: Uint128::new(1000),
+                allowed_buyers: vec![],
                 dealers: vec![dealer_address.clone()],
                 is_disabled: false,
+                max_bid_count: 3,
+                contract_admin: deps.api.addr_make("contract_admin"),
             },
         )
         .unwrap();
 
         let pool_denoms = vec![pool_denom.into()];
-        save_buyer_state(
+        save_bid_list_state(
             &mut deps.storage,
-            &Buyer {
-                buyer_address: Addr::unchecked(buyer_address),
-                has_accepted_pools: true,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: buyer_address.clone(),
+                    agreement_terms_hash: "".to_string(),
+                }],
             },
         )
         .unwrap();
@@ -68,9 +68,27 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
+            },
+        )
+        .unwrap();
+
+        save_buyer_state(
+            &mut deps.storage,
+            &Buyer {
+                buyer_address: buyer_address.clone(),
+                buyer_has_accepted_pools: true,
+                agreement_terms_hash: "".to_string(),
+            },
+        )
+        .unwrap();
+
+        save_token_data_state(
+            &mut deps.storage,
+            &TokenData {
+                token_denom: "test.token.fm".to_string(),
+                token_count: Uint128::new(10),
             },
         )
         .unwrap();
@@ -183,13 +201,12 @@ mod execute_dealer_confirm_tests {
     }
 
     #[test]
-    fn execute_seller_confirm_invalid_seller_state() {
+    fn execute_seller_confirm_invalid_seller() {
         let mut deps = mock_provenance_dependencies();
         let dealer_address = deps.api.addr_make("dealer-address");
         let seller_address = deps.api.addr_make("allowed-seller-0");
-        let buyer_address = deps.api.addr_make("contract_buyer");
+        let buyer_address = deps.api.addr_make("contract-buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: dealer_address.clone(),
             funds: vec![],
@@ -198,25 +215,26 @@ mod execute_dealer_confirm_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
-                allowed_sellers: vec![Addr::unchecked("different_seller")],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
-                token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(100000),
-                tick_size: Uint128::new(1000),
+                use_private_sellers: true,
+                use_private_buyers: false,
+                allowed_sellers: vec![deps.api.addr_make("different-seller")],
+                allowed_buyers: vec![],
                 dealers: vec![dealer_address.clone()],
                 is_disabled: false,
+                max_bid_count: 2,
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
 
         let pool_denoms = vec![pool_denom.into()];
-        save_buyer_state(
+        save_bid_list_state(
             &mut deps.storage,
-            &Buyer {
-                buyer_address: buyer_address.clone(),
-                has_accepted_pools: true,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: buyer_address.clone(),
+                    agreement_terms_hash: "".to_string(),
+                }],
             },
         )
         .unwrap();
@@ -225,9 +243,27 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
+            },
+        )
+        .unwrap();
+
+        save_buyer_state(
+            &mut deps.storage,
+            &Buyer {
+                buyer_address: buyer_address.clone(),
+                buyer_has_accepted_pools: true,
+                agreement_terms_hash: "".to_string(),
+            },
+        )
+        .unwrap();
+
+        save_token_data_state(
+            &mut deps.storage,
+            &TokenData {
+                token_denom: "test.token.fm".to_string(),
+                token_count: Uint128::new(10),
             },
         )
         .unwrap();
@@ -263,7 +299,6 @@ mod execute_dealer_confirm_tests {
         let seller_address = deps.api.addr_make("allowed-seller-0");
         let buyer_address = deps.api.addr_make("contract_buyer");
         let pool_denom = "test.token.asset.pool.0";
-        let token_denom = "test.forward.market.token";
         let info = MessageInfo {
             sender: deps.api.addr_make("not-the-dealer"),
             funds: vec![],
@@ -272,25 +307,26 @@ mod execute_dealer_confirm_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
-                allowed_sellers: vec![Addr::unchecked("different_seller")],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
-                token_denom: token_denom.into(),
-                max_face_value_cents: Uint128::new(650000000),
-                min_face_value_cents: Uint128::new(100000),
-                tick_size: Uint128::new(1000),
+                use_private_sellers: true,
+                use_private_buyers: false,
+                allowed_sellers: vec![deps.api.addr_make("different_seller")],
+                allowed_buyers: vec![],
                 dealers: vec![dealer_address.clone()],
                 is_disabled: false,
+                max_bid_count: 5,
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
 
         let pool_denoms = vec![pool_denom.into()];
-        save_buyer_state(
+        save_bid_list_state(
             &mut deps.storage,
-            &Buyer {
-                buyer_address: buyer_address.clone(),
-                has_accepted_pools: true,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: buyer_address.clone(),
+                    agreement_terms_hash: "".to_string(),
+                }],
             },
         )
         .unwrap();
@@ -299,7 +335,6 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &Seller {
                 seller_address: seller_address.clone(),
-                accepted_value_cents: Uint128::new(550000000),
                 pool_denoms,
                 offer_hash: "mock-offer-hash".to_string(),
             },
@@ -334,23 +369,24 @@ mod execute_dealer_confirm_tests {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: false,
+                use_private_sellers: false,
+                use_private_buyers: false,
                 allowed_sellers: vec![],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
-                token_denom: "denom".into(),
-                max_face_value_cents: Uint128::new(550000000),
-                min_face_value_cents: Uint128::new(550000000),
-                tick_size: Uint128::new(1000),
-                dealers: vec![dealer_address],
+                allowed_buyers: vec![],
+                dealers: vec![dealer_address.clone()],
                 is_disabled: false,
+                max_bid_count: 50,
+                contract_admin: deps.api.addr_make("contract-admin"),
             },
         )
         .unwrap();
-        save_buyer_state(
+        save_bid_list_state(
             &mut deps.storage,
-            &Buyer {
-                buyer_address: deps.api.addr_make("buyer-address"),
-                has_accepted_pools: false,
+            &BidList {
+                bids: vec![Bid {
+                    buyer_address: deps.api.addr_make("buyer-address"),
+                    agreement_terms_hash: "".to_string(),
+                }],
             },
         )
         .unwrap();
@@ -358,7 +394,7 @@ mod execute_dealer_confirm_tests {
             &mut deps.storage,
             &SettlementData {
                 block_height: 1,
-                settling_dealer: deps.api.addr_make("dealer-address"),
+                settling_dealer: dealer_address.clone(),
             },
         )
         .unwrap();
@@ -366,29 +402,19 @@ mod execute_dealer_confirm_tests {
         [
             ContractDisable {},
             AddSeller {
-                accepted_value_cents: Uint128::new(1),
                 offer_hash: "mock-offer-hash".to_string(),
-                agreement_terms_hash: "mock-terms-hash".to_string(),
             },
-            RemoveAsSeller {},
             FinalizePools {
                 pool_denoms: vec![],
             },
             DealerConfirm {},
-            UpdateAgreementTermsHash {
-                agreement_terms_hash: "".to_string(),
-            },
-            UpdateFaceValueCents {
-                max_face_value_cents: Uint128::new(1),
-                min_face_value_cents: Uint128::new(1),
-                tick_size: Uint128::new(1),
-            },
             UpdateAllowedSellers {
                 allowed_sellers: vec![],
             },
-            AcceptFinalizedPools {},
+            AcceptFinalizedPools {
+                offer_hash: "".to_string(),
+            },
             RescindFinalizedPools {},
-            DealerReset {},
         ]
         .into_iter()
         .for_each(|command| -> () {

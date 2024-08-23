@@ -4,10 +4,10 @@ mod execute_update_allowed_sellers {
     use crate::error::ContractError;
     use crate::msg::ExecuteMsg::UpdateAllowedSellers;
     use crate::query::contract_state::query_contract_state;
-    use crate::storage::state_store::{save_buyer_state, save_contract_config, Buyer, Config};
+    use crate::storage::state_store::{save_bid_list_state, save_contract_config, BidList, Config};
     use crate::version_info::{set_version_info, VersionInfoV1};
     use cosmwasm_std::testing::mock_env;
-    use cosmwasm_std::{Addr, Attribute, MessageInfo, Uint128};
+    use cosmwasm_std::{Attribute, MessageInfo};
     use provwasm_mocks::mock_provenance_dependencies;
 
     #[test]
@@ -25,15 +25,14 @@ mod execute_update_allowed_sellers {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: true,
+                use_private_sellers: true,
+                use_private_buyers: false,
                 allowed_sellers: vec![allowed_seller_0_addr],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
-                token_denom: "test.forward.market.token".into(),
-                max_face_value_cents: Uint128::new(9000000000),
-                min_face_value_cents: Uint128::new(500000000),
-                tick_size: Uint128::new(1000),
-                dealers: vec![Addr::unchecked("dealer-address")],
+                allowed_buyers: vec![],
+                dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
+                max_bid_count: 8,
+                contract_admin: info.sender.clone(),
             },
         )
         .unwrap();
@@ -47,31 +46,23 @@ mod execute_update_allowed_sellers {
         )
         .unwrap();
 
-        save_buyer_state(
-            &mut deps.storage,
-            &Buyer {
-                buyer_address: buyer_address.clone(),
-                has_accepted_pools: false,
-            },
-        )
-        .unwrap();
+        save_bid_list_state(&mut deps.storage, &BidList { bids: vec![] }).unwrap();
 
         let update_allowed_sellers = UpdateAllowedSellers {
             allowed_sellers: vec![allowed_seller_1_addr.to_string()],
         };
 
-        match execute(deps.as_mut(), env, info, update_allowed_sellers) {
+        match execute(deps.as_mut(), env, info.clone(), update_allowed_sellers) {
             Ok(response) => {
                 let expected_config_attributes = Config {
-                    is_private: true,
+                    use_private_sellers: true,
+                    use_private_buyers: false,
                     allowed_sellers: vec![allowed_seller_1_addr],
-                    agreement_terms_hash: "mock-terms-hash".to_string(),
-                    token_denom: "test.forward.market.token".to_string(),
-                    min_face_value_cents: Uint128::new(500000000),
-                    max_face_value_cents: Uint128::new(9000000000),
-                    tick_size: Uint128::new(1000),
-                    dealers: vec![Addr::unchecked("dealer-address")],
+                    allowed_buyers: vec![],
+                    dealers: vec![deps.api.addr_make("dealer-address")],
                     is_disabled: false,
+                    max_bid_count: 8,
+                    contract_admin: info.sender.clone(),
                 };
                 assert_eq!(response.attributes.len(), 1);
                 assert_eq!(
@@ -105,24 +96,14 @@ mod execute_update_allowed_sellers {
         save_contract_config(
             &mut deps.storage,
             &Config {
-                is_private: false,
+                use_private_sellers: false,
+                use_private_buyers: false,
                 allowed_sellers: vec![],
-                agreement_terms_hash: "mock-terms-hash".to_string(),
-                token_denom: "test.forward.market.token".into(),
-                max_face_value_cents: Uint128::new(500000000),
-                min_face_value_cents: Uint128::new(200000000),
-                tick_size: Uint128::new(1000),
+                allowed_buyers: vec![],
                 dealers: vec![deps.api.addr_make("dealer-address")],
                 is_disabled: false,
-            },
-        )
-        .unwrap();
-
-        save_buyer_state(
-            &mut deps.storage,
-            &Buyer {
-                buyer_address: buyer_address.clone(),
-                has_accepted_pools: false,
+                max_bid_count: 5,
+                contract_admin: info.sender.clone(),
             },
         )
         .unwrap();

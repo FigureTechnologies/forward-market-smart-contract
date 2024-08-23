@@ -1,2 +1,2 @@
 mod execute;
-pub mod instantiate;
+mod instantiate;

@@ -1,12 +1,11 @@
 use crate::error::ContractError;
 use crate::error::ContractError::{
-    FaceValueMustBePositive, IllegalConfigUpdate, InvalidDenom, InvalidDenomOwnership,
-    InvalidMaxFaceValue, InvalidTickSizeValueMatch, UnauthorizedConfigUpdate,
+    IllegalConfigUpdate, InvalidDenom, InvalidDenomOwnership, UnauthorizedConfigUpdate,
 };
 use crate::msg::KeyType::Session;
 use crate::msg::{KeyType, MetadataAddress};
 use crate::storage::state_store::{
-    retrieve_buyer_state, retrieve_contract_config, retrieve_optional_seller_state,
+    retrieve_contract_config, retrieve_optional_buyer_state, retrieve_optional_seller_state,
     save_contract_config, Config,
 };
 use bech32::ToBase32;
@@ -24,17 +23,16 @@ use provwasm_std::types::provenance::marker::v1::{
 use provwasm_std::types::provenance::metadata::v1::{MetadataQuerier, ValueOwnershipResponse};
 use uuid::Uuid;
 
-pub fn create_and_transfer_marker(
-    contract_address: String,
-    denom: String,
-    amount: Uint128,
-    owner_address: String,
+pub fn create_mint_tokens_messages(
+    token_denom: String,
+    token_count: Uint128,
     dealer_list: Vec<Addr>,
+    contract_address: String,
 ) -> Vec<CosmosMsg> {
     let mut messages: Vec<CosmosMsg> = vec![];
     let coin = Coin {
-        denom: denom.clone(),
-        amount: amount.to_string(),
+        denom: token_denom.clone(),
+        amount: token_count.to_string(),
     };
 
     let mut access_grants = vec![];
@@ -77,16 +75,24 @@ pub fn create_and_transfer_marker(
     }));
 
     messages.push(CosmosMsg::from(MsgFinalizeRequest {
-        denom: denom.clone(),
+        denom: token_denom.clone(),
         administrator: contract_address.clone(),
     }));
 
     messages.push(CosmosMsg::from(MsgActivateRequest {
-        denom: denom.clone(),
+        denom: token_denom.clone(),
         administrator: contract_address.clone(),
     }));
+    messages
+}
 
-    messages.push(CosmosMsg::from(MsgWithdrawRequest {
+pub fn create_transfer_tokens_message(
+    contract_address: String,
+    denom: String,
+    amount: Uint128,
+    owner_address: String,
+) -> Vec<CosmosMsg> {
+    return vec![CosmosMsg::from(MsgWithdrawRequest {
         denom: denom.to_string(),
         administrator: contract_address.clone(),
         to_address: owner_address.clone(),
@@ -94,8 +100,7 @@ pub fn create_and_transfer_marker(
             denom: denom.clone(),
             amount: amount.to_string(),
         }],
-    }));
-    messages
+    })];
 }
 
 pub fn get_owned_scopes(
@@ -191,34 +196,6 @@ pub fn get_balance(deps: &DepsMut, denom: String) -> Result<HeldCoin, ContractEr
     })
 }
 
-pub fn validate_face_values(
-    min_face_value_cents: Uint128,
-    max_face_value_cents: Uint128,
-    tick_size: Uint128,
-) -> Result<(), ContractError> {
-    // Make sure the face value is positive
-    if min_face_value_cents <= Uint128::new(0) || max_face_value_cents <= Uint128::new(0) {
-        return Err(FaceValueMustBePositive);
-    }
-
-    // Max value must be greater or equal to the min value
-    if min_face_value_cents >= max_face_value_cents {
-        return Err(InvalidMaxFaceValue);
-    }
-
-    // Make sure the min and max face values are valid for the tick size
-    if !is_valid_tick_size(tick_size, min_face_value_cents)
-        || !is_valid_tick_size(tick_size, max_face_value_cents)
-    {
-        return Err(InvalidTickSizeValueMatch);
-    }
-    Ok(())
-}
-
-pub fn is_valid_tick_size(tick_size: Uint128, face_value_cents: Uint128) -> bool {
-    tick_size > Uint128::new(0) && face_value_cents % tick_size == Uint128::new(0)
-}
-
 pub fn is_seller(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
     match retrieve_optional_seller_state(deps.storage)? {
         None => Ok(false),
@@ -239,27 +216,37 @@ pub fn seller_has_finalized(deps: &DepsMut) -> Result<bool, ContractError> {
 }
 
 pub fn is_buyer(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
-    let buyer_state = retrieve_buyer_state(deps.storage)?;
-    Ok(buyer_state.buyer_address == info.sender)
+    return match retrieve_optional_buyer_state(deps.storage)? {
+        None => Ok(false),
+        Some(state) => Ok(state.buyer_address == info.sender),
+    };
 }
 
 pub fn buyer_has_accepted(deps: &DepsMut) -> Result<bool, ContractError> {
-    let buyer_state = retrieve_buyer_state(deps.storage)?;
-    Ok(buyer_state.has_accepted_pools)
+    return match retrieve_optional_buyer_state(deps.storage)? {
+        None => Ok(false),
+        Some(state) => Ok(state.buyer_has_accepted_pools),
+    };
 }
 
-pub fn update_config_as_buyer(
+pub fn is_contract_admin(deps: &DepsMut, info: &MessageInfo) -> Result<bool, ContractError> {
+    let config = retrieve_contract_config(deps.storage)?;
+    return Ok(info.sender == config.contract_admin);
+}
+
+pub fn update_config_as_admin(
     deps: DepsMut,
     info: MessageInfo,
     updated_config: Config,
 ) -> Result<Response, ContractError> {
-    match retrieve_optional_seller_state(deps.storage)? {
-        None => {}
-        Some(_) => return Err(IllegalConfigUpdate),
+    if !is_contract_admin(&deps, &info)? {
+        return Err(UnauthorizedConfigUpdate);
     }
 
-    if !is_buyer(&deps, &info)? {
-        return Err(UnauthorizedConfigUpdate);
+    let seller_state = retrieve_optional_seller_state(deps.storage)?;
+    let buyer_state = retrieve_optional_buyer_state(deps.storage)?;
+    if seller_state.is_some() && buyer_state.is_some() {
+        return Err(IllegalConfigUpdate);
     }
 
     save_contract_config(deps.storage, &updated_config)?;

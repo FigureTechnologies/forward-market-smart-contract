@@ -4,17 +4,18 @@ use cosmwasm_std::{
 
 use crate::error::ContractError;
 use crate::error::ContractError::{IllegalContractExecution, InvalidContractExecution};
+use crate::execute::accept_bid::execute_accept_bid;
 use crate::execute::accept_finalized_pools::execute_accept_finalized_pools;
+use crate::execute::add_bidder::execute_add_bidder;
 use crate::execute::add_seller::execute_add_seller;
 use crate::execute::dealer_confirm::execute_dealer_confirm;
-use crate::execute::dealer_reset::execute_dealer_reset;
 use crate::execute::disable_contract::execute_disable_contract;
 use crate::execute::finalize_pools::execute_finalize_pools;
-use crate::execute::remove_as_seller::execute_remove_as_seller;
+use crate::execute::mint_tokens::execute_mint_tokens;
 use crate::execute::rescind_finalized_pools::execute_rescind_finalized_pools;
+use crate::execute::update_allowed_buyers::execute_update_allowed_buyers;
 use crate::execute::update_allowed_sellers::execute_update_allowed_sellers;
-use crate::execute::update_face_value_cents::execute_update_face_value_cents;
-use crate::execute::update_terms_hash::execute_update_terms_hash;
+use crate::execute::update_seller_offer_hash::execute_update_seller_offer_hash;
 use crate::instantiate::instantiate_contract::instantiate_contract;
 use crate::migrate::migrate::migrate_contract;
 use crate::msg::{ExecuteMsg, InstantiateContractMsg, MigrateMsg, QueryMsg};
@@ -78,44 +79,36 @@ pub fn execute(
         return Err(InvalidContractExecution);
     }
     match msg {
-        ExecuteMsg::AddSeller {
-            accepted_value_cents,
-            offer_hash,
-            agreement_terms_hash,
-        } => execute_add_seller(
-            deps,
-            env,
-            info,
-            accepted_value_cents,
-            offer_hash,
-            agreement_terms_hash,
-        ),
-        ExecuteMsg::RemoveAsSeller {} => execute_remove_as_seller(deps, info),
+        ExecuteMsg::AddSeller { offer_hash } => execute_add_seller(deps, info, offer_hash),
+        ExecuteMsg::UpdateSellerOfferHash { offer_hash } => {
+            execute_update_seller_offer_hash(deps, info, offer_hash)
+        }
         ExecuteMsg::FinalizePools { pool_denoms } => {
             execute_finalize_pools(deps, env, info, &pool_denoms)
         }
         ExecuteMsg::DealerConfirm {} => execute_dealer_confirm(deps, env, info),
-        ExecuteMsg::UpdateAgreementTermsHash {
-            agreement_terms_hash: new_agreement_terms_hash,
-        } => execute_update_terms_hash(deps, info, new_agreement_terms_hash),
-        ExecuteMsg::UpdateFaceValueCents {
-            max_face_value_cents,
-            min_face_value_cents,
-            tick_size,
-        } => execute_update_face_value_cents(
-            deps,
-            info,
-            min_face_value_cents,
-            max_face_value_cents,
-            tick_size,
-        ),
         ExecuteMsg::UpdateAllowedSellers { allowed_sellers } => {
             execute_update_allowed_sellers(deps, info, allowed_sellers)
         }
-        ExecuteMsg::AcceptFinalizedPools {} => execute_accept_finalized_pools(deps, info),
+        ExecuteMsg::UpdateAllowedBuyers { allowed_buyers } => {
+            execute_update_allowed_buyers(deps, info, allowed_buyers)
+        }
+        ExecuteMsg::AcceptFinalizedPools { offer_hash } => {
+            execute_accept_finalized_pools(deps, info, offer_hash)
+        }
         ExecuteMsg::RescindFinalizedPools {} => execute_rescind_finalized_pools(deps, env, info),
-        ExecuteMsg::DealerReset {} => execute_dealer_reset(deps, env, info),
-        ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, info),
+        ExecuteMsg::ContractDisable {} => execute_disable_contract(deps, env, info),
+        ExecuteMsg::AcceptBid {
+            bidder_address,
+            agreement_terms_hash,
+        } => execute_accept_bid(deps, env, info, bidder_address, agreement_terms_hash),
+        ExecuteMsg::AddBid {
+            agreement_terms_hash,
+        } => execute_add_bidder(deps, info, agreement_terms_hash),
+        ExecuteMsg::MintTokens {
+            token_count,
+            token_denom,
+        } => execute_mint_tokens(deps, env, info, token_count, token_denom),
     }
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "forward_market_contract"
-version = "0.1.2"
+version = "1.0.0"
 authors = ["Jordon Tolotti <jtolotti@figure.com>"]
 edition = "2021"
 
@@ -26,7 +26,7 @@ library = []
 optimize = """docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/optimizer:0.15.0
+  cosmwasm/optimizer:0.16.0
 """
 
 [dependencies]
@@ -43,6 +43,8 @@ hex = "0.4.3"
 bech32 = "0.9.1"
 rust_decimal = "1.29.0"
 uuid = { version = "1.7.0", features = ["v1"] }
+log = "0.4.21"
+
 
 
 [dev-dependencies]

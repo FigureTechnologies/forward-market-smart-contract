@@ -23,58 +23,54 @@ contract.
 
 To instantiate a new instance of the contract, the following parameters are required:
 
-* `is_private`: A flag indicating whether to limit the allowed seller addresses to the list defined in the allowed sellers list
-* `allowed_sellers`: A list addresses allowed to be a seller in the contract. This is only valid if the is_private field is set to true and must be empty when is_private is false
-* `agreement_terms_hash`: A hash generated from the agreement terms that are stored in block vault
-* `token_denom`: The denom of the marker that all seller assets with be transferred to upon successful confirmation by the dealer
-* `max_face_value_cents`: The maximum value that may be accepted by a seller
-* `min_face_value_cents`: The minimum value that may be accepted by a seller
-* `tick_size`: The number of coins per accepted cents by the seller (if the seller accepts 1000 cents and tick size is 10, 100 coins will be minted for the token_denom)
+* `use_private_sellers`: A flag indicating whether to limit the allowed seller addresses to the list defined in the allowed sellers list
+* `use_private_buyers`: A flag indicating whether to limit the allowed buyer addresses to the list defined in the allowed buyers list
+* `allowed_sellers`: A list of addresses allowed to be a seller in the contract. This is only valid if the use_private_sellers field is set to true and must be empty when use_private_sellers is false
+* `allowed_buyers`: A list of addresses allowed to be a buyer in the contract. This is only valid if the use_private_buyers field is set to true and must be empty when use_private_buyers is false
+* `max_buyer_count`: The maximum number of bids that can be placed on the contract
 * `dealers`: The list of addresses allowed to confirm and reset the contract
 
 Example instantiation payload:
 ```json
 {
-  "is_private": true,
-  "allowed_sellers": listOf("mockpbselleraddress"),
-  "agreement_terms_hash": "a1b2c3d4",
-  "token_denom": "example.test.token.forward.market",
-  "max_face_value_cents": 100_000_000,
-  "min_face_value_cents": 50_000_000,
-  "tick_size": 1000,
-  "dealers": listOf("mockpbdealeraddress")
+  "use_private_sellers": true,
+  "use_private_buyers": true,
+  "allowed_sellers": ["mockpbselleraddress"],
+  "allowed_buyers": ["mockpbbuyeraddress"],
+  "max_buyer_count": 10,
+  "dealers": ["mockpbdealeraddress"]
 }
 ```
 
 ## Contract Execution
 ### AddSeller
-#### Adds the sender as the seller on the contract. Along with the sender being added, an accepted value of the contract is also submitted
+#### Adds the sender as the seller on the contract. Along with the sender being added, a hash of the offer terms is added
 
-* `accepted_value_cents`: The amount of the face value the seller is willing to provide. This must be between the min and max face values defied by the contract
 * `offer_hash`: A hash generated from the offer terms that are stored in block vault
-* `agreement_terms_hash`: The hash generated from the agreement terms that the seller is agreeing to
 
 Example execution payload:
 
 ```json
 {
   "AddSeller": {
-    "accepted_value_cents": 70_000_000,
-    "offer_hash": "b1c2d3e4",
-    "agreement_terms_hash": "a1b2c3d4"
+    "offer_hash": "b1c2d3e4"
   }
 }
 
 ```
 
-### RemoveAsSeller
-#### Allows the sender to remove themselves from the list of allowed sellers. No arguments are required
+### UpdateSellerOfferHash
+#### Allows the buyer to update terms of the contract before a seller has been added
+
+* `offer_hash`: A hash generated from the offer terms that are stored in block vault
 
 Example execution payload:
 
 ```json
 {
-  "RemoveAsSeller": {}
+  "UpdateSellerOfferHash": {
+    "offer_hash": "a1b2c3d4"
+  }
 }
 ```
 
@@ -88,7 +84,7 @@ Example execution payload:
 ```json
 {
   "FinalizePools": {
-    "pool_denoms": listOf("example.test.pool.0)
+    "pool_denoms": ["example.test.pool.0"]
   }
 }
 ```
@@ -104,40 +100,6 @@ Example execution payload:
 }
 ```
 
-### UpdateAgreementTermsHash
-#### Allows the buyer to update terms of the contract before a seller has been added
-
-* `agreement_terms_hash`: A hash generated from the agreement terms that are stored in block vault
-
-Example execution payload:
-
-```json
-{
-  "UpdateAgreementTermsHash": {
-    "agreement_terms_hash": "a1b2c3d4"
-  }
-}
-```
-
-### UpdateFaceValueCents
-#### Allows the buyer to update the face values before a seller has been added
-
-* `max_face_value_cents`: The maximum value that may be accepted by a seller
-* `min_face_value_cents`: The minimum value that may be accepted by a seller
-* `tick_size`: The number of coins per accepted cents by the seller (if the seller accepts 1000 cents and tick size is 10, 100 coins will be minted for the token_denom)
-
-Example execution payload:
-
-```json
-{
-  "UpdateFaceValueCents": {
-    "max_face_value_cents": 100_000_000,
-    "min_face_value_cents": 50_000_000,
-    "tick_size": 1000
-  }
-}
-```
-
 ### UpdateAllowedSellers
 #### Allows the buyer to update the allowed seller's list before a seller has been added
 
@@ -148,7 +110,7 @@ Example execution payload:
 ```json
 {
   "UpdateAllowedSellers": {
-    "allowed_sellers": listOf("mockpbselleraddress")
+    "allowed_sellers": ["mockpbselleraddress"]
   }
 }
 ```
@@ -175,23 +137,57 @@ Example execution payload:
 }
 ```
 
-### DealerReset
-#### Allows the dealer to reset a contract, which will clear buyer acceptance, seller finalization, and return the coins in escrow by the contract back to the seller
+### ContractDisable
+#### Allows the dealer to disable a contract provided that the contract does not hold any coins
 
 Example execution payload:
 
 ```json
 {
-  "DealerReset": {}
+  "ContractDisable": {}
 }
 ```
 
-### ContractDisable
-#### Allows the dealer to disable a contract provided that the contract does not hold any coins
+### AcceptBid
+#### Allows the seller to accept one of the bids from the bid list
+
+* `bidder_address`: The address of the bidder for the bid the seller wishes to accept
+* `agreement_terms_hash`: The hash of the terms that the seller is agreeing to that are stored in block vault
+
+Example execution payload:
 
 ```json
 {
-  "ContractDisable": {}
+  "bidder_address": "mockpbbidderaddress",
+  "agreement_terms_hash": "1d3d5d7"
+}
+```
+
+### AddBid
+#### Allows a potential buyer to add a bid to the bid list
+
+* `agreement_terms_hash`: A hash generated from the agreement terms that are stored in block vault
+
+Example execution payload:
+
+```json
+{
+  "agreement_terms_hash": "2j547d5e"
+}
+```
+
+### MintTokens
+#### Allows the admin of the contract to mint the tokens that will be given to the buyer when their bid is accepted
+
+* `token_count`: The number of tokens that will be minted for the specified denom
+* `token_denom`: The denom of the marker that will hold the tokens
+
+Example execution payload:
+
+```json
+{
+  "token_count": "5000",
+  "token_denom": "test.mock.fake.denom"
 }
 ```
 

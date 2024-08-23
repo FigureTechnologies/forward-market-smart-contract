@@ -28,47 +28,33 @@ pub enum ContractError {
     #[error("Seller address is not in allowed list of private sellers")]
     UnauthorizedPrivateSeller,
 
-    /// Occurs if anyone other than the buyer attempts to modify contract configuration options
-    #[error("Only the buyer can update the contract configuration")]
+    /// Occurs when a buyer that is not specified in the allowed buyers list tries to submit a bid
+    #[error("Buyer address is not in allowed list of private buyers")]
+    UnauthorizedPrivateBuyer,
+
+    /// Occurs if anyone other than the contract admin attempts to modify contract configuration options
+    #[error("Only the contract admin can update the contract configuration")]
     UnauthorizedConfigUpdate,
 
-    /// Occurs if the buyer attempts to modify configuration after the seller has already been added
-    #[error("Configuration cannot be updated once a seller has been established")]
+    /// Occurs if anyone other than the contract admin attempts to mint the tokens for the contract
+    #[error("Only the contract admin can mint the tokens for the forward market transaction")]
+    UnauthorizedToMint,
+
+    /// Occurs if the contract admin attempts to modify configuration after a buyer and seller have been added
+    #[error("Configuration cannot be updated once a buyer and seller have been established")]
     IllegalConfigUpdate,
-
-    /// Occurs if a negative value for either the minimum or maximum face value is submitted
-    #[error("The face value of the forward market contract must be greater than 0")]
-    FaceValueMustBePositive,
-
-    /// Occurs if the max face value does not exceed or equal the minimum face value
-    #[error("The max face value of the forward market contract must be greater than or equal to the min face value")]
-    InvalidMaxFaceValue,
-
-    /// Occurs if the sell attempts to accept a non-positive value for the contract
-    #[error("The face value of the forward market contract must be greater than 0")]
-    AcceptedValueMustBePositive,
-
-    /// Occurs if the seller tries to accept a value that exceeds the max value defined by the buyer
-    #[error("The face value of the forward market contract must be less than the max face value")]
-    AcceptedValueExceedsMaxFaceValue,
-
-    /// Occurs if the seller tries to accept a value that does not exceed or equal the min value defined by the buyer
-    #[error(
-        "The accepted value of the forward market contract cannot be less than the min face value"
-    )]
-    AcceptedValueLessThanMinFaceValue,
 
     /// Occurs if the seller tries to finalize without adding any asset pools
     #[error("The set of pools cannot be empty when finalizing the transaction")]
     InvalidFinalizationRequest,
 
-    /// Occurs if the list of approved sellers has any addresses while the contract is not marked as private
-    #[error("The list of approved sellers should be empty unless is_private = true")]
+    /// Occurs if the list of approved addresses is not empty while the visibility config for that list is private
+    #[error("The list of approved addresses should be empty unless the visibility config for that list is private ")]
     InvalidVisibilityConfig,
 
     /// Occurs if a face value or accepted value cannot be divided without remainder by the tick value
-    #[error("Tick size must divide the face value into a whole number")]
-    InvalidTickSizeValueMatch,
+    #[error("Token count must be greater than 0")]
+    InvalidTokenCount,
 
     /// Occurs if an attempt to finalize a list of pools is made after the pool has already been finalized by the seller
     #[error("The list of pools has already been finalized")]
@@ -171,9 +157,37 @@ pub enum ContractError {
     #[error("A contract may only be disabled by the buyer or a dealer")]
     UnauthorizedDisableRequest,
 
-    /// Occurs if the seller is agreeing to a terms hash that does not match the latest
+    /// Occurs if the seller is agreeing to a terms hash that does not match the latest for the buyer
     #[error("The agreement terms hash provided by the seller does not match the current agreement terms hash")]
     InvalidAgreementTermsHash,
+
+    /// Occurs if the buyer is agreeing to an offer hash that does not match the latest for the seller
+    #[error("The offer hash provided does not match the current offer hash of the seller")]
+    InvalidOfferHash,
+
+    /// Occurs when a buyer attempts to submit a bid but the limit of allowed buyers has already been reached
+    #[error("The limit of allowed buyers has already been reached")]
+    MaxPrivateBuyersReached,
+
+    /// Occurs when a seller attempts to accept a bid for a bidder address that doesn't exist
+    #[error("Bid does not exist for address {address:?}")]
+    BidDoesNotExist { address: String },
+
+    /// Occurs when a seller attempts to accept a bid when a previous bid has already been accepted
+    #[error("Cannot accept bid because a bid from address {address:?} was already accepted")]
+    BidPreviouslyAccepted { address: String },
+
+    /// Occurs when a seller attempts to update an offer hash after a buyer has accepted the offer
+    #[error("The offer has cannot be updated after a buyer has accepted it")]
+    IllegalOfferHashUpdate,
+
+    /// Occurs when tokens for the contract have previously been minted
+    #[error("Tokens for the contract were already minted for token denom {token_denom:?}")]
+    TokensAlreadyMinted { token_denom: String },
+
+    /// Occurs when a seller tries to accept a bid before the tokens have been minted
+    #[error("Bid cannot be accepted until the admin has completed the MintTokens action")]
+    TokensNotMinted,
 
     /// Occurs when a migration is attempted for an unsupported version
     #[error("Migration does not support {version:?} version")]

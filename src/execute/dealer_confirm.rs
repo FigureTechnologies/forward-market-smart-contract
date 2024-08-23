@@ -4,7 +4,8 @@ use crate::error::ContractError::{
     UnauthorizedPrivateSeller,
 };
 use crate::storage::state_store::{
-    retrieve_contract_config, retrieve_seller_state, save_settlement_data_state, SettlementData,
+    retrieve_contract_config, retrieve_seller_state, retrieve_token_data_state,
+    save_settlement_data_state, SettlementData,
 };
 use crate::util::helpers::{
     buyer_has_accepted, get_balance, get_marker, is_dealer, seller_has_finalized,
@@ -31,10 +32,11 @@ pub fn execute_dealer_confirm(
 
     let config = retrieve_contract_config(deps.storage)?;
     let seller_state = retrieve_seller_state(deps.storage)?;
+    let token_data = retrieve_token_data_state(deps.storage)?;
 
     // A private contract should not allow a state where the accepted seller is not in the list of allowed
     // sellers, but before we transfer anything run a sanity check
-    if config.is_private
+    if config.use_private_sellers
         && !config
             .allowed_sellers
             .contains(&seller_state.seller_address)
@@ -48,13 +50,13 @@ pub fn execute_dealer_confirm(
     // Get the address of the marker that all the assets will be held by so that we can transfer
     // all the scopes to it
     let forward_market_marker = get_marker(
-        config.token_denom.clone(),
+        token_data.token_denom.clone(),
         &MarkerQuerier::new(&deps.querier),
     )?;
     let forward_market_base_address = match forward_market_marker.base_account {
         None => {
             return Err(MissingMarkerBaseAccount {
-                denom: config.token_denom.clone(),
+                denom: token_data.token_denom.clone(),
             })
         }
         Some(base_account) => base_account.address,
