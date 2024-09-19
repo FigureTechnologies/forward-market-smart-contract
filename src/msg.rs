@@ -55,6 +55,8 @@ pub enum ExecuteMsg {
     },
     /// A route used by a potential buyer to add their bid to the list of buyer bids
     AddBid { agreement_terms_hash: String },
+    /// A route used by a potential buyer to rescind their bid by removing it from the list of bidders
+    RescindBid {},
     /// A route used the admin of the contract to mint the tokens used in the forward market transaction
     MintTokens {
         token_count: Uint128,

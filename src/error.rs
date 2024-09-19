@@ -192,4 +192,12 @@ pub enum ContractError {
     /// Occurs when a migration is attempted for an unsupported version
     #[error("Migration does not support {version:?} version")]
     IllegalMigrationVersion { version: String },
+
+    /// Occurs when bidder attempts to rescind a bid that has already been accepted
+    #[error("Bid cannot be rescinded because it has already been accepted")]
+    IllegalBidRescind,
+
+    /// Occurs when bidder attempts to rescind a bid but doesn't have an existing bid
+    #[error("Bid cannot be rescinded because no bid exists for bidder")]
+    InvalidBidRescind,
 }

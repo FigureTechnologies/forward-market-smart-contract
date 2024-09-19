@@ -10,3 +10,4 @@ pub mod rescind_finalized_pools;
 pub mod update_allowed_buyers;
 pub mod update_allowed_sellers;
 pub mod update_seller_offer_hash;
+pub mod rescind_bid;
