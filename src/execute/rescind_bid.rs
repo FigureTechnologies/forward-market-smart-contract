@@ -13,11 +13,17 @@ pub fn execute_rescind_bid(
         return Err(IllegalBidRescind)
     }
     let bid_list = retrieve_bid_list_state(deps.storage)?.bids;
+
+    // Get the number of current bids
     let bid_count = bid_list.len();
+
+    // Remove the bid that corresponds to the sender's address
     let updated_bid_list: Vec<Bid> = bid_list
         .into_iter()
         .filter(|bid| bid.buyer_address != info.sender)
         .collect();
+
+    // If the bid count is unchanged it means we didn't find a bid to remove, so return an error
     if updated_bid_list.len() == bid_count {
         return Err(InvalidBidRescind)
     }
