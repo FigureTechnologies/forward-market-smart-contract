@@ -7,3 +7,4 @@ mod execute_finalize_pools;
 mod execute_mint_tokens;
 mod execute_update_allowed_sellers;
 mod execute_update_seller_offer_hash;
+mod execute_rescind_bid;
